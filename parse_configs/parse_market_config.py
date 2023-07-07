@@ -1,8 +1,6 @@
 import yaml
 
 
-
-
 class TaxBrackets(yaml.YAMLObject):
 	"""Stores tax bracket config.
 
@@ -16,6 +14,10 @@ class TaxBrackets(yaml.YAMLObject):
 	# __init__ method not used due to yaml.YAMLObject
 
 	def get_tax(income):
+		"""Calculates tax owed given income.
+
+		Income must be non-negative. Tax is always non-negative.
+		"""
 		tax = 0
 		lower_limit = 0
 		for bracket in tax_brackets:
@@ -44,6 +46,7 @@ class MarketConfig(yaml.YAMLObject):
 
 	@staticmethod
 	def parse_market_config():
+		""" Load market config yaml file as an instance of this class """
 		# TODO replace this absolute path string literal
 		with open("/Users/rocky/Downloads/rent-buy-invest/configs/market-config.yaml") as f:
 			config = yaml.load(f)
