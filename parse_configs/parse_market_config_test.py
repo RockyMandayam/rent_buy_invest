@@ -6,7 +6,7 @@ import parse_market_config
 
 class TestMarketConfig():
 
-	def test_get_tax(self):
+	def test_get_tax(self) -> None:
 		# TODO don't use absolute path
 		with open("/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml") as f:
 			market_config = yaml.load(f)
