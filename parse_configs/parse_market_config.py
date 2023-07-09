@@ -41,7 +41,7 @@ class MarketConfig(yaml.YAMLObject):
 			"""Sanity checks the configs.
 
 			Raises:
-				AssertionError: If any configs are invaalid
+				AssertionError: If any tax brackets configs are invaalid
 			"""
 			assert self.tax_brackets
 			upper_limit = 0
@@ -91,14 +91,18 @@ class MarketConfig(yaml.YAMLObject):
 		"""Sanity checks the configs.
 
 		Raises:
-			AssertionError: If any configs are invaalid
+			AssertionError: If any market configs are invalid
 		"""
 		assert self.tax_brackets is not None
 		self.tax_brackets._validate()
 
 	@staticmethod
 	def parse_market_config() -> 'MarketConfig':
-		""" Load market config yaml file as an instance of this class """
+		"""Load market config yaml file as an instance of this class
+		
+		Raises:
+			AssertionError: If any market configs are invalid
+		"""
 		# TODO replace this absolute path string literal
 		with open("/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml") as f:
 			market_config = yaml.load(f)
@@ -124,4 +128,3 @@ if __name__ == "__main__":
 	print(c.__dict__)
 	print(c.tax_brackets.tax_brackets[0])
 	print("Done parsing market config")
-	print(__file__)
