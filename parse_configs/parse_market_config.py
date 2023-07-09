@@ -10,7 +10,7 @@ class MarketConfig(yaml.YAMLObject):
 
 	Documentation of the instance variable types:
 		self.market_rate_of_return (float): ANNUAL rate of return in the market, as a decimal
-		self.tax_brackets ('TaxBrackets'): A TaxBrackets objec
+		self.tax_brackets ('TaxBrackets'): A TaxBrackets object
 	"""
 
 	yaml_tag: str = "!MarketConfig"
@@ -142,12 +142,11 @@ class MarketConfig(yaml.YAMLObject):
 			0.00948879293.
 		
 		Returns:
-			List[float], List[float]: monthly return in dollars each month
-				rounded to the two decimal points. This does NOT include the
-				principal. This is NOT adjusted for inflation.
+			List[float]: monthly wealth in dollars at th beginning of each month
+				rounded to two decimal points.
 
 		Raises:
-			AssertionError: If the principal or num_months are negative
+			AssertionError: If the principal is negative or num_months is not positive
 		"""
 		assert principal >= 0
 		assert num_months > 0

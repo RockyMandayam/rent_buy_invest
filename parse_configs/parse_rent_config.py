@@ -56,7 +56,15 @@ class RentConfig(yaml.YAMLObject):
 		return self.monthly_rent + self.monthly_utilities + self.monthly_renters_insurance + self.monthly_parking_fee
 
 	def get_monthly_costs_of_renting(self, num_months: int) -> float:
-		""" Return the monthly cost of renting each month for num_months months """
+		"""Return the monthly cost of renting each month for num_months months.
+
+		Returns:
+			List[float]: monthly cost of renting in dollars rounded to two
+				decimal points.
+
+		Raises:
+			AssertionError: If num_months is not positive
+		"""
 		assert num_months > 0
 		monthly_costs = []
 		total_monthly_cost = self._get_total_monthly_cost()
