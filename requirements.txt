@@ -1,1 +1,2 @@
-PyYAML
+pytest==7.1.3
+PyYAML==3.13
