@@ -51,16 +51,17 @@ class RentConfig(yaml.YAMLObject):
 		rent_config._validate()
 		return rent_config
 
-	def _get_uninflated_monthly_cost(self) -> float:
+	def _get_total_monthly_cost(self) -> float:
+		""" Get total monthly cost of renting for the first month """
 		return self.monthly_rent + self.monthly_utilities + self.monthly_renters_insurance + self.monthly_parking_fee
 
 	def get_monthly_costs_of_renting(self, num_months: int) -> float:
 		""" Return the monthly cost of renting each month for num_months months """
 		assert num_months > 0
 		monthly_costs = []
-		uninflated_monthly_cost = self._get_uninflated_monthly_cost()
+		total_monthly_cost = self._get_total_monthly_cost()
 		for month in range(num_months):
-			monthly_cost = round(uninflated_monthly_cost * (1+self.annual_rent_inflation)**(month // 12), 2)
+			monthly_cost = round(total_monthly_cost * (1+self.annual_rent_inflation)**(month // 12), 2)
 			monthly_costs.append(monthly_cost)
 		return monthly_costs
 
