@@ -3,6 +3,7 @@ import yaml
 import parse_rent_config
 
 class TestRentConfig():
+	# TODO test edge cases
 
 	def test_get_monthly_costs_of_renting(self) -> None:
 		# TODO don't use absolute path

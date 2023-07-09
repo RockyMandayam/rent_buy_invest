@@ -9,7 +9,8 @@ class MarketConfig(yaml.YAMLObject):
 	the __init__ method is not used.
 
 	Documentation of the instance variable types:
-		self.tax_brackets ('TaxBrackets'): A TaxBrackets object.
+		self.market_rate_of_return (float): ANNUAL rate of return in the market, as a decimal
+		self.tax_brackets ('TaxBrackets'): A TaxBrackets objec
 	"""
 
 	yaml_tag: str = "!MarketConfig"
@@ -63,26 +64,15 @@ class MarketConfig(yaml.YAMLObject):
 			Returns:
 				tax: non-negative tax owed
 			"""
-			print(f"ALL BRACKETS: {self.tax_brackets}")
-			print(income)
 			tax = 0
 			lower_limit = 0
 			for bracket in self.tax_brackets:
-				print("####")
-				print(f"bracket: {bracket}")
-				print(f"tax: {tax}")
 				if income < lower_limit:
-					print("1")
 					break
 				tax_rate, upper_limit = bracket['tax_rate'], bracket['upper_limit']
 				if income <= upper_limit:
-					print("2")
-					print(tax_rate)
-					print(income)
-					print(lower_limit)
 					tax += tax_rate * (income - lower_limit)
 					break
-				print("3")
 				tax += tax_rate * (upper_limit - lower_limit)
 				lower_limit = upper_limit
 			return tax
@@ -119,6 +109,55 @@ class MarketConfig(yaml.YAMLObject):
 			tax: non-negative tax owed
 		"""
 		return self.tax_brackets.get_tax(income)
+
+	def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
+		"""Return the pretax wealth in the market at the BEGINNING of each month
+		for num_months months.
+
+		Wealth refers to the total amount of money in the market, not the
+		return (which refers to just the difference in wealth between one month
+		and the previous month).
+
+		NOTE: The annual rate of return is given by the configs. To make some
+		calculations easier, an "equivalent" monthly rate of return is
+		calculated such that compounding the monthly rate every month results
+		in an annual growth of the given annual rate of return. Thus,
+		compounding the monthly rate every month for 24 months is also
+		equivalent to compounding the annual rate every year for 2 years.
+
+		Math equations:
+			Let a = annual rate of return, compounded annually
+			Let m = "equivalent" monthly rate of return, compounded monthly
+			We are given a and want to find m
+			After one year, principal grows to:
+				If compounding annually: (1 + a) * principal
+				If compounding monthly: (1 + m)**12 * principal
+			They should be equal:
+				(1 + a) * principal = (1 + m)**12 * principal
+				(1 + a) = (1 + m)**12
+				(1 + a)**(1/12) = 1 + m
+				m = (1 + a)**(1/12) - 1
+			E.g., if the annual rate of return compounded annually is 0.12
+			(12%), the monthly rate of return compounded monthly is
+			0.00948879293.
+		
+		Returns:
+			List[float], List[float]: monthly return in dollars each month
+				rounded to the two decimal points. This does NOT include the
+				principal. This is NOT adjusted for inflation.
+
+		Raises:
+			AssertionError: If the principal or num_months are negative
+		"""
+		assert principal >= 0
+		assert num_months > 0
+
+		equivalent_monthly_return = (1 + self.market_rate_of_return)**(1/12) - 1
+		monthly_wealths = []
+		for month in range(num_months):
+			wealth = round((1 + equivalent_monthly_return)**month * principal, 2)
+			monthly_wealths.append(wealth)
+		return monthly_wealths
 
 
 if __name__ == "__main__":
