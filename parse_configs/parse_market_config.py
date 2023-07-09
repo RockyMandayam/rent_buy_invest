@@ -2,7 +2,7 @@ import yaml
 
 
 class MarketConfig(yaml.YAMLObject):
-	"""Stores tax bracket config.
+	"""Stores market config.
 
 	Due to using yaml_tag = "!MarketConfig", the yaml library handles auto-
 	converting from a yaml file to an instance of this class. Therefore,
