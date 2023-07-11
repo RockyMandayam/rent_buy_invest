@@ -14,9 +14,9 @@ class RentConfig(yaml.YAMLObject):
 		self.monthly_renters_insurance (float): Monthly renters insurance for
 			the first month
 		self.monthly_parking_fee (float): Monthly parking fee
-		self.annual_rent_inflation (float): ANNUAL rent inflation rate. This
-			will be applied to all rent-related expenses.E.g., not just rent
-			but also utilities, etc.
+		self.annual_rent_inflation_rate (float): ANNUAL rent inflation rate.
+			This will be applied to all rent-related expenses.E.g., not just
+			rent but also utilities, etc.
 		self.inflation_adjustment_period (int): How often (in months) to update
 			rent-related expenses for inflation. If you rent with 12-month
 			leases, 12 is a good number here.

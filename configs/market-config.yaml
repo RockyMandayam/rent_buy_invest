@@ -2,7 +2,7 @@
 
 --- !MarketConfig
 
-# ANNUAL rate of return in the market, as a decimal
+# ANNUAL rate of return in the market, as a fraction
 market_rate_of_return: !!float 0.07
 
 # tax information - assume only capital gains tax
