@@ -73,5 +73,4 @@ if __name__ == "__main__":
 	print("Parsing rent config")
 	c = RentConfig.parse_rent_config()
 	print(c)
-	print(c.get_monthly_costs_of_renting(25))
 	print("Done parsing rent config")

@@ -120,40 +120,40 @@ escrow_fixed_fee: !!float 500
 
 flood_certification_fee: !!float 20
 
-title_costs:
-  title_search_fee: !!float 100 # 
+title_search_fee: !!float 100 # 
 
-  seller_burden_of_title_search_fee_fraction: !!float 1.0
+seller_burden_of_title_search_fee_fraction: !!float 1.0
 
-  attorney_fee: !!float 800
+attorney_fee: !!float 800
 
-  # closing protection letter (CPL) fee
-  closing_protection_letter_fee: !!float 35
+# closing protection letter (CPL) fee
+closing_protection_letter_fee: !!float 35
 
-  # loose term
-  # TODO cost of escrow could be considered part of this
-  settlement_fees:
-    search_abstract_fee: !!float 
-    survey_fee: !!float 500
-    notary_fee: !!float 100
-    deep_prep_fee: !!float 50
+# part of loose settlement fees
+search_abstract_fee: !!float
+# part of loose settlement fees
+survey_fee: !!float 500
+# part of loose settlement fees
+notary_fee: !!float 100
+# part of loose settlement fees
+deep_prep_fee: !!float 50
 
-  # lender's title insurance (protects the lender) as a fraction of the mortgage
-  # amount. Apparently there is a wide range of typical values here.
-  # CLOSING COST
-  lenders_title_insurance_fraction: !!float 0.02
+# lender's title insurance (protects the lender) as a fraction of the mortgage
+# amount. Apparently there is a wide range of typical values here.
+# CLOSING COST
+lenders_title_insurance_fraction: !!float 0.02
 
-  # owner's title insurance (protects the owner (you)) as a fraction of the
-  # mortgage amount. Apparently there is a wide range of typical values here.
-  # CLOSING COST
-  owners_title_insurance_fraction: !!float 0.01 
+# owner's title insurance (protects the owner (you)) as a fraction of the
+# mortgage amount. Apparently there is a wide range of typical values here.
+# CLOSING COST
+owners_title_insurance_fraction: !!float 0.01 
 
-  # these are for add-ons ("endorsements") that are not included in a standard
-  # title insurance, e.g., Easements And Encroachments, Zoning.
-  # The expected price per-endorsement is about $75. Enter the total amount you
-  # expect for all endorsements.
-  # TODO not sure if this is for lenders, owners, or both
-  endorsement_fees: !!float 150
+# these are for add-ons ("endorsements") that are not included in a standard
+# title insurance, e.g., Easements And Encroachments, Zoning.
+# The expected price per-endorsement is about $75. Enter the total amount you
+# expect for all endorsements.
+# TODO not sure if this is for lenders, owners, or both
+endorsement_fees: !!float 150
 
 
 ##### MISCELLANEOUS MONTHLY COSTS
@@ -165,16 +165,16 @@ monthly_homeowners_insurance_fraction: !!float 0.005
 # monthly utilities for the first month
 monthly_utilities: !!float 300
 
-# monthly maintenance cost as a fraction of the assessed house value (not 
+# ANNUAL maintenance cost as a fraction of the assessed house value (not 
 # sale price)
-monthly_maintenance_cost_fraction: !!float 0.02
+annual_maintenance_cost_fraction: !!float 0.02
 
 # monthly HOA fees
 monthly_hoa_fees: !!float 250
 
 ##### MANAGEMENT COSTS
 
-# total monthly cost of managing the house without living in it (being a
+# total ANNUAL cost of managing the house without living in it (being a
 # landlord) EXCEPT for maintenance costs that you'd expect to pay even if you
 # lived in the house. Note that this means if you expect maintenance costs to be
 # higher when you do not live in the house vs when you live in it (because you
@@ -183,4 +183,4 @@ monthly_hoa_fees: !!float 250
 # parameter can include paying a management company, advertising the house, any
 # trips you may have to make, anything associated with managing / landlord
 # Expressed as fraction of assessed house price
-monthly_management_cost_fraction: !!float 0.02
+annual_management_cost_fraction: !!float 0.02
