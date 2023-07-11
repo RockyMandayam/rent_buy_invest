@@ -66,7 +66,7 @@ class RentConfig(yaml.YAMLObject):
 		Raises:
 			AssertionError: If num_months is not positive
 		"""
-		return math_utils.project_growth(self._get_total_monthly_cost(), self.annual_rent_inflation, num_months)
+		return math_utils.project_growth(self._get_total_monthly_cost(), self.annual_rent_inflation, False, num_months)
 
 
 if __name__ == "__main__":

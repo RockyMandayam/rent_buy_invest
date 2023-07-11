@@ -1,5 +1,8 @@
 
-def project_growth(principal: float, annual_growth_rate: float, num_months: int, round_to_cent: bool = True) -> float:
+def get_equivalent_monthly_compound_rate(annual_compound_rate: float) -> float:
+	return (1 + annual_compound_rate)**(1/12) - 1
+
+def project_growth(principal: float, annual_growth_rate: float, compound_monthly: bool, num_months: int, round_to_cent: bool = True) -> float:
 	"""Given a principal (starting amount) and an annual growth rate, return
 	the value each month for num_months months.
 
@@ -11,9 +14,14 @@ def project_growth(principal: float, annual_growth_rate: float, num_months: int,
 	"""
 	assert principal >= 0
 	assert num_months > 0
+	if compound_monthly:
+		equivalent_monthly_rate = get_equivalent_monthly_compound_rate(annual_growth_rate)
 	monthly_values = []
 	for month in range(num_months):
-		monthly_value = principal * (1+annual_growth_rate)**(month // 12)
+		if compound_monthly:
+			monthly_value = principal * (1+equivalent_monthly_rate)**month
+		else:
+			monthly_value = principal * (1+annual_growth_rate)**(month // 12)
 		if round_to_cent:
 			monthly_value = round(monthly_value, 2)
 		monthly_values.append(monthly_value)
