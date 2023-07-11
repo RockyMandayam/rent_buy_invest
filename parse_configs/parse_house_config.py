@@ -1,5 +1,6 @@
 import yaml
 
+from ..utils import math_utils
 
 class HouseConfig(yaml.YAMLObject):
 	"""Stores house config.
@@ -61,6 +62,21 @@ class HouseConfig(yaml.YAMLObject):
 		assert annual_maintenance_cost_fraction >= 0
 		assert monthly_hoa_fees >= 0
 		assert annual_management_cost_fraction >= 0
+
+	def get_down_payment(self):
+		return self.down_payment_fraction * self.sale_price
+
+	def get_loan_amount(self):
+		return (1 - self.down_payment_fraction) * self.sale_price
+
+	def get_monthly_mortgage_payment(self):
+		# https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:geo-series-notation/v/geometric-series-sum-to-figure-out-mortgage-payments
+		# NOTE mortgages typically use the annual rate divided by 12
+		# as opposed to using the "equivalnt" monthly compound rate
+		i = self.mortgage_annual_interest_rate / 12
+		r = 1 / (1 + i)
+		L = self.get_loan_amount()
+		return L * (1 - r) / (r - r**(n+1))
 
 	# TODO test this and all parse methods
 	@staticmethod
