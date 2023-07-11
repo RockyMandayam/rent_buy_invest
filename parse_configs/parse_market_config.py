@@ -151,6 +151,7 @@ class MarketConfig(yaml.YAMLObject):
 		assert principal >= 0
 		assert num_months > 0
 
+		# TODO adapt math_utils to also do some/all of this logic?
 		equivalent_monthly_return = (1 + self.market_rate_of_return)**(1/12) - 1
 		monthly_wealths = []
 		for month in range(num_months):
