@@ -1,5 +1,6 @@
 import yaml
 
+from ..utils import math_utils
 
 class RentConfig(yaml.YAMLObject):
 	"""Stores rent config.
@@ -65,13 +66,7 @@ class RentConfig(yaml.YAMLObject):
 		Raises:
 			AssertionError: If num_months is not positive
 		"""
-		assert num_months > 0
-		monthly_costs = []
-		total_monthly_cost = self._get_total_monthly_cost()
-		for month in range(num_months):
-			monthly_cost = round(total_monthly_cost * (1+self.annual_rent_inflation)**(month // 12), 2)
-			monthly_costs.append(monthly_cost)
-		return monthly_costs
+		return math_utils.get_monthly_costs(self._get_total_monthly_cost(), self.annual_rent_inflation, num_months)
 
 
 if __name__ == "__main__":
