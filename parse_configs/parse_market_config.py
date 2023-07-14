@@ -1,5 +1,6 @@
 import yaml
 
+from ..utils import math_utils
 
 class MarketConfig(yaml.YAMLObject):
 	"""Stores market config.
@@ -150,14 +151,7 @@ class MarketConfig(yaml.YAMLObject):
 		"""
 		assert principal >= 0
 		assert num_months > 0
-
-		equivalent_monthly_return = (1 + self.market_rate_of_return)**(1/12) - 1
-		monthly_wealths = []
-		for month in range(num_months):
-			wealth = round((1 + equivalent_monthly_return)**month * principal, 2)
-			monthly_wealths.append(wealth)
-		return monthly_wealths
-
+		return math_utils.project_growth(principal, self.market_rate_of_return, True, num_months)
 
 if __name__ == "__main__":
 	print("Parsing market config")

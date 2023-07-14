@@ -1,5 +1,6 @@
 import yaml
 
+from ..utils import math_utils
 
 class RentConfig(yaml.YAMLObject):
 	"""Stores rent config.
@@ -14,9 +15,9 @@ class RentConfig(yaml.YAMLObject):
 		self.monthly_renters_insurance (float): Monthly renters insurance for
 			the first month
 		self.monthly_parking_fee (float): Monthly parking fee
-		self.annual_rent_inflation (float): ANNUAL rent inflation rate. This
-			will be applied to all rent-related expenses.E.g., not just rent
-			but also utilities, etc.
+		self.annual_rent_inflation_rate (float): ANNUAL rent inflation rate.
+			This will be applied to all rent-related expenses.E.g., not just
+			rent but also utilities, etc.
 		self.inflation_adjustment_period (int): How often (in months) to update
 			rent-related expenses for inflation. If you rent with 12-month
 			leases, 12 is a good number here.
@@ -65,18 +66,11 @@ class RentConfig(yaml.YAMLObject):
 		Raises:
 			AssertionError: If num_months is not positive
 		"""
-		assert num_months > 0
-		monthly_costs = []
-		total_monthly_cost = self._get_total_monthly_cost()
-		for month in range(num_months):
-			monthly_cost = round(total_monthly_cost * (1+self.annual_rent_inflation)**(month // 12), 2)
-			monthly_costs.append(monthly_cost)
-		return monthly_costs
+		return math_utils.project_growth(self._get_total_monthly_cost(), self.annual_rent_inflation, False, num_months)
 
 
 if __name__ == "__main__":
 	print("Parsing rent config")
 	c = RentConfig.parse_rent_config()
 	print(c)
-	print(c.get_monthly_costs_of_renting(25))
 	print("Done parsing rent config")
