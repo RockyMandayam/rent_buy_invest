@@ -49,12 +49,12 @@ pmi_fraction: !!float 0.005
 # originating (creating), reviewing, processing, etc. the loan.
 # Also called loan origination fee?
 # Expressed as a fraction of the mortgage amount
-# CLOSING COST
 mortgage_origination_points_fee: !!float 0.015
 
 # processing fee. Maybe included in the origination fee
 mortgage_processing_fee: !!float 300
 
+# underwriting fee. Maybe included in the origination fee.
 mortgage_underwriting_fee: !!float 500
 
 # mortgage discount points (a.k.a. mortgage points) are a fee you can pay up
@@ -79,12 +79,10 @@ credit_report_fee: !!float 50
 # note there are often multiple transfer taxes (e.g., state and county)
 # this parameter represents the sum of all such transfer taxes
 # transfer tax is a one-time tax
-# CLOSING COST
 transfer_tax_fraction: !!float 0.0011
 
 # what fraction of the transfer tax burden is borne by the seller
 # the rest is borne by the buyer
-# CLOSING COST
 seller_burden_of_transfer_tax_fraction: !!float 0.9
 
 # often considered part of title fees and therefore part of closing costs.
@@ -101,9 +99,10 @@ monthly_property_tax_rate: !!float 0.01
 # buyer's realtor's commission as a fraction of sale price 
 realtor_commission_fraction: !!float 0.025
 
-# fee to sell home in HOA
+# fee to sell home in HOA (Homee Owners Association)
 hoa_transfer_fee: !!float 300
 
+# sellre's burdene of HOA transfer fee as a fraction of the fee
 seller_burden_of_hoa_transfer_fee: !!float 1.0
 
 # house inspection should include at least the following types: general,
@@ -111,6 +110,8 @@ seller_burden_of_hoa_transfer_fee: !!float 1.0
 # typically a house inspection does NOT include a pest inspection
 house_inspection_cost: !!float 500
 
+# pest inspection cost
+# house inspection probably does not include pest inspection
 pest_inspection_cost: !!float 500
 
 # fixed fee
@@ -118,34 +119,39 @@ pest_inspection_cost: !!float 500
 # line items, e.g., flood certification fee
 escrow_fixed_fee: !!float 500
 
+# flood certification fee
 flood_certification_fee: !!float 20
 
+# title search fee
 title_search_fee: !!float 100 # 
 
-seller_burden_of_title_search_fee_fraction: !!float 1.0
+# seller burden of the title search fee as a fraction
+seller_burden_of_title_search_fee_fraction: !!float 1
 
+# attorney fee
 attorney_fee: !!float 800
 
 # closing protection letter (CPL) fee
 closing_protection_letter_fee: !!float 35
 
-# part of loose settlement fees
+# part of loosely defined "settlement fees"
 search_abstract_fee: !!float
-# part of loose settlement fees
+
+# part of loosely defined "settlement fees"
 survey_fee: !!float 500
-# part of loose settlement fees
+
+# part of loosely defined "settlement fees"
 notary_fee: !!float 100
-# part of loose settlement fees
+
+# part of loosely defined "settlement fees"
 deep_prep_fee: !!float 50
 
 # lender's title insurance (protects the lender) as a fraction of the mortgage
 # amount. Apparently there is a wide range of typical values here.
-# CLOSING COST
 lenders_title_insurance_fraction: !!float 0.02
 
 # owner's title insurance (protects the owner (you)) as a fraction of the
 # mortgage amount. Apparently there is a wide range of typical values here.
-# CLOSING COST
 owners_title_insurance_fraction: !!float 0.01 
 
 # these are for add-ons ("endorsements") that are not included in a standard
@@ -169,7 +175,7 @@ monthly_utilities: !!float 300
 # sale price)
 annual_maintenance_cost_fraction: !!float 0.02
 
-# monthly HOA fees
+# monthly HOA (Home Owners Association) fees
 monthly_hoa_fees: !!float 250
 
 ##### MANAGEMENT COSTS
