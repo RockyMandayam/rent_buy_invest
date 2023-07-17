@@ -150,6 +150,7 @@ class MarketConfig(yaml.YAMLObject):
 			AssertionError: If the principal is negative or num_months is not positive
 		"""
 		assert principal >= 0
+		# TODO this and all other such assertions maybe could happen only once earlier?
 		assert num_months > 0
 		return math_utils.project_growth(principal, self.market_rate_of_return, True, num_months)
 
