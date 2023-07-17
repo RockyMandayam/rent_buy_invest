@@ -6,4 +6,3 @@ Calculates the long-term financial pros and cons of decisions related to renting
 - Clone this repo
 - Make sure you have python 3.7+ and pip3 installed
 - Navigate to the top-level directory of this repo and run `pip3 install -r requirements.txt`
-
