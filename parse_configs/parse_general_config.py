@@ -26,7 +26,7 @@ class GeneralConfig(yaml.YAMLObject):
 			AssertionError: If any general configs are invalid
 		"""
 		# make 150 if parameter and maybe appropriately update the yaml comment
-		assert self.num_months > 0 aand self.num_months < 150
+		assert self.num_months > 0 and self.num_months < 150
 
 	# TODO test this and all parse methods
 	@staticmethod
