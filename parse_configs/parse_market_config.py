@@ -11,7 +11,8 @@ class MarketConfig(yaml.YAMLObject):
     the __init__ method is not used.
 
     Documentation of the instance variable types:
-            self.market_rate_of_return (float): ANNUAL rate of return in the market, as a decimal
+            self.market_rate_of_return (float): ANNUAL rate of return in the
+                market, as a decimal
             self.tax_brackets ('TaxBrackets'): A TaxBrackets object
     """
 
@@ -27,13 +28,13 @@ class MarketConfig(yaml.YAMLObject):
         the __init__ method is not used.
 
         Documentation of the instance variable types:
-                self.tax_brackets (List[Dict[str, float]]): A list of tax brackets,
-                        where each bracket contains two keys, "upper_limit" and "tax_rate".
-                        "tax_rate" is the marginal tax rate of that bracket. "upper_limit"
-                        is the upper income limit of that bracket (beyond that limit, the
-                        next tax bracket begins). This list is ordered from lowest tax
-                        bracket to highest tax bracket. The highest tax bracket will have
-                        an upper limit of positive infinity.
+            self.tax_brackets (List[Dict[str, float]]): A list of tax brackets,
+                where each bracket contains two keys, "upper_limit" and "tax_rate".
+                "tax_rate" is the marginal tax rate of that bracket. "upper_limit"
+                is the upper income limit of that bracket (beyond that limit, the
+                next tax bracket begins). This list is ordered from lowest tax
+                bracket to highest tax bracket. The highest tax bracket will have
+                an upper limit of positive infinity.
         """
 
         yaml_tag: str = "!TaxBrackets"
@@ -44,7 +45,7 @@ class MarketConfig(yaml.YAMLObject):
             """Sanity checks the configs.
 
             Raises:
-                    AssertionError: If any tax brackets configs are invaalid
+                    AssertionError: If any tax brackets configs are invalid
             """
             assert self.tax_brackets
             upper_limit = 0
@@ -70,7 +71,8 @@ class MarketConfig(yaml.YAMLObject):
             for bracket in self.tax_brackets:
                 if income < lower_limit:
                     break
-                tax_rate, upper_limit = bracket["tax_rate"], bracket["upper_limit"]
+                tax_rate = bracket["tax_rate"]
+                upper_limit = bracket["upper_limit"]
                 if income <= upper_limit:
                     tax += tax_rate * (income - lower_limit)
                     break
@@ -149,7 +151,7 @@ class MarketConfig(yaml.YAMLObject):
                         rounded to two decimal points.
 
         Raises:
-                AssertionError: If the principal is negative or num_months is not positive
+            AssertionError: If the principal is negative or num_months is not positive
         """
         assert principal >= 0
         # TODO this and all other such assertions maybe could happen only once earlier?

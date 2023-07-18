@@ -1,7 +1,5 @@
 import yaml
 
-from ..utils import math_utils
-
 
 class HouseConfig(yaml.YAMLObject):
     """Stores house config.
@@ -26,7 +24,7 @@ class HouseConfig(yaml.YAMLObject):
                 AssertionError: If any house configs are invalid
         """
         assert self.sale_price > 0
-        assert self.down_payment_fraction >= 0 and down_payment_fraction <= 1
+        assert self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
         assert self.mortgage_annual_interest_rate >= 0
         assert self.mortgage_term_months > 0
         assert self.pmi_fraction >= 0
@@ -86,7 +84,7 @@ class HouseConfig(yaml.YAMLObject):
         i = self.mortgage_annual_interest_rate / 12
         r = 1 / (1 + i)
         L = self.get_loan_amount()
-        return L * (1 - r) / (r - r ** (n + 1))
+        return L * (1 - r) / (r - r ** (self.mortgage_term_months + 1))
 
     def get_upfront_one_time_cost(self):
         return (
