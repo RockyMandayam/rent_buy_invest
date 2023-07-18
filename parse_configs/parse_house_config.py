@@ -9,8 +9,8 @@ class HouseConfig(yaml.YAMLObject):
     the __init__ method is not used.
 
     Documentation of the instance variable types:
-            # TODO add documentation
-            # TODO maybe just point to the yaml file
+    # TODO add documentation
+    # TODO maybe just point to the yaml file
     """
 
     yaml_tag: str = "!HouseConfig"
@@ -21,7 +21,7 @@ class HouseConfig(yaml.YAMLObject):
         """Sanity checks the configs.
 
         Raises:
-                AssertionError: If any house configs are invalid
+            AssertionError: If any house configs are invalid
         """
         assert self.sale_price > 0
         assert self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
@@ -123,7 +123,7 @@ class HouseConfig(yaml.YAMLObject):
         """Load house config yaml file as an instance of this class
 
         Raises:
-                AssertionError: If any house configs are invalid
+            AssertionError: If any house configs are invalid
         """
         # TODO replace this absolute path string literal
         with open(
