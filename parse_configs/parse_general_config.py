@@ -1,7 +1,5 @@
 import yaml
 
-from ..utils import math_utils
-
 
 class GeneralConfig(yaml.YAMLObject):
     # TODO test this class
