@@ -36,9 +36,15 @@ class RentConfig(yaml.YAMLObject):
         """
         assert self.monthly_rent >= 0, "Monthly rent must be non-negative."
         assert self.monthly_utilities >= 0, "Monthly utilities must be non-negative."
-        assert self.monthly_renters_insurance >= 0, "Monthly renter's insurance must be non-negative."
-        assert self.monthly_parking_fee >= 0, "Monthly parking fee must be non-negative."
-        assert self.inflation_adjustment_period >= 1, "Inflation adjustment period must be at least 1."
+        assert (
+            self.monthly_renters_insurance >= 0
+        ), "Monthly renter's insurance must be non-negative."
+        assert (
+            self.monthly_parking_fee >= 0
+        ), "Monthly parking fee must be non-negative."
+        assert (
+            self.inflation_adjustment_period >= 1
+        ), "Inflation adjustment period must be at least 1."
 
     @staticmethod
     def parse_rent_config() -> "RentConfig":

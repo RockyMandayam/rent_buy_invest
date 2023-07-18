@@ -51,12 +51,18 @@ class MarketConfig(yaml.YAMLObject):
             upper_limit = 0
             tax_rate = -1
             for bracket in self.tax_brackets:
-                assert bracket["upper_limit"] > upper_limit, "Tax brackets must be listed in order."
+                assert (
+                    bracket["upper_limit"] > upper_limit
+                ), "Tax brackets must be listed in order."
                 # Assumes "progressive" tax brackets
-                assert bracket["tax_rate"] > tax_rate, "Tax brackets must be listed in order."
+                assert (
+                    bracket["tax_rate"] > tax_rate
+                ), "Tax brackets must be listed in order."
                 upper_limit = bracket["upper_limit"]
                 tax_rate = bracket["tax_rate"]
-            assert self.tax_brackets[-1]["upper_limit"] == float("inf"), "The last tax bracket's upper limit must be infinity."
+            assert self.tax_brackets[-1]["upper_limit"] == float(
+                "inf"
+            ), "The last tax bracket's upper limit must be infinity."
 
         def get_tax(self, income: float) -> float:
             """Calculates tax owed given income.
@@ -156,7 +162,7 @@ class MarketConfig(yaml.YAMLObject):
         """
         assert principal >= 0, "Principal invested must be non-negative."
         # TODO this and all other such assertions maybe could happen only once earlier?
-        assert num_months > 0, 'Number of months must be positive.'
+        assert num_months > 0, "Number of months must be positive."
         return math_utils.project_growth(
             principal, self.market_rate_of_return, True, num_months
         )
