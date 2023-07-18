@@ -11,17 +11,17 @@ class RentConfig(yaml.YAMLObject):
     the __init__ method is not used.
 
     Documentation of the instance variable types:
-            self.monthly_rent (float): Monthly rent for first month
-            self.monthly_utilities (float): Monthly utilities for the first month
-            self.monthly_renters_insurance (float): Monthly renters insurance for
-                    the first month
-            self.monthly_parking_fee (float): Monthly parking fee
-            self.annual_rent_inflation_rate (float): ANNUAL rent inflation rate.
-                    This will be applied to all rent-related expenses.E.g., not just
-                    rent but also utilities, etc.
-            self.inflation_adjustment_period (int): How often (in months) to update
-                    rent-related expenses for inflation. If you rent with 12-month
-                    leases, 12 is a good number here.
+        self.monthly_rent (float): Monthly rent for first month
+        self.monthly_utilities (float): Monthly utilities for the first month
+        self.monthly_renters_insurance (float): Monthly renters insurance for
+            the first month
+        self.monthly_parking_fee (float): Monthly parking fee
+        self.annual_rent_inflation_rate (float): ANNUAL rent inflation rate.
+            This will be applied to all rent-related expenses.E.g., not just
+            rent but also utilities, etc.
+        self.inflation_adjustment_period (int): How often (in months) to update
+            rent-related expenses for inflation. If you rent with 12-month
+            leases, 12 is a good number here.
     """
 
     yaml_tag: str = "!RentConfig"
@@ -32,7 +32,7 @@ class RentConfig(yaml.YAMLObject):
         """Sanity checks the configs.
 
         Raises:
-                AssertionError: If any rent configs are invalid
+            AssertionError: If any rent configs are invalid
         """
         assert self.monthly_rent >= 0
         assert self.monthly_utilities >= 0
@@ -45,7 +45,7 @@ class RentConfig(yaml.YAMLObject):
         """Load rent config yaml file as an instance of this class
 
         Raises:
-                AssertionError: If any rent configs are invalid
+            AssertionError: If any rent configs are invalid
         """
         # TODO replace this absolute path string literal
         with open(
@@ -68,11 +68,11 @@ class RentConfig(yaml.YAMLObject):
         """Return the monthly cost of renting each month for num_months months.
 
         Returns:
-                List[float]: monthly cost of renting in dollars rounded to two
-                        decimal points.
+            List[float]: monthly cost of renting in dollars rounded to two
+                decimal points.
 
         Raises:
-                AssertionError: If num_months is not positive
+            AssertionError: If num_months is not positive
         """
         return math_utils.project_growth(
             self._get_total_monthly_cost(),

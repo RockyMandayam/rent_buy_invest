@@ -13,10 +13,10 @@ def project_growth(
     the value each month for num_months months.
 
     Returns:
-            List[float]: monthly value in dollars
+        List[float]: monthly value in dollars
 
     Raises:
-            AssertionError: If principal is negative or num_months is not positive
+        AssertionError: If principal is negative or num_months is not positive
     """
     assert principal >= 0
     assert num_months > 0

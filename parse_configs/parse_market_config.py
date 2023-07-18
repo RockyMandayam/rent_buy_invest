@@ -11,9 +11,9 @@ class MarketConfig(yaml.YAMLObject):
     the __init__ method is not used.
 
     Documentation of the instance variable types:
-            self.market_rate_of_return (float): ANNUAL rate of return in the
-                market, as a decimal
-            self.tax_brackets ('TaxBrackets'): A TaxBrackets object
+        self.market_rate_of_return (float): ANNUAL rate of return in the
+            market, as a decimal
+        self.tax_brackets ('TaxBrackets'): A TaxBrackets object
     """
 
     yaml_tag: str = "!MarketConfig"
@@ -45,7 +45,7 @@ class MarketConfig(yaml.YAMLObject):
             """Sanity checks the configs.
 
             Raises:
-                    AssertionError: If any tax brackets configs are invalid
+                AssertionError: If any tax brackets configs are invalid
             """
             assert self.tax_brackets
             upper_limit = 0
@@ -61,10 +61,10 @@ class MarketConfig(yaml.YAMLObject):
             """Calculates tax owed given income.
 
             Args:
-                    income: non-negative income
+                income: non-negative income
 
             Returns:
-                    tax: non-negative tax owed
+                tax: non-negative tax owed
             """
             tax = 0
             lower_limit = 0
@@ -84,7 +84,7 @@ class MarketConfig(yaml.YAMLObject):
         """Sanity checks the configs.
 
         Raises:
-                AssertionError: If any market configs are invalid
+            AssertionError: If any market configs are invalid
         """
         assert self.tax_brackets is not None
         self.tax_brackets._validate()
@@ -94,7 +94,7 @@ class MarketConfig(yaml.YAMLObject):
         """Load market config yaml file as an instance of this class
 
         Raises:
-                AssertionError: If any market configs are invalid
+            AssertionError: If any market configs are invalid
         """
         # TODO replace this absolute path string literal
         with open(
@@ -108,10 +108,10 @@ class MarketConfig(yaml.YAMLObject):
         """Calculates tax owed given income.
 
         Args:
-                income: non-negative income
+            income: non-negative income
 
         Returns:
-                tax: non-negative tax owed
+            tax: non-negative tax owed
         """
         return self.tax_brackets.get_tax(income)
 
@@ -131,24 +131,24 @@ class MarketConfig(yaml.YAMLObject):
         equivalent to compounding the annual rate every year for 2 years.
 
         Math equations:
-                Let a = annual rate of return, compounded annually
-                Let m = "equivalent" monthly rate of return, compounded monthly
-                We are given a and want to find m
-                After one year, principal grows to:
-                        If compounding annually: (1 + a) * principal
-                        If compounding monthly: (1 + m)**12 * principal
-                They should be equal:
-                        (1 + a) * principal = (1 + m)**12 * principal
-                        (1 + a) = (1 + m)**12
-                        (1 + a)**(1/12) = 1 + m
-                        m = (1 + a)**(1/12) - 1
-                E.g., if the annual rate of return compounded annually is 0.12
-                (12%), the monthly rate of return compounded monthly is
-                0.00948879293.
+            Let a = annual rate of return, compounded annually
+            Let m = "equivalent" monthly rate of return, compounded monthly
+            We are given a and want to find m
+            After one year, principal grows to:
+                If compounding annually: (1 + a) * principal
+                If compounding monthly: (1 + m)**12 * principal
+            They should be equal:
+                (1 + a) * principal = (1 + m)**12 * principal
+                (1 + a) = (1 + m)**12
+                (1 + a)**(1/12) = 1 + m
+                m = (1 + a)**(1/12) - 1
+            E.g., if the annual rate of return compounded annually is 0.12
+            (12%), the monthly rate of return compounded monthly is
+            0.00948879293.
 
         Returns:
-                List[float]: monthly wealth in dollars at th beginning of each month
-                        rounded to two decimal points.
+            List[float]: monthly wealth in dollars at th beginning of each month
+                rounded to two decimal points.
 
         Raises:
             AssertionError: If the principal is negative or num_months is not positive

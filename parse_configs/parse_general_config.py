@@ -10,8 +10,8 @@ class GeneralConfig(yaml.YAMLObject):
     the __init__ method is not used.
 
     Documentation of the instance variable types:
-            # TODO add documentation
-            # TODO maybe just point to the yaml file
+    # TODO add documentation
+    # TODO maybe just point to the yaml file
     """
 
     yaml_tag: str = "!GeneralConfig"
@@ -22,7 +22,7 @@ class GeneralConfig(yaml.YAMLObject):
         """Sanity checks the configs.
 
         Raises:
-                AssertionError: If any general configs are invalid
+            AssertionError: If any general configs are invalid
         """
         # make 150 if parameter and maybe appropriately update the yaml comment
         assert self.num_months > 0 and self.num_months < 150
@@ -33,7 +33,7 @@ class GeneralConfig(yaml.YAMLObject):
         """Load general config yaml file as an instance of this class
 
         Raises:
-                AssertionError: If any general configs are invalid
+            AssertionError: If any general configs are invalid
         """
         # TODO replace this absolute path string literal
         with open(
