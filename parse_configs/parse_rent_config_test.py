@@ -1,5 +1,6 @@
 import yaml
 
+from . import parse_rent_config
 
 class TestRentConfig:
     # TODO test edge cases
