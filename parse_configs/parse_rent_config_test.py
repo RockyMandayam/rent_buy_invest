@@ -12,7 +12,7 @@ class TestRentConfig:
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/test-rent-config.yaml"
         ) as f:
-            rent_config = yaml.load(f)
+            rent_config = yaml.load(f, Loader=yaml.Loader)
         actual = rent_config.get_monthly_costs_of_renting(25)
         expected = (
             [2420.0] * 12

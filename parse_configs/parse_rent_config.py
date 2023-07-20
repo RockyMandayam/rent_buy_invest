@@ -57,7 +57,7 @@ class RentConfig(yaml.YAMLObject):
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
         ) as f:
-            rent_config = yaml.load(f)
+            rent_config = yaml.load(f, Loader=yaml.Loader)
         rent_config._validate()
         return rent_config
 

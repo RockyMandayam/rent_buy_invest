@@ -173,7 +173,7 @@ class HouseConfig(yaml.YAMLObject):
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
         ) as f:
-            house_config = yaml.load(f)
+            house_config = yaml.load(f, Loader=yaml.Loader)
         house_config._validate()
         return house_config
 
