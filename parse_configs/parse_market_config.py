@@ -107,7 +107,7 @@ class MarketConfig(yaml.YAMLObject):
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
         ) as f:
-            market_config = yaml.load(f)
+            market_config = yaml.load(f, Loader=yaml.Loader)
         market_config._validate()
         return market_config
 

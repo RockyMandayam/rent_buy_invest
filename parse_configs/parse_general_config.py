@@ -41,7 +41,7 @@ class GeneralConfig(yaml.YAMLObject):
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml"
         ) as f:
-            general_config = yaml.load(f)
+            general_config = yaml.load(f, Loader=yaml.Loader)
         general_config._validate()
         return general_config
 
