@@ -1,6 +1,8 @@
 import pytest
 import yaml
 
+from . import parse_market_config
+
 
 class TestMarketConfig:
     # TODO test edge cases
