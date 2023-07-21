@@ -14,6 +14,7 @@ class TestMarketConfig:
             "/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml"
         ) as f:
             market_config = yaml.load(f, Loader=yaml.Loader)
+        market_config = parse_market_config.MarketConfig(**market_config)
         # assert market_config.get_tax(0) == 0
         assert market_config.get_tax(44625) == pytest.approx(0)
         assert market_config.get_tax(500000) == pytest.approx(68691.25)
@@ -26,6 +27,7 @@ class TestMarketConfig:
             "/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml"
         ) as f:
             market_config = yaml.load(f, Loader=yaml.Loader)
+            market_config = parse_market_config.MarketConfig(**market_config)
         actual = market_config.get_pretax_monthly_wealth(100, 1)
         expected = [pytest.approx(100)]
         assert actual == expected

@@ -6,19 +6,11 @@ from ..utils import math_utils
 class MarketConfig(yaml.YAMLObject):
     """Stores market config.
 
-    Due to using yaml_tag = "!MarketConfig", the yaml library handles auto-
-    converting from a yaml file to an instance of this class. Therefore,
-    the __init__ method is not used.
-
     Documentation of the instance variable types:
         self.market_rate_of_return (float): ANNUAL rate of return in the
             market, as a decimal
         self.tax_brackets ('TaxBrackets'): A TaxBrackets object
     """
-
-    yaml_tag: str = "!MarketConfig"
-
-    # __init__ method not used due to yaml.YAMLObject
 
     class TaxBrackets(yaml.YAMLObject):
         """Stores tax bracket config.
@@ -87,6 +79,19 @@ class MarketConfig(yaml.YAMLObject):
                 lower_limit = upper_limit
             return tax
 
+    def __init__(
+        self,
+        market_rate_of_return,
+        tax_brackets,
+    ):
+        """Initializes the class.
+
+        To see why I don't use yaml tags, see the docstring for __init__
+        in GeneralConfig.
+        """
+        self.market_rate_of_return = market_rate_of_return
+        self.tax_brackets = tax_brackets
+
     def _validate(self) -> None:
         """Sanity checks the configs.
 
@@ -108,6 +113,7 @@ class MarketConfig(yaml.YAMLObject):
             "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
         ) as f:
             market_config = yaml.load(f, Loader=yaml.Loader)
+        market_config = MarketConfig(**market_config)
         market_config._validate()
         return market_config
 

@@ -1,6 +1,6 @@
 # Config file relating to assumptions about the market
 
---- !MarketConfig
+
 # annual return on money invested in the market, as a decimal
 market_rate_of_return: !!float 0.07
 

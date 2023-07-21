@@ -1,7 +1,5 @@
 # Config file relating to assumptions about the market
 
---- !MarketConfig
-
 # ANNUAL rate of return in the market, as a fraction
 market_rate_of_return: !!float 0.07
 

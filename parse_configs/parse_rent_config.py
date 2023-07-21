@@ -6,10 +6,7 @@ from ..utils import math_utils
 class RentConfig(yaml.YAMLObject):
     """Stores rent config.
 
-    Due to using yaml_tag = "!RentConfig", the yaml library handles auto-
-    converting from a yaml file to an instance of this class. Therefore,
-    the __init__ method is not used.
-
+    TODO: maybe I don't need this documentation
     Documentation of the instance variable types:
         self.monthly_rent (float): Monthly rent for first month
         self.monthly_utilities (float): Monthly utilities for the first month
@@ -24,9 +21,21 @@ class RentConfig(yaml.YAMLObject):
             leases, 12 is a good number here.
     """
 
-    yaml_tag: str = "!RentConfig"
+    def __init__(
+        self,
+        **kwargs
+    ):
+        """Initializes the class.
 
-    # __init__ method not used due to yaml.YAMLObject
+        To see why I don't use yaml tags, see the docstring for __init__
+        in GeneralConfig.
+        """
+        self.monthly_rent = kwargs["monthly_rent"]
+        self.monthly_utilities = kwargs["monthly_utilities"]
+        self.monthly_renters_insurance = kwargs["monthly_renters_insurance"]
+        self.monthly_parking_fee = kwargs["monthly_parking_fee"]
+        self.annual_rent_inflation_rate = kwargs["annual_rent_inflation_rate"]
+        self.inflation_adjustment_period = kwargs["inflation_adjustment_period"]
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -58,6 +67,7 @@ class RentConfig(yaml.YAMLObject):
             "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
         ) as f:
             rent_config = yaml.load(f, Loader=yaml.Loader)
+        rent_config = RentConfig(**rent_config)
         rent_config._validate()
         return rent_config
 
@@ -82,7 +92,7 @@ class RentConfig(yaml.YAMLObject):
         """
         return math_utils.project_growth(
             self._get_total_monthly_cost(),
-            self.annual_rent_inflation,
+            self.annual_rent_inflation_rate,
             False,
             num_months,
         )

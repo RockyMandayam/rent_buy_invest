@@ -1,8 +1,5 @@
 # Config file relating to assumptions about buying, owning, and selling real estate
 
---- !HouseConfig
-
-
 ##### BASICS AND GENERAL CONFIGS
 
 # sale price of the house
