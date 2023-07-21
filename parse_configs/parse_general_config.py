@@ -3,7 +3,7 @@ import yaml
 from typing import Dict, Any
 
 
-class GeneralConfig(yaml.YAMLObject):
+class GeneralConfig():
     # TODO test this class
     """Stores general config.
 
@@ -62,5 +62,4 @@ if __name__ == "__main__":
     print("Parsing general config")
     c = GeneralConfig.parse_general_config()
     print(c)
-    print(c.num_months)
     print("Done parsing general config")

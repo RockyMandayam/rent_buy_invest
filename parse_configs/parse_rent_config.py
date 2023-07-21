@@ -1,9 +1,11 @@
 import yaml
 
+from typing import Dict, Any
+
 from ..utils import math_utils
 
 
-class RentConfig(yaml.YAMLObject):
+class RentConfig():
     """Stores rent config.
 
     TODO: maybe I don't need this documentation
@@ -23,19 +25,19 @@ class RentConfig(yaml.YAMLObject):
 
     def __init__(
         self,
-        **kwargs
-    ):
+        **kwargs: Dict[str, Any] # too many to type
+    ) -> None:
         """Initializes the class.
 
         To see why I don't use yaml tags, see the docstring for __init__
         in GeneralConfig.
         """
-        self.monthly_rent = kwargs["monthly_rent"]
-        self.monthly_utilities = kwargs["monthly_utilities"]
-        self.monthly_renters_insurance = kwargs["monthly_renters_insurance"]
-        self.monthly_parking_fee = kwargs["monthly_parking_fee"]
-        self.annual_rent_inflation_rate = kwargs["annual_rent_inflation_rate"]
-        self.inflation_adjustment_period = kwargs["inflation_adjustment_period"]
+        self.monthly_rent: float = kwargs["monthly_rent"]
+        self.monthly_utilities: float = kwargs["monthly_utilities"]
+        self.monthly_renters_insurance: float = kwargs["monthly_renters_insurance"]
+        self.monthly_parking_fee: float = kwargs["monthly_parking_fee"]
+        self.annual_rent_inflation_rate: float = kwargs["annual_rent_inflation_rate"]
+        self.inflation_adjustment_period: int = kwargs["inflation_adjustment_period"]
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -66,7 +68,7 @@ class RentConfig(yaml.YAMLObject):
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
         ) as f:
-            rent_config = yaml.load(f, Loader=yaml.Loader)
+            rent_config: Dict[str, Any] = yaml.load(f, Loader=yaml.Loader)
         rent_config = RentConfig(**rent_config)
         rent_config._validate()
         return rent_config

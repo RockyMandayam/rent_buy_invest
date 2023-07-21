@@ -1,7 +1,8 @@
 import yaml
+from typing import Dict, Any
 
 
-class HouseConfig(yaml.YAMLObject):
+class HouseConfig():
     """Stores house config.
 
     Documentation of the instance variable types:
@@ -11,7 +12,7 @@ class HouseConfig(yaml.YAMLObject):
 
     def __init__(
         self,
-        **kwargs, # lots of parameters, see body of this method
+        **kwargs: Dict[str, Any], # lots of parameters, see body of this method
     ) -> None:
         """Initializes the class.
 
@@ -214,7 +215,7 @@ class HouseConfig(yaml.YAMLObject):
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
         ) as f:
-            house_config = yaml.load(f, Loader=yaml.Loader)
+            house_config: Dict[str, Any] = yaml.load(f, Loader=yaml.Loader)
         house_config = HouseConfig(**house_config)
         house_config._validate()
         return house_config

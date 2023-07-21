@@ -7,7 +7,7 @@ market_rate_of_return: !!float 0.07
 # tax information - assume only capital gains tax
 # assume the investor will remain in the market long-term
 # therefore, only list long-term capital gains rates
-tax_brackets: !TaxBrackets
+tax_brackets:
   tax_brackets:
     -
       upper_limit: !!float 44625
