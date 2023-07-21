@@ -3,9 +3,10 @@ from typing import Any, Dict
 import yaml
 
 from ..utils import io_utils
+from .config import Config
 
 
-class HouseConfig:
+class HouseConfig(Config):
     """Stores house config.
 
     Documentation of the instance variable types:
@@ -232,25 +233,3 @@ class HouseConfig:
             + self.owners_title_insurance_fraction * self.get_loan_amount()
             + self.endorsement_fees
         )
-
-    # TODO test this and all parse methods
-    @staticmethod
-    def parse_house_config() -> "HouseConfig":
-        """Load house config yaml file as an instance of this class
-
-        Raises:
-            AssertionError: If any house configs are invalid
-        """
-        # TODO replace this absolute path string literal
-        house_config = io_utils.load_yaml(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
-        )
-        house_config = HouseConfig(**house_config)
-        return house_config
-
-
-if __name__ == "__main__":
-    print("Parsing house config")
-    c = HouseConfig.parse_house_config()
-    print(c)
-    print("Done parsing house config")

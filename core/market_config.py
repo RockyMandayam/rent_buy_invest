@@ -3,9 +3,10 @@ from typing import Any, Dict, List
 import yaml
 
 from ..utils import io_utils, math_utils
+from .config import Config
 
 
-class MarketConfig:
+class MarketConfig(Config):
     """Stores market config.
 
     Documentation of the instance variable types:
@@ -105,20 +106,6 @@ class MarketConfig:
         """
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
 
-    @staticmethod
-    def parse_market_config() -> "MarketConfig":
-        """Load market config yaml file as an instance of this class
-
-        Raises:
-            AssertionError: If any market configs are invalid
-        """
-        # TODO replace this absolute path string literal
-        market_config = io_utils.load_yaml(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
-        )
-        market_config = MarketConfig(**market_config)
-        return market_config
-
     def get_tax(self, income: float) -> float:
         """Calculates tax owed given income.
 
@@ -174,12 +161,3 @@ class MarketConfig:
         return math_utils.project_growth(
             principal, self.market_rate_of_return, True, num_months
         )
-
-
-if __name__ == "__main__":
-    print("Parsing market config")
-    c = MarketConfig.parse_market_config()
-    print(c)
-    print(c.__dict__)
-    print(c.tax_brackets.tax_brackets[0])
-    print("Done parsing market config")

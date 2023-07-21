@@ -8,11 +8,15 @@ from .market_config import MarketConfig
 class TestMarketConfig:
     # TODO test edge cases
 
+    def test_parse(self) -> None:
+        filename = "/Users/rocky/Downloads/rent_buy_invest/core/test_resources/2023-market-config.yaml"
+        MarketConfig.parse(filename)
+
     def test_get_tax(self) -> None:
         # TODO don't use absolute path
         # TODO use market_config and pass in test config path
         market_config = io_utils.load_yaml(
-            "/Users/rocky/Downloads/rent_buy_invest/core/test_config_files/2023-market-config.yaml"
+            "/Users/rocky/Downloads/rent_buy_invest/core/test_resources/2023-market-config.yaml"
         )
         market_config = MarketConfig(**market_config)
         # assert market_config.get_tax(0) == 0
@@ -24,7 +28,7 @@ class TestMarketConfig:
         # TODO use market_config and pass in test config path
         # TODO don't do this in every test, just do it once
         market_config = io_utils.load_yaml(
-            "/Users/rocky/Downloads/rent_buy_invest/core/test_config_files/2023-market-config.yaml"
+            "/Users/rocky/Downloads/rent_buy_invest/core/test_resources/2023-market-config.yaml"
         )
         market_config = MarketConfig(**market_config)
         actual = market_config.get_pretax_monthly_wealth(100, 1)
