@@ -1,0 +1,5 @@
+# General config file
+
+
+# number of months to run the calculations for (max of 150)
+num_months: !!int 40
