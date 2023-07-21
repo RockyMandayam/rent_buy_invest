@@ -5,7 +5,6 @@ import yaml
 from ..utils import io_utils, path_utils
 from .house_config import HouseConfig
 
-
 filename = path_utils.get_abs_path(
     "rent_buy_invest/core/test_resources/test-house-config.yaml"
 )
