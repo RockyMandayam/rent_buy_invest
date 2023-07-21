@@ -11,10 +11,11 @@ def get_abs_path(project_path: str) -> str:
         str: absolute path
 
     Examples:
-    >>> get_abs_path("rent-buy-invest/configs")
-    '/Users/FooBarUser/rent-buy-invest/configs'
+    >>> get_abs_path("rent_buy_invest/configs")
+    '/Users/FooBarUser/rent_buy_invest/configs'
     """
-    if not project_path.startswith("rent-buy-invest"):
+    # TODO do not hardcode this
+    if not project_path.startswith("rent_buy_invest"):
         raise ValueError("Invalid project_path")
     # TODO move this line to be a constant?
     dir_containing_top_level_dir = os.path.join(

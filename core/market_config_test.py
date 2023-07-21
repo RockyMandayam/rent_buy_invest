@@ -1,12 +1,12 @@
 import pytest
 import yaml
 
-from ..utils import io_utils
+from ..utils import io_utils, path_utils
 from .market_config import MarketConfig
 
 # TODO don't use absolute path
-filename = (
-    "/Users/rocky/Downloads/rent_buy_invest/core/test_resources/2023-market-config.yaml"
+filename = path_utils.get_abs_path(
+    "rent_buy_invest/core/test_resources/2023-market-config.yaml"
 )
 market_config = MarketConfig.parse(filename)
 

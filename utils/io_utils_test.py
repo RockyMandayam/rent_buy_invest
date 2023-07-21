@@ -2,14 +2,11 @@ from typing import Any, Dict
 
 import yaml
 
-from . import io_utils
+from . import io_utils, path_utils
 
 
 def test_load_yaml() -> None:
-    # TODO remove absolute path
-    filename = (
-        "/Users/rocky/Downloads/rent_buy_invest/utils/test_resources/simple-yaml.yaml"
-    )
+    filename = path_utils.get_abs_path("rent_buy_invest/utils/test_resources/simple-yaml.yaml")
     with open(filename) as f:
         actual: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     expected = {
