@@ -33,7 +33,7 @@ class MarketConfig():
             To see why I don't use yaml tags, see the docstring for __init__
             in GeneralConfig.
             """
-            self.tax_brackets = tax_brackets
+            self.tax_brackets: List[Dict[str, float]] = tax_brackets
 
         def _validate(self) -> None:
             """Sanity checks the configs.
@@ -91,8 +91,8 @@ class MarketConfig():
         To see why I don't use yaml tags, see the docstring for __init__
         in GeneralConfig.
         """
-        self.market_rate_of_return = market_rate_of_return
-        self.tax_brackets: TaxBrackets = MarketConfig.TaxBrackets(tax_brackets["tax_brackets"])
+        self.market_rate_of_return: float = market_rate_of_return
+        self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(tax_brackets["tax_brackets"])
 
     def _validate(self) -> None:
         """Sanity checks the configs.
