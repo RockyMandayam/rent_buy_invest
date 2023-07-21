@@ -1,11 +1,11 @@
-import yaml
+from typing import Any, Dict
 
-from typing import Dict, Any
+import yaml
 
 from ..utils import io_utils
 
 
-class GeneralConfig():
+class GeneralConfig:
     # TODO test this class
     """Stores general config.
 
@@ -18,7 +18,7 @@ class GeneralConfig():
         """Initializes the class.
 
         To easily convert a yaml file to a class, there is the option of using
-        a yaml tag. To use this, you simply set a class variable yaml_tag = 
+        a yaml tag. To use this, you simply set a class variable yaml_tag =
         "!GeneralConfig" and in the yaml file use "--- !GeneralConfig" at the
         top of the file to indicate that you are specifying a GeneralConfig
         object. However, this makes it hard to use jsonschema for validation.
@@ -51,7 +51,9 @@ class GeneralConfig():
             AssertionError: If any general configs are invalid
         """
         # TODO replace this absolute path string literal
-        general_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml")
+        general_config = io_utils.load_yaml(
+            "/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml"
+        )
         general_config = GeneralConfig(**general_config)
         general_config._validate()
         return general_config

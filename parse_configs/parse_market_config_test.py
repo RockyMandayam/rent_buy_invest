@@ -1,8 +1,8 @@
 import pytest
 import yaml
 
-from . import parse_market_config
 from ..utils import io_utils
+from . import parse_market_config
 
 
 class TestMarketConfig:
@@ -11,7 +11,9 @@ class TestMarketConfig:
     def test_get_tax(self) -> None:
         # TODO don't use absolute path
         # TODO use parse_market_config and pass in test config path
-        market_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml")
+        market_config = io_utils.load_yaml(
+            "/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml"
+        )
         market_config = parse_market_config.MarketConfig(**market_config)
         # assert market_config.get_tax(0) == 0
         assert market_config.get_tax(44625) == pytest.approx(0)
@@ -21,7 +23,9 @@ class TestMarketConfig:
         # TODO don't use absolute path
         # TODO use parse_market_config and pass in test config path
         # TODO don't do this in every test, just do it once
-        market_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml")
+        market_config = io_utils.load_yaml(
+            "/Users/rocky/Downloads/rent_buy_invest/parse_configs/test_config_files/2023-market-config.yaml"
+        )
         market_config = parse_market_config.MarketConfig(**market_config)
         actual = market_config.get_pretax_monthly_wealth(100, 1)
         expected = [pytest.approx(100)]

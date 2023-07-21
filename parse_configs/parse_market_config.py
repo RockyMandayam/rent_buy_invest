@@ -1,11 +1,11 @@
+from typing import Any, Dict, List
+
 import yaml
 
-from typing import Dict, Any, List
-
-from ..utils import math_utils, io_utils
+from ..utils import io_utils, math_utils
 
 
-class MarketConfig():
+class MarketConfig:
     """Stores market config.
 
     Documentation of the instance variable types:
@@ -14,7 +14,7 @@ class MarketConfig():
         self.tax_brackets ('TaxBrackets'): A TaxBrackets object
     """
 
-    class TaxBrackets():
+    class TaxBrackets:
         """Stores tax bracket config.
 
         Documentation of the instance variable types:
@@ -92,7 +92,9 @@ class MarketConfig():
         in GeneralConfig.
         """
         self.market_rate_of_return: float = market_rate_of_return
-        self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(tax_brackets["tax_brackets"])
+        self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
+            tax_brackets["tax_brackets"]
+        )
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -111,7 +113,9 @@ class MarketConfig():
             AssertionError: If any market configs are invalid
         """
         # TODO replace this absolute path string literal
-        market_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml")
+        market_config = io_utils.load_yaml(
+            "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
+        )
         market_config = MarketConfig(**market_config)
         market_config._validate()
         return market_config

@@ -1,11 +1,11 @@
+from typing import Any, Dict
+
 import yaml
 
-from typing import Dict, Any
-
-from ..utils import math_utils, io_utils
+from ..utils import io_utils, math_utils
 
 
-class RentConfig():
+class RentConfig:
     """Stores rent config.
 
     TODO: maybe I don't need this documentation
@@ -23,10 +23,7 @@ class RentConfig():
             leases, 12 is a good number here.
     """
 
-    def __init__(
-        self,
-        **kwargs: Dict[str, Any] # too many to type
-    ) -> None:
+    def __init__(self, **kwargs: Dict[str, Any]) -> None:  # too many to type
         """Initializes the class.
 
         To see why I don't use yaml tags, see the docstring for __init__
@@ -65,7 +62,9 @@ class RentConfig():
             AssertionError: If any rent configs are invalid
         """
         # TODO replace this absolute path string literal
-        rent_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml")
+        rent_config = io_utils.load_yaml(
+            "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
+        )
         rent_config = RentConfig(**rent_config)
         rent_config._validate()
         return rent_config
