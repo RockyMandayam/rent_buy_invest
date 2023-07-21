@@ -1,6 +1,6 @@
+
 def get_equivalent_monthly_compound_rate(annual_compound_rate: float) -> float:
     return (1 + annual_compound_rate) ** (1 / 12) - 1
-
 
 def project_growth(
     principal: float,

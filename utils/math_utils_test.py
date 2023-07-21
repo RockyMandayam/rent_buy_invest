@@ -1,5 +1,16 @@
+import pytest
+
 from . import math_utils
 
+def test_get_equivalent_monthly_compound_rate() -> None:
+    annual_compound_rate = 4095 # unrealistic example, just trying with a nice int
+    actual = math_utils.get_equivalent_monthly_compound_rate(annual_compound_rate)
+    expected = 1
+    assert actual == pytest.approx(expected)
+    annual_compound_rate = 0.07 # unrealistic example, just trying with a nice int
+    actual = math_utils.get_equivalent_monthly_compound_rate(annual_compound_rate)
+    expected = 0.00565414539
+    assert actual == pytest.approx(expected)
 
 def test_get_monthly_costs() -> None:
     # TODO test all parameters
