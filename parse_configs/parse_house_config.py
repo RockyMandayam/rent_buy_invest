@@ -1,6 +1,7 @@
 import yaml
 from typing import Dict, Any
 
+from ..utils import io_utils
 
 class HouseConfig():
     """Stores house config.
@@ -212,10 +213,7 @@ class HouseConfig():
             AssertionError: If any house configs are invalid
         """
         # TODO replace this absolute path string literal
-        with open(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
-        ) as f:
-            house_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
+        house_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml")
         house_config = HouseConfig(**house_config)
         house_config._validate()
         return house_config

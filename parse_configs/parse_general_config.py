@@ -2,6 +2,8 @@ import yaml
 
 from typing import Dict, Any
 
+from ..utils import io_utils
+
 
 class GeneralConfig():
     # TODO test this class
@@ -49,10 +51,7 @@ class GeneralConfig():
             AssertionError: If any general configs are invalid
         """
         # TODO replace this absolute path string literal
-        with open(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml"
-        ) as f:
-            general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
+        general_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml")
         general_config = GeneralConfig(**general_config)
         general_config._validate()
         return general_config

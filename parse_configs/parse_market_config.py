@@ -2,7 +2,7 @@ import yaml
 
 from typing import Dict, Any, List
 
-from ..utils import math_utils
+from ..utils import math_utils, io_utils
 
 
 class MarketConfig():
@@ -111,10 +111,7 @@ class MarketConfig():
             AssertionError: If any market configs are invalid
         """
         # TODO replace this absolute path string literal
-        with open(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
-        ) as f:
-            market_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
+        market_config = io_utils.load_yaml("/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml")
         market_config = MarketConfig(**market_config)
         market_config._validate()
         return market_config
