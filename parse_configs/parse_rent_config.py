@@ -68,7 +68,7 @@ class RentConfig():
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
         ) as f:
-            rent_config: Dict[str, Any] = yaml.load(f, Loader=yaml.Loader)
+            rent_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
         rent_config = RentConfig(**rent_config)
         rent_config._validate()
         return rent_config

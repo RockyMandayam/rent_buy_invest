@@ -114,7 +114,7 @@ class MarketConfig():
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
         ) as f:
-            market_config: Dict[str, Any] = yaml.load(f, Loader=yaml.Loader)
+            market_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
         market_config = MarketConfig(**market_config)
         market_config._validate()
         return market_config

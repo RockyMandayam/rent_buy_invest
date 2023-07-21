@@ -215,7 +215,7 @@ class HouseConfig():
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
         ) as f:
-            house_config: Dict[str, Any] = yaml.load(f, Loader=yaml.Loader)
+            house_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
         house_config = HouseConfig(**house_config)
         house_config._validate()
         return house_config

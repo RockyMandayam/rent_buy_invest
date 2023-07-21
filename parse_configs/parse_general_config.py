@@ -52,7 +52,7 @@ class GeneralConfig():
         with open(
             "/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml"
         ) as f:
-            general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.Loader)
+            general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
         general_config = GeneralConfig(**general_config)
         general_config._validate()
         return general_config
