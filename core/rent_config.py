@@ -35,6 +35,7 @@ class RentConfig:
         self.monthly_parking_fee: float = kwargs["monthly_parking_fee"]
         self.annual_rent_inflation_rate: float = kwargs["annual_rent_inflation_rate"]
         self.inflation_adjustment_period: int = kwargs["inflation_adjustment_period"]
+        self._validate()
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -66,7 +67,6 @@ class RentConfig:
             "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
         )
         rent_config = RentConfig(**rent_config)
-        rent_config._validate()
         return rent_config
 
     def _get_total_monthly_cost(self) -> float:

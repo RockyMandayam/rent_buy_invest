@@ -30,6 +30,7 @@ class GeneralConfig:
         this approach seems bad.
         """
         self.num_months: int = num_months
+        self._validate()
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -55,7 +56,6 @@ class GeneralConfig:
             "/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml"
         )
         general_config = GeneralConfig(**general_config)
-        general_config._validate()
         return general_config
 
 

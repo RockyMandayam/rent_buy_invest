@@ -34,6 +34,7 @@ class MarketConfig:
             in GeneralConfig.
             """
             self.tax_brackets: List[Dict[str, float]] = tax_brackets
+            self._validate()
 
         def _validate(self) -> None:
             """Sanity checks the configs.
@@ -103,7 +104,6 @@ class MarketConfig:
             AssertionError: If any market configs are invalid
         """
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
-        self.tax_brackets._validate()
 
     @staticmethod
     def parse_market_config() -> "MarketConfig":
@@ -117,7 +117,6 @@ class MarketConfig:
             "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
         )
         market_config = MarketConfig(**market_config)
-        market_config._validate()
         return market_config
 
     def get_tax(self, income: float) -> float:
