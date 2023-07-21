@@ -33,13 +33,13 @@ class HouseConfig(Config):
         ]
         self.mortgage_term_months: int = kwargs["mortgage_term_months"]
         self.pmi_fraction: float = kwargs["pmi_fraction"]
-        self.mortgage_origination_points_fee: float = kwargs[
-            "mortgage_origination_points_fee"
+        self.mortgage_origination_points_fee_fraction: float = kwargs[
+            "mortgage_origination_points_fee_fraction"
         ]
         self.mortgage_processing_fee: float = kwargs["mortgage_processing_fee"]
         self.mortgage_underwriting_fee: float = kwargs["mortgage_underwriting_fee"]
-        self.mortgage_discount_points_fee: float = kwargs[
-            "mortgage_discount_points_fee"
+        self.mortgage_discount_points_fee_fraction: float = kwargs[
+            "mortgage_discount_points_fee_fraction"
         ]
         self.house_appraisal_cost: float = kwargs["house_appraisal_cost"]
         self.credit_report_fee: float = kwargs["credit_report_fee"]
@@ -108,8 +108,8 @@ class HouseConfig(Config):
         ), "Mortgage term in months must be positive."
         assert self.pmi_fraction >= 0, "PMI fraction must be non-negative."
         assert (
-            self.mortgage_origination_points_fee >= 0
-        ), "Mortgage original points fee must be non-negative."
+            self.mortgage_origination_points_fee_fraction >= 0
+        ), "Mortgage original points fee fraction must be non-negative."
         assert (
             self.mortgage_processing_fee >= 0
         ), "Mortgage processing fee must be non-negative."
@@ -117,8 +117,8 @@ class HouseConfig(Config):
             self.mortgage_underwriting_fee >= 0
         ), "Mortgage underwriting fee must be non-negative."
         assert (
-            self.mortgage_discount_points_fee >= 0
-        ), "Mortgage discount points fee must be non-negative."
+            self.mortgage_discount_points_fee_fraction >= 0
+        ), "Mortgage discount points fee fraction must be non-negative."
         assert (
             self.house_appraisal_cost >= 0
         ), "House appraisal cost must be non-negative."
@@ -201,16 +201,16 @@ class HouseConfig(Config):
         i = self.mortgage_annual_interest_rate / 12
         r = 1 / (1 + i)
         L = self.get_loan_amount()
-        return L * (1 - r) / (r - r ** (self.mortgage_term_months + 1))
+        return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_upfront_one_time_cost(self):
         return (
-            self.mortgage_origination_points_fee
+            self.mortgage_origination_points_fee_fraction * self.get_loan_amount()
             + self.mortgage_processing_fee
             + self.mortgage_underwriting_fee
-            + self.mortgage_discount_points_fee
+            + self.mortgage_discount_points_fee_fraction * self.get_loan_amount()
             + self.house_appraisal_cost
-            + self.credit_report_fe
+            + self.credit_report_fee
             + (1 - self.seller_burden_of_transfer_tax_fraction)
             * self.transfer_tax_fraction
             * self.sale_price
