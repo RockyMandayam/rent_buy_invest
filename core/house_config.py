@@ -87,6 +87,7 @@ class HouseConfig:
         self.annual_management_cost_fraction: float = kwargs[
             "annual_management_cost_fraction"
         ]
+        self._validate()
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -245,7 +246,6 @@ class HouseConfig:
             "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
         )
         house_config = HouseConfig(**house_config)
-        house_config._validate()
         return house_config
 
 
