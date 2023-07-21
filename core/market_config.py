@@ -60,7 +60,7 @@ class MarketConfig(Config):
                 "inf"
             ), "The last tax bracket's upper limit must be infinity."
 
-        def get_tax(self, income: float) -> float:
+        def _get_tax(self, income: float) -> float:
             """Calculates tax owed given income.
 
             Args:
@@ -115,7 +115,7 @@ class MarketConfig(Config):
         Returns:
             tax: non-negative tax owed
         """
-        return self.tax_brackets.get_tax(income)
+        return self.tax_brackets._get_tax(income)
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
         """Return the pretax wealth in the market at the BEGINNING of each month
