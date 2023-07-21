@@ -2,12 +2,11 @@ from typing import Any, Dict
 
 import yaml
 
-from ..utils import io_utils
+from ..utils import io_utils, path_utils
 from .house_config import HouseConfig
 
-# TODO don't use absolute path
-filename = (
-    "/Users/rocky/Downloads/rent_buy_invest/core/test_resources/test-house-config.yaml"
+filename = path_utils.get_abs_path(
+    "rent_buy_invest/core/test_resources/test-house-config.yaml"
 )
 house_config = HouseConfig.parse(filename)
 

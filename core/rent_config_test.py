@@ -1,11 +1,10 @@
 import yaml
 
-from ..utils import io_utils
+from ..utils import io_utils, path_utils
 from .rent_config import RentConfig
 
-# TODO don't use absolute path
-filename = (
-    "/Users/rocky/Downloads/rent_buy_invest/core/test_resources/test-rent-config.yaml"
+filename = path_utils.get_abs_path(
+    "rent_buy_invest/core/test_resources/test-rent-config.yaml"
 )
 rent_config = RentConfig.parse(filename)
 
