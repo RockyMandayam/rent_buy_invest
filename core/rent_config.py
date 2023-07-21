@@ -3,9 +3,10 @@ from typing import Any, Dict
 import yaml
 
 from ..utils import io_utils, math_utils
+from .config import Config
 
 
-class RentConfig:
+class RentConfig(Config):
     """Stores rent config.
 
     TODO: maybe I don't need this documentation
@@ -55,20 +56,6 @@ class RentConfig:
             self.inflation_adjustment_period >= 1
         ), "Inflation adjustment period must be at least 1."
 
-    @staticmethod
-    def parse_rent_config() -> "RentConfig":
-        """Load rent config yaml file as an instance of this class
-
-        Raises:
-            AssertionError: If any rent configs are invalid
-        """
-        # TODO replace this absolute path string literal
-        rent_config = io_utils.load_yaml(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
-        )
-        rent_config = RentConfig(**rent_config)
-        return rent_config
-
     def _get_total_monthly_cost(self) -> float:
         """Get total monthly cost of renting for the first month"""
         return (
@@ -94,10 +81,3 @@ class RentConfig:
             False,
             num_months,
         )
-
-
-if __name__ == "__main__":
-    print("Parsing rent config")
-    c = RentConfig.parse_rent_config()
-    print(c)
-    print("Done parsing rent config")

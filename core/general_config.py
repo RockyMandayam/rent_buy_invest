@@ -3,9 +3,10 @@ from typing import Any, Dict
 import yaml
 
 from ..utils import io_utils
+from .config import Config
 
 
-class GeneralConfig:
+class GeneralConfig(Config):
     # TODO test this class
     """Stores general config.
 
@@ -42,25 +43,3 @@ class GeneralConfig:
         assert (
             self.num_months > 0 and self.num_months <= 150
         ), "Number of months must be positive and at most 150."
-
-    # TODO test this and all parse methods
-    @staticmethod
-    def parse_general_config() -> "GeneralConfig":
-        """Load general config yaml file as an instance of this class
-
-        Raises:
-            AssertionError: If any general configs are invalid
-        """
-        # TODO replace this absolute path string literal
-        general_config = io_utils.load_yaml(
-            "/Users/rocky/Downloads/rent_buy_invest/configs/general-config.yaml"
-        )
-        general_config = GeneralConfig(**general_config)
-        return general_config
-
-
-if __name__ == "__main__":
-    print("Parsing general config")
-    c = GeneralConfig.parse_general_config()
-    print(c)
-    print("Done parsing general config")
