@@ -17,7 +17,6 @@ def get_abs_path(project_path: str) -> str:
     # TODO do not hardcode this
     if not project_path.startswith("rent_buy_invest"):
         raise ValueError("Invalid project_path")
-    # TODO move this line to be a constant?
     dir_containing_top_level_dir = os.path.join(
         os.path.join(os.path.dirname(__file__), ".."), ".."
     )
