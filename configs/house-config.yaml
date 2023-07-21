@@ -135,7 +135,7 @@ attorney_fee: !!float 800
 closing_protection_letter_fee: !!float 35
 
 # part of loosely defined "settlement fees"
-search_abstract_fee: !!float
+search_abstract_fee: !!float 300
 
 # part of loosely defined "settlement fees"
 survey_fee: !!float 500
