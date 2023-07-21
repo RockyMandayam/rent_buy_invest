@@ -5,6 +5,7 @@ import yaml
 from ..utils import io_utils, math_utils
 from .config import Config
 
+
 class RentConfig(Config):
     """Stores rent config.
 
