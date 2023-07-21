@@ -1,15 +1,14 @@
+from typing import Any, Dict
+
 import yaml
 
-from ..utils import math_utils
+from ..utils import io_utils, math_utils
 
 
-class RentConfig(yaml.YAMLObject):
+class RentConfig:
     """Stores rent config.
 
-    Due to using yaml_tag = "!RentConfig", the yaml library handles auto-
-    converting from a yaml file to an instance of this class. Therefore,
-    the __init__ method is not used.
-
+    TODO: maybe I don't need this documentation
     Documentation of the instance variable types:
         self.monthly_rent (float): Monthly rent for first month
         self.monthly_utilities (float): Monthly utilities for the first month
@@ -24,9 +23,18 @@ class RentConfig(yaml.YAMLObject):
             leases, 12 is a good number here.
     """
 
-    yaml_tag: str = "!RentConfig"
+    def __init__(self, **kwargs: Dict[str, Any]) -> None:  # too many to type
+        """Initializes the class.
 
-    # __init__ method not used due to yaml.YAMLObject
+        To see why I don't use yaml tags, see the docstring for __init__
+        in GeneralConfig.
+        """
+        self.monthly_rent: float = kwargs["monthly_rent"]
+        self.monthly_utilities: float = kwargs["monthly_utilities"]
+        self.monthly_renters_insurance: float = kwargs["monthly_renters_insurance"]
+        self.monthly_parking_fee: float = kwargs["monthly_parking_fee"]
+        self.annual_rent_inflation_rate: float = kwargs["annual_rent_inflation_rate"]
+        self.inflation_adjustment_period: int = kwargs["inflation_adjustment_period"]
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -54,10 +62,10 @@ class RentConfig(yaml.YAMLObject):
             AssertionError: If any rent configs are invalid
         """
         # TODO replace this absolute path string literal
-        with open(
+        rent_config = io_utils.load_yaml(
             "/Users/rocky/Downloads/rent_buy_invest/configs/rent-config.yaml"
-        ) as f:
-            rent_config = yaml.load(f, Loader=yaml.Loader)
+        )
+        rent_config = RentConfig(**rent_config)
         rent_config._validate()
         return rent_config
 
@@ -82,7 +90,7 @@ class RentConfig(yaml.YAMLObject):
         """
         return math_utils.project_growth(
             self._get_total_monthly_cost(),
-            self.annual_rent_inflation,
+            self.annual_rent_inflation_rate,
             False,
             num_months,
         )

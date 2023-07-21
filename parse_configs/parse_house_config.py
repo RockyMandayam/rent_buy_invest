@@ -1,21 +1,92 @@
+from typing import Any, Dict
+
 import yaml
 
+from ..utils import io_utils
 
-class HouseConfig(yaml.YAMLObject):
+
+class HouseConfig:
     """Stores house config.
-
-    Due to using yaml_tag = "!HouseConfig", the yaml library handles auto-
-    converting from a yaml file to an instance of this class. Therefore,
-    the __init__ method is not used.
 
     Documentation of the instance variable types:
     # TODO add documentation
     # TODO maybe just point to the yaml file
     """
 
-    yaml_tag: str = "!HouseConfig"
+    def __init__(
+        self,
+        **kwargs: Dict[str, Any],  # lots of parameters, see body of this method
+    ) -> None:
+        """Initializes the class.
 
-    # __init__ method not used due to yaml.YAMLObject
+        To see why I don't use yaml tags, see the docstring for __init__
+        in GeneralConfig.
+        """
+        self.sale_price: float = kwargs["sale_price"]
+        self.annual_assessed_value_inflation_rate: float = kwargs[
+            "annual_assessed_value_inflation_rate"
+        ]
+        self.down_payment_fraction: float = kwargs["down_payment_fraction"]
+        self.mortgage_annual_interest_rate: float = kwargs[
+            "mortgage_annual_interest_rate"
+        ]
+        self.mortgage_term_months: int = kwargs["mortgage_term_months"]
+        self.pmi_fraction: float = kwargs["pmi_fraction"]
+        self.mortgage_origination_points_fee: float = kwargs[
+            "mortgage_origination_points_fee"
+        ]
+        self.mortgage_processing_fee: float = kwargs["mortgage_processing_fee"]
+        self.mortgage_underwriting_fee: float = kwargs["mortgage_underwriting_fee"]
+        self.mortgage_discount_points_fee: float = kwargs[
+            "mortgage_discount_points_fee"
+        ]
+        self.house_appraisal_cost: float = kwargs["house_appraisal_cost"]
+        self.credit_report_fee: float = kwargs["credit_report_fee"]
+        self.transfer_tax_fraction: float = kwargs["transfer_tax_fraction"]
+        self.seller_burden_of_transfer_tax_fraction: float = kwargs[
+            "seller_burden_of_transfer_tax_fraction"
+        ]
+        self.recording_fee_fraction: float = kwargs["recording_fee_fraction"]
+        self.monthly_property_tax_rate: float = kwargs["monthly_property_tax_rate"]
+        self.realtor_commission_fraction: float = kwargs["realtor_commission_fraction"]
+        self.hoa_transfer_fee: float = kwargs["hoa_transfer_fee"]
+        self.seller_burden_of_hoa_transfer_fee: float = kwargs[
+            "seller_burden_of_hoa_transfer_fee"
+        ]
+        self.house_inspection_cost: float = kwargs["house_inspection_cost"]
+        self.pest_inspection_cost: float = kwargs["pest_inspection_cost"]
+        self.escrow_fixed_fee: float = kwargs["escrow_fixed_fee"]
+        self.flood_certification_fee: float = kwargs["flood_certification_fee"]
+        self.title_search_fee: float = kwargs["title_search_fee"]
+        self.seller_burden_of_title_search_fee_fraction: float = kwargs[
+            "seller_burden_of_title_search_fee_fraction"
+        ]
+        self.attorney_fee: float = kwargs["attorney_fee"]
+        self.closing_protection_letter_fee: float = kwargs[
+            "closing_protection_letter_fee"
+        ]
+        self.search_abstract_fee: float = kwargs["search_abstract_fee"]
+        self.survey_fee: float = kwargs["survey_fee"]
+        self.notary_fee: float = kwargs["notary_fee"]
+        self.deep_prep_fee: float = kwargs["deep_prep_fee"]
+        self.lenders_title_insurance_fraction: float = kwargs[
+            "lenders_title_insurance_fraction"
+        ]
+        self.owners_title_insurance_fraction: float = kwargs[
+            "owners_title_insurance_fraction"
+        ]
+        self.endorsement_fees: float = kwargs["endorsement_fees"]
+        self.monthly_homeowners_insurance_fraction: float = kwargs[
+            "monthly_homeowners_insurance_fraction"
+        ]
+        self.monthly_utilities: float = kwargs["monthly_utilities"]
+        self.annual_maintenance_cost_fraction: float = kwargs[
+            "annual_maintenance_cost_fraction"
+        ]
+        self.monthly_hoa_fees: float = kwargs["monthly_hoa_fees"]
+        self.annual_management_cost_fraction: float = kwargs[
+            "annual_management_cost_fraction"
+        ]
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -170,10 +241,10 @@ class HouseConfig(yaml.YAMLObject):
             AssertionError: If any house configs are invalid
         """
         # TODO replace this absolute path string literal
-        with open(
+        house_config = io_utils.load_yaml(
             "/Users/rocky/Downloads/rent_buy_invest/configs/house-config.yaml"
-        ) as f:
-            house_config = yaml.load(f, Loader=yaml.Loader)
+        )
+        house_config = HouseConfig(**house_config)
         house_config._validate()
         return house_config
 

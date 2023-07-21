@@ -1,14 +1,12 @@
+from typing import Any, Dict, List
+
 import yaml
 
-from ..utils import math_utils
+from ..utils import io_utils, math_utils
 
 
-class MarketConfig(yaml.YAMLObject):
+class MarketConfig:
     """Stores market config.
-
-    Due to using yaml_tag = "!MarketConfig", the yaml library handles auto-
-    converting from a yaml file to an instance of this class. Therefore,
-    the __init__ method is not used.
 
     Documentation of the instance variable types:
         self.market_rate_of_return (float): ANNUAL rate of return in the
@@ -16,16 +14,8 @@ class MarketConfig(yaml.YAMLObject):
         self.tax_brackets ('TaxBrackets'): A TaxBrackets object
     """
 
-    yaml_tag: str = "!MarketConfig"
-
-    # __init__ method not used due to yaml.YAMLObject
-
-    class TaxBrackets(yaml.YAMLObject):
+    class TaxBrackets:
         """Stores tax bracket config.
-
-        Due to using yaml_tag = "!TaxBrackets", the yaml library handles auto-
-        converting from a yaml file to an instance of this class. Therefore,
-        the __init__ method is not used.
 
         Documentation of the instance variable types:
             self.tax_brackets (List[Dict[str, float]]): A list of tax brackets,
@@ -37,9 +27,13 @@ class MarketConfig(yaml.YAMLObject):
                 an upper limit of positive infinity.
         """
 
-        yaml_tag: str = "!TaxBrackets"
+        def __init__(self, tax_brackets: List[Dict[str, float]]) -> None:
+            """Initializes the class.
 
-        # __init__ method not used due to yaml.YAMLObject
+            To see why I don't use yaml tags, see the docstring for __init__
+            in GeneralConfig.
+            """
+            self.tax_brackets: List[Dict[str, float]] = tax_brackets
 
         def _validate(self) -> None:
             """Sanity checks the configs.
@@ -87,6 +81,21 @@ class MarketConfig(yaml.YAMLObject):
                 lower_limit = upper_limit
             return tax
 
+    def __init__(
+        self,
+        market_rate_of_return: float,
+        tax_brackets: List[Dict[str, float]],
+    ) -> None:
+        """Initializes the class.
+
+        To see why I don't use yaml tags, see the docstring for __init__
+        in GeneralConfig.
+        """
+        self.market_rate_of_return: float = market_rate_of_return
+        self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
+            tax_brackets["tax_brackets"]
+        )
+
     def _validate(self) -> None:
         """Sanity checks the configs.
 
@@ -104,10 +113,10 @@ class MarketConfig(yaml.YAMLObject):
             AssertionError: If any market configs are invalid
         """
         # TODO replace this absolute path string literal
-        with open(
+        market_config = io_utils.load_yaml(
             "/Users/rocky/Downloads/rent_buy_invest/configs/market-config.yaml"
-        ) as f:
-            market_config = yaml.load(f, Loader=yaml.Loader)
+        )
+        market_config = MarketConfig(**market_config)
         market_config._validate()
         return market_config
 

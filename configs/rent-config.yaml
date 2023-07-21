@@ -1,6 +1,5 @@
 # Config file relating to assumptions about rent
 
---- !RentConfig
 
 # monthly rent for the first month
 monthly_rent: !!float 2000.0
