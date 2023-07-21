@@ -2,15 +2,17 @@ import pytest
 
 from . import math_utils
 
+
 def test_get_equivalent_monthly_compound_rate() -> None:
-    annual_compound_rate = 4095 # unrealistic example, just trying with a nice int
+    annual_compound_rate = 4095  # unrealistic example, just trying with a nice int
     actual = math_utils.get_equivalent_monthly_compound_rate(annual_compound_rate)
     expected = 1
     assert actual == pytest.approx(expected)
-    annual_compound_rate = 0.07 # unrealistic example, just trying with a nice int
+    annual_compound_rate = 0.07  # unrealistic example, just trying with a nice int
     actual = math_utils.get_equivalent_monthly_compound_rate(annual_compound_rate)
     expected = 0.00565414539
     assert actual == pytest.approx(expected)
+
 
 def test_get_monthly_costs() -> None:
     # test negative principal
@@ -19,13 +21,17 @@ def test_get_monthly_costs() -> None:
     compound_monthly = True
     num_months = 1
     with pytest.raises(AssertionError):
-        math_utils.project_growth(principal, annual_growth_rate, compound_monthly, num_months)
+        math_utils.project_growth(
+            principal, annual_growth_rate, compound_monthly, num_months
+        )
 
     # test negative num_months
     principal = 0
     num_months = 0
     with pytest.raises(AssertionError):
-        math_utils.project_growth(principal, annual_growth_rate, compound_monthly, num_months)
+        math_utils.project_growth(
+            principal, annual_growth_rate, compound_monthly, num_months
+        )
 
     # test compounding annually
     principal = 1000
@@ -47,16 +53,23 @@ def test_get_monthly_costs() -> None:
     actual = math_utils.project_growth(
         principal, annual_growth_rate, compound_monthly, num_months
     )
-    equivalent_monthly_rate = math_utils.get_equivalent_monthly_compound_rate(annual_growth_rate)
-    expected = [round(principal*(1 + equivalent_monthly_rate)**m, 2) for m in range(num_months)]
+    equivalent_monthly_rate = math_utils.get_equivalent_monthly_compound_rate(
+        annual_growth_rate
+    )
+    expected = [
+        round(principal * (1 + equivalent_monthly_rate) ** m, 2)
+        for m in range(num_months)
+    ]
     assert actual == expected
 
     # test without rounding
     actual = math_utils.project_growth(
         principal, annual_growth_rate, compound_monthly, num_months, round_to_cent=False
     )
-    equivalent_monthly_rate = math_utils.get_equivalent_monthly_compound_rate(annual_growth_rate)
-    expected = [principal*(1 + equivalent_monthly_rate)**m for m in range(num_months)]
+    equivalent_monthly_rate = math_utils.get_equivalent_monthly_compound_rate(
+        annual_growth_rate
+    )
+    expected = [
+        principal * (1 + equivalent_monthly_rate) ** m for m in range(num_months)
+    ]
     assert actual == pytest.approx(expected)
-
-
