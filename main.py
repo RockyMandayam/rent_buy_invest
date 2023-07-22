@@ -75,10 +75,12 @@ def main() -> None:
     # project forward in time
     # some numbers can be calculated ahead of time, others month by month
     rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
-    # rent_invested_in_market = market_config.get_pretax_monthly_wealth(rent)
-    projection = [[None, "Rent monthly cost"]]
+    rent_investment_monthly = market_config.get_pretax_monthly_wealth(
+        initial_state.rent_invested, num_months
+    )
+    projection = [[None, "Rent monthly cost", "Rent market investment"]]
     for month in range(experiment_config.num_months):
-        month_row = [month, rent_monthly_costs[month]]
+        month_row = [month, rent_monthly_costs[month], rent_investment_monthly[month]]
         projection.append(month_row)
     _write_output_csv(output_dir, "projection.csv", projection)
 
