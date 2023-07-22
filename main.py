@@ -3,7 +3,7 @@ import datetime
 import os
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
-from rent_buy_invest.utils import io_utils, path_utils
+from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
@@ -26,7 +26,7 @@ def get_args() -> argparse.Namespace:
 def make_output_dir() -> str:
     timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     output_dir = os.path.join(OVERALL_OUTPUT_DIR, f"experiment_{timestamp_str}")
-    output_dir = path_utils.get_abs_path(output_dir)
+    output_dir = io_utils.get_abs_path(output_dir)
     os.makedirs(output_dir)
     return output_dir
 
