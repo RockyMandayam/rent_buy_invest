@@ -1,6 +1,9 @@
 import argparse
 import datetime
 import os
+from typing import Any, Dict, List
+
+import yaml
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
 from rent_buy_invest.utils import io_utils
@@ -26,9 +29,20 @@ def get_args() -> argparse.Namespace:
 def make_output_dir() -> str:
     timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     output_dir = os.path.join(OVERALL_OUTPUT_DIR, f"experiment_{timestamp_str}")
-    output_dir = io_utils.get_abs_path(output_dir)
-    os.makedirs(output_dir)
+    io_utils.make_dirs(output_dir)
     return output_dir
+    # os.makedirs(io_utils.get_abs_path(output_dir))
+    # return output_dir
+
+
+def write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
+    path = os.path.join(output_dir, filename)
+    io_utils.write_yaml(path, obj)
+
+
+def write_output_csv(output_dir: str, filename: str, rows: List[List[str]]) -> None:
+    path = os.path.join(output_dir, filename)
+    io_utils.write_csv(path, rows)
 
 
 def main() -> None:
@@ -46,6 +60,9 @@ def main() -> None:
 
     # create output dir
     output_dir = make_output_dir()
+
+    # dump configs in output dir (to keep record of configs)
+    write_output_yaml(output_dir, "configs.yaml", experiment_config)
 
     # calculate initial state
     # TODO are there costs? Moving? Security deposit?
@@ -66,8 +83,7 @@ def main() -> None:
             house_invested_in_house,
         ],
     ]
-    initial_state_file_path = os.path.join(output_dir, "initial_state.csv")
-    io_utils.write_csv(initial_state_file_path, initial_state)
+    write_output_csv(output_dir, "initial_state.csv", initial_state)
 
     # project forward in time
     # some numbers can be calculated ahead of time
@@ -77,8 +93,7 @@ def main() -> None:
     for month in range(experiment_config.num_months):
         month_row = [month, rent_monthly_costs[month]]
         projection.append(month_row)
-    projection_file_path = os.path.join(output_dir, "projection.csv")
-    io_utils.write_csv(projection_file_path, projection)
+    write_output_csv(output_dir, "projection.csv", projection)
 
 
 if __name__ == "__main__":

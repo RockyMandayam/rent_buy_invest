@@ -4,8 +4,10 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 
+from rent_buy_invest.utils import io_utils
 
-def get_abs_path(project_path: str) -> str:
+
+def _get_abs_path(project_path: str) -> str:
     """Returns the absolute path given relative path.
 
     Args:
@@ -15,7 +17,7 @@ def get_abs_path(project_path: str) -> str:
         str: absolute path
 
     Examples:
-    >>> get_abs_path("rent_buy_invest/configs")
+    >>> _get_abs_path("rent_buy_invest/configs")
     '/Users/FooBarUser/rent_buy_invest/configs'
     """
     # TODO is there any way not to hard code this?
@@ -28,18 +30,32 @@ def get_abs_path(project_path: str) -> str:
     return os.path.join(os.path.abspath(dir_containing_top_level_dir), project_path)
 
 
-def load_yaml(path: str) -> Dict[str, Any]:
-    """Load yaml given by path as dictionary."""
-    with open(path) as f:
+def make_dirs(project_path: str) -> None:
+    os.makedirs(_get_abs_path(project_path))
+
+
+def read_yaml(project_path: str) -> Dict[str, Any]:
+    """Load yaml given by path (from top-level directory) as dictionary."""
+    abs_path = _get_abs_path(project_path)
+    with open(abs_path, mode="r") as f:
         general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     return general_config
 
 
+# TODO test this
+def write_yaml(project_path: str, obj: Any) -> None:
+    """Write objct to given path (from top-level directory) as yaml."""
+    abs_path = _get_abs_path(project_path)
+    with open(abs_path, mode="x") as f:
+        yaml.dump(obj, f)
+
+
 # TODO maybe make this a context I can iteratively write to?
 # TODO test this
-def write_csv(path: str, rows: List[List[Optional[str]]]) -> None:
+def write_csv(project_path: str, rows: List[List[Optional[str]]]) -> None:
     """Write the given rows to file with given path."""
-    with open(path, mode="x", newline="") as f:
+    abs_path = _get_abs_path(project_path)
+    with open(abs_path, mode="x", newline="") as f:
         writer = csv.writer(f, strict=True)
         for row in rows:
             writer.writerow(row)
