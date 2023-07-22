@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 import yaml
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
+from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
@@ -41,31 +42,11 @@ def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
     io_utils.write_yaml(path, obj)
 
 
-def _write_output_csv(output_dir: str, filename: str, rows: List[List[Optional[Any]]]) -> None:
+def _write_output_csv(
+    output_dir: str, filename: str, rows: List[List[Optional[Any]]]
+) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_csv(path, rows)
-
-
-def _get_initial_state(house_config: HouseConfig) -> List[List[Optional[Any]]]:
-    # TODO are there costs? Moving? Security deposit?
-    rent_one_time_costs = 0
-    house_one_time_costs = house_config.get_upfront_one_time_cost()
-    house_invested_in_house = house_config.get_down_payment()
-    # TODO what if rent_one_time_costs is non-zero? Can this be negative?
-    rent_invested_in_market = (
-        house_one_time_costs + house_invested_in_house - rent_one_time_costs
-    )
-    # initial state csv rows to write
-    initial_state = [
-        [None, "Rent", "House"],
-        ["One-time costs", rent_one_time_costs, house_one_time_costs],
-        [
-            "Invested (in market or house)",
-            rent_invested_in_market,
-            house_invested_in_house,
-        ],
-    ]
-    return initial_state
 
 
 def main() -> None:
@@ -88,13 +69,14 @@ def main() -> None:
     _write_output_yaml(output_dir, "configs.yaml", experiment_config)
 
     # calculate initial state
-    initial_state = _get_initial_state(house_config)
-    _write_output_csv(output_dir, "initial_state.csv", initial_state)
+    initial_state = InitialState(house_config)
+    _write_output_csv(output_dir, "initial_state.csv", initial_state.to_csv())
 
     # project forward in time
     # some numbers can be calculated ahead of time, others month by month
     rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
-    projection = [None, "Rent monthly cost"]
+    # rent_invested_in_market = market_config.get_pretax_monthly_wealth(rent)
+    projection = [[None, "Rent monthly cost"]]
     for month in range(experiment_config.num_months):
         month_row = [month, rent_monthly_costs[month]]
         projection.append(month_row)
