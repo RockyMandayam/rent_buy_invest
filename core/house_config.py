@@ -259,7 +259,7 @@ class HouseConfig(Config):
         )
 
     def _get_first_inflation_related_monthly_cost(self) -> float:
-        return self.monthly_utilities
+        return self.monthly_utilities + self.monthly_hoa_fees
 
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
