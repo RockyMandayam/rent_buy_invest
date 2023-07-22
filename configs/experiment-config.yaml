@@ -5,10 +5,10 @@
 num_months: !!int 40
 
 # market config file path from top-level directory 
-market_config_path: !!str "rent_buy_invest/configs/market-config.yaml"
+market_config_path: !!str "rent_buy_invest/configs/market/market-config.yaml"
 
 # rent config file path from top-level directory 
-rent_config_path: !!str "rent_buy_invest/configs/rent-config.yaml"
+rent_config_path: !!str "rent_buy_invest/configs/rent/rent-config.yaml"
 
 # house config file path from top-level directory 
-house_config_path: !!str "rent_buy_invest/configs/house-config.yaml"
+house_config_path: !!str "rent_buy_invest/configs/house/house-config.yaml"
