@@ -12,4 +12,15 @@ class Config(ABC):
 
     @classmethod
     def parse(cls, project_path: str) -> "Config":
-        return cls(**io_utils.load_yaml(path_utils.get_abs_path(project_path)))
+        """Returns object with type equal to the calling class using arguments
+        provided in the yaml file with the given path.
+
+        Args:
+            project_path (str): Path (from top-level directory) to yaml file
+
+        Returns:
+            cls: Object with type equal to the calling class (whicch will be a
+                descendent of this class)
+        """
+        abs_path = path_utils.get_abs_path(project_path)
+        return cls(**io_utils.load_yaml(abs_path))
