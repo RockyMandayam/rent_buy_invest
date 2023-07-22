@@ -3,3 +3,12 @@
 
 # number of months to run the calculations for (max of 150)
 num_months: !!int 40
+
+# market config file path from top-level directory 
+market_config_path: !!str "rent_buy_invest/core/test_resources/2023-market-config.yaml"
+
+# rent config file path from top-level directory 
+rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.yaml"
+
+# house config file path from top-level directory 
+house_config_path: !!str "rent_buy_invest/core/test_resources/test-house-config.yaml"

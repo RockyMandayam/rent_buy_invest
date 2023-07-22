@@ -3,7 +3,10 @@ from typing import Any, Dict
 import yaml
 
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.core.house_config import HouseConfig
+from rent_buy_invest.core.market_config import MarketConfig
+from rent_buy_invest.core.rent_config import RentConfig
+from rent_buy_invest.utils import io_utils, path_utils
 
 
 class ExperimentConfig(Config):
@@ -14,7 +17,13 @@ class ExperimentConfig(Config):
     # TODO maybe just point to the yaml file
     """
 
-    def __init__(self, num_months: int) -> None:
+    def __init__(
+        self,
+        num_months: int,
+        market_config_path: str,
+        rent_config_path: str,
+        house_config_path: str,
+    ) -> None:
         """Initializes the class.
 
         To easily convert a yaml file to a class, there is the option of using
@@ -30,6 +39,9 @@ class ExperimentConfig(Config):
         Exception, but this approach seems bad.
         """
         self.num_months: int = num_months
+        self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
+        self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
+        self.house_config: HouseConfig = HouseConfig.parse(house_config_path)
         self._validate()
 
     def _validate(self) -> None:

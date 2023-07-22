@@ -5,8 +5,7 @@ from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.utils import io_utils, path_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/2023-market-config.yaml"
-filename = path_utils.get_abs_path(TEST_CONFIG_PATH)
-market_config = MarketConfig.parse(filename)
+market_config = MarketConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestMarketConfig:

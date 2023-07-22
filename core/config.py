@@ -1,6 +1,6 @@
 from abc import ABC
 
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.utils import io_utils, path_utils
 
 
 class Config(ABC):
@@ -11,5 +11,16 @@ class Config(ABC):
     """
 
     @classmethod
-    def parse(cls, filename: str) -> "Config":
-        return cls(**io_utils.load_yaml(filename))
+    def parse(cls, project_path: str) -> "Config":
+        """Returns object with type equal to the calling class using arguments
+        provided in the yaml file with the given path.
+
+        Args:
+            project_path (str): Path (from top-level directory) to yaml file
+
+        Returns:
+            cls: Object with type equal to the calling class (whicch will be a
+                descendent of this class)
+        """
+        abs_path = path_utils.get_abs_path(project_path)
+        return cls(**io_utils.load_yaml(abs_path))

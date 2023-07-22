@@ -4,8 +4,7 @@ from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils import io_utils, path_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
-filename = path_utils.get_abs_path(TEST_CONFIG_PATH)
-rent_config = RentConfig.parse(filename)
+rent_config = RentConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestRentConfig:

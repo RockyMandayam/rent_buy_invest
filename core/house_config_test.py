@@ -6,8 +6,7 @@ from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.utils import io_utils, path_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
-filename = path_utils.get_abs_path(TEST_CONFIG_PATH)
-house_config = HouseConfig.parse(filename)
+house_config = HouseConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestHouseConfig:
