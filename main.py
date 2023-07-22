@@ -1,17 +1,21 @@
 import argparse
 import datetime
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import yaml
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
+from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
 
-def get_args() -> argparse.Namespace:
+# TODO test this file
+
+
+def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="rent_buy_invest",
         description="Calculates the long-term financial pros and cons of decisions related to renting a home, buying a house, and investing in the stock market.",
@@ -26,21 +30,21 @@ def get_args() -> argparse.Namespace:
     return args
 
 
-def make_output_dir() -> str:
+def _make_output_dir() -> str:
     timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     output_dir = os.path.join(OVERALL_OUTPUT_DIR, f"experiment_{timestamp_str}")
     io_utils.make_dirs(output_dir)
     return output_dir
-    # os.makedirs(io_utils.get_abs_path(output_dir))
-    # return output_dir
 
 
-def write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
+def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_yaml(path, obj)
 
 
-def write_output_csv(output_dir: str, filename: str, rows: List[List[str]]) -> None:
+def _write_output_csv(
+    output_dir: str, filename: str, rows: List[List[Optional[Any]]]
+) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_csv(path, rows)
 
@@ -49,7 +53,7 @@ def main() -> None:
     """Main method; entrypoint for this repo."""
 
     # get args; set up `--help` and `-h`
-    args = get_args()
+    args = _get_args()
 
     # load configs
     experiment_config = ExperimentConfig.parse(args.experiment_config)
@@ -59,41 +63,26 @@ def main() -> None:
     house_config = experiment_config.house_config
 
     # create output dir
-    output_dir = make_output_dir()
+    output_dir = _make_output_dir()
 
     # dump configs in output dir (to keep record of configs)
-    write_output_yaml(output_dir, "configs.yaml", experiment_config)
+    _write_output_yaml(output_dir, "configs.yaml", experiment_config)
 
     # calculate initial state
-    # TODO are there costs? Moving? Security deposit?
-    rent_one_time_costs = 0
-    house_one_time_costs = house_config.get_upfront_one_time_cost()
-    house_invested_in_house = house_config.get_down_payment()
-    # TODO what if rent_one_time_costs is non-zero? Can this be negative?
-    rent_invested_in_market = (
-        house_one_time_costs + house_invested_in_house - rent_one_time_costs
-    )
-    # initial state csv rows to write
-    initial_state = [
-        [None, "Rent", "House"],
-        ["One-time costs", rent_one_time_costs, house_one_time_costs],
-        [
-            "Invested (in market or house)",
-            rent_invested_in_market,
-            house_invested_in_house,
-        ],
-    ]
-    write_output_csv(output_dir, "initial_state.csv", initial_state)
+    initial_state = InitialState(house_config)
+    _write_output_csv(output_dir, "initial_state.csv", initial_state.to_csv())
 
     # project forward in time
-    # some numbers can be calculated ahead of time
+    # some numbers can be calculated ahead of time, others month by month
     rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
-    # calculate the rest month by month
-    projection = []
+    rent_investment_monthly = market_config.get_pretax_monthly_wealth(
+        initial_state.rent_invested, num_months
+    )
+    projection = [[None, "Rent monthly cost", "Rent market investment"]]
     for month in range(experiment_config.num_months):
-        month_row = [month, rent_monthly_costs[month]]
+        month_row = [month, rent_monthly_costs[month], rent_investment_monthly[month]]
         projection.append(month_row)
-    write_output_csv(output_dir, "projection.csv", projection)
+    _write_output_csv(output_dir, "projection.csv", projection)
 
 
 if __name__ == "__main__":
