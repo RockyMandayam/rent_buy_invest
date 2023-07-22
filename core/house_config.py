@@ -191,15 +191,17 @@ class HouseConfig(Config):
     def get_down_payment(self):
         return self.down_payment_fraction * self.sale_price
 
-    def get_loan_amount(self):
+    def get_initial_loan_amount(self):
         return (1 - self.down_payment_fraction) * self.sale_price
 
     def get_upfront_one_time_cost(self):
         return (
-            self.mortgage_origination_points_fee_fraction * self.get_loan_amount()
+            self.mortgage_origination_points_fee_fraction
+            * self.get_initial_loan_amount()
             + self.mortgage_processing_fee
             + self.mortgage_underwriting_fee
-            + self.mortgage_discount_points_fee_fraction * self.get_loan_amount()
+            + self.mortgage_discount_points_fee_fraction
+            * self.get_initial_loan_amount()
             + self.house_appraisal_cost
             + self.credit_report_fee
             + (1 - self.seller_burden_of_transfer_tax_fraction)
@@ -220,8 +222,8 @@ class HouseConfig(Config):
             + self.survey_fee
             + self.notary_fee
             + self.deep_prep_fee
-            + self.lenders_title_insurance_fraction * self.get_loan_amount()
-            + self.owners_title_insurance_fraction * self.get_loan_amount()
+            + self.lenders_title_insurance_fraction * self.get_initial_loan_amount()
+            + self.owners_title_insurance_fraction * self.get_initial_loan_amount()
             + self.endorsement_fees
         )
 
@@ -231,7 +233,7 @@ class HouseConfig(Config):
         # as opposed to using the "equivalent" monthly compound rate
         i = self.mortgage_annual_interest_rate / 12
         r = 1 / (1 + i)
-        L = self.get_loan_amount()
+        L = self.get_initial_loan_amount()
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_monthly_house_values(self, num_months: int):
