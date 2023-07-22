@@ -1,8 +1,9 @@
 import csv
-from typing import Any, Dict, List, Optional
 import os
+from typing import Any, Dict, List, Optional
 
 import yaml
+
 
 def get_abs_path(project_path: str) -> str:
     """Returns the absolute path given relative path.
@@ -25,6 +26,7 @@ def get_abs_path(project_path: str) -> str:
     )
     dir_containing_top_level_dir = os.path.abspath(dir_containing_top_level_dir)
     return os.path.join(os.path.abspath(dir_containing_top_level_dir), project_path)
+
 
 def load_yaml(path: str) -> Dict[str, Any]:
     """Load yaml given by path as dictionary."""
