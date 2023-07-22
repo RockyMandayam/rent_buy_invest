@@ -1,6 +1,6 @@
 import pytest
 
-from . import math_utils
+from rent_buy_invest.utils import math_utils
 
 
 def test_get_equivalent_monthly_compound_rate() -> None:

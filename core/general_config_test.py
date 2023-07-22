@@ -2,8 +2,8 @@ from typing import Any, Dict
 
 import yaml
 
-from ..utils import io_utils, path_utils
-from .general_config import GeneralConfig
+from rent_buy_invest.core.general_config import GeneralConfig
+from rent_buy_invest.utils import io_utils, path_utils
 
 
 class TestGeneralConfig:

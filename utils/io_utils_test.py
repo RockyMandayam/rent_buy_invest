@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 import yaml
 
-from . import io_utils, path_utils
+from rent_buy_invest.utils import io_utils, path_utils
 
 
 def test_load_yaml() -> None:
