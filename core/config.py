@@ -22,5 +22,4 @@ class Config(ABC):
             cls: Object with type equal to the calling class (whicch will be a
                 descendent of this class)
         """
-        abs_path = io_utils.get_abs_path(project_path)
-        return cls(**io_utils.load_yaml(abs_path))
+        return cls(**io_utils.read_yaml(project_path))
