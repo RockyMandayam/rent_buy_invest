@@ -257,3 +257,16 @@ class HouseConfig(Config):
             compound_monthly=True,
             num_months=num_months,
         )
+
+    def _get_first_inflation_related_monthly_cost(self) -> float:
+        return self.monthly_utilities
+
+    def get_inflation_related_monthly_costs(
+        self, annual_inflation_rate: float, num_months: int
+    ) -> float:
+        return math_utils.project_growth(
+            principal=self._get_first_inflation_related_monthly_cost(),
+            annual_growth_rate=annual_inflation_rate,
+            compound_monthly=True,
+            num_months=num_months,
+        )

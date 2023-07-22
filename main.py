@@ -79,16 +79,24 @@ def main() -> None:
         initial_state.rent_invested, num_months
     )
     house_values = house_config.get_monthly_house_values(num_months)
-    house_value_related_monthly_costs = (
+    house_monthly_costs_related_to_house_value = (
         house_config.get_house_value_related_monthly_costs(num_months)
     )
+    house_monthly_costs_related_to_inflation = (
+        # TODO don't use rent inflation maybe? Use something else for utilities for rent and house?
+        house_config.get_inflation_related_monthly_costs(
+            rent_config.annual_rent_inflation_rate, num_months
+        )
+    )
+
     projection = [
         [
             None,
-            "Rent monthly cost",
-            "Rent market investment",
-            "House value related monthly cost",
-            "House value",
+            "Rent: monthly cost",
+            "Rent: market investment",
+            "House: house value related monthly cost",
+            "House: house value",
+            "House: inflation related monthly cost",
         ]
     ]
     for month in range(experiment_config.num_months):
@@ -96,8 +104,9 @@ def main() -> None:
             month,
             rent_monthly_costs[month],
             rent_investment_monthly[month],
-            house_value_related_monthly_costs[month],
+            house_monthly_costs_related_to_house_value[month],
             house_values[month],
+            house_monthly_costs_related_to_inflation[month],
         ]
         projection.append(month_row)
     _write_output_csv(output_dir, "projection.csv", projection)
