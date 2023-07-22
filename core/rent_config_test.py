@@ -3,9 +3,8 @@ import yaml
 from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils import io_utils, path_utils
 
-filename = path_utils.get_abs_path(
-    "rent_buy_invest/core/test_resources/test-rent-config.yaml"
-)
+TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
+filename = path_utils.get_abs_path(TEST_CONFIG_PATH)
 rent_config = RentConfig.parse(filename)
 
 

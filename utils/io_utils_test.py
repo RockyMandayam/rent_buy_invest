@@ -4,11 +4,11 @@ import yaml
 
 from rent_buy_invest.utils import io_utils, path_utils
 
+TEST_YAML_PATH = "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
+
 
 def test_load_yaml() -> None:
-    filename = path_utils.get_abs_path(
-        "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
-    )
+    filename = path_utils.get_abs_path(TEST_YAML_PATH)
     with open(filename) as f:
         actual: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     expected = {
