@@ -1,6 +1,6 @@
+import csv
 from typing import Any, Dict, List, Optional
 
-import csv
 import yaml
 
 
@@ -9,6 +9,7 @@ def load_yaml(path: str) -> Dict[str, Any]:
     with open(path) as f:
         general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     return general_config
+
 
 # TODO maybe make this a context I can iteratively write to?
 # TODO test this

@@ -1,7 +1,11 @@
 import argparse
+import datetime
+import os
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.utils import io_utils, path_utils
+
+OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
 
 def get_args() -> argparse.Namespace:
@@ -19,6 +23,14 @@ def get_args() -> argparse.Namespace:
     return args
 
 
+def make_output_dir() -> str:
+    timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    output_dir = os.path.join(OVERALL_OUTPUT_DIR, f"experiment_{timestamp_str}")
+    output_dir = path_utils.get_abs_path(output_dir)
+    os.makedirs(output_dir)
+    return output_dir
+
+
 def main() -> None:
     """Main method; entrypoint for this repo."""
 
@@ -31,6 +43,9 @@ def main() -> None:
     market_config = experiment_config.market_config
     rent_config = experiment_config.rent_config
     house_config = experiment_config.house_config
+
+    # create output dir
+    output_dir = make_output_dir()
 
     # calculate initial state
     # TODO are there costs? Moving? Security deposit?
@@ -51,16 +66,19 @@ def main() -> None:
             house_invested_in_house,
         ],
     ]
-    io_utils.write_csv("out_initial_state.csv", initial_state)
+    initial_state_file_path = os.path.join(output_dir, "initial_state.csv")
+    io_utils.write_csv(initial_state_file_path, initial_state)
 
+    # project forward in time
     # some numbers can be calculated ahead of time
     rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
-
+    # calculate the rest month by month
     projection = []
     for month in range(experiment_config.num_months):
         month_row = [month, rent_monthly_costs[month]]
         projection.append(month_row)
-    io_utils.write_csv("out_projection.csv", projection)
+    projection_file_path = os.path.join(output_dir, "projection.csv")
+    io_utils.write_csv(projection_file_path, projection)
 
 
 if __name__ == "__main__":
