@@ -1,6 +1,8 @@
 import argparse
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
+from rent_buy_invest.utils import io_utils
+
 
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -16,9 +18,10 @@ def get_args() -> argparse.Namespace:
     args = parser.parse_args()
     return args
 
+
 def main() -> None:
-    """ Main method; entrypoint for this repo. """
-    
+    """Main method; entrypoint for this repo."""
+
     # get args; set up `--help` and `-h`
     args = get_args()
 
@@ -29,18 +32,35 @@ def main() -> None:
     rent_config = experiment_config.rent_config
     house_config = experiment_config.house_config
 
-
-    # calculate starting points
+    # calculate initial state
     # TODO are there costs? Moving? Security deposit?
-    rent_one_time_costs = 0 
+    rent_one_time_costs = 0
     house_one_time_costs = house_config.get_upfront_one_time_cost()
     house_invested_in_house = house_config.get_down_payment()
     # TODO what if rent_one_time_costs is non-zero? Can this be negative?
-    rent_invested_in_market = house_one_time_costs + house_invested_in_house - rent_one_time_costs
-    
-    # # some numbers can be calculated ahead of time
+    rent_invested_in_market = (
+        house_one_time_costs + house_invested_in_house - rent_one_time_costs
+    )
+    # initial state csv rows to write
+    initial_state = [
+        [None, "Rent", "House"],
+        ["One-time costs", rent_one_time_costs, house_one_time_costs],
+        [
+            "Invested (in market or house)",
+            rent_invested_in_market,
+            house_invested_in_house,
+        ],
+    ]
+    io_utils.write_csv("out_initial_state.csv", initial_state)
 
-    # # for month in range(experiment_config.num_months):
+    # some numbers can be calculated ahead of time
+    rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
+
+    projection = []
+    for month in range(experiment_config.num_months):
+        month_row = [month, rent_monthly_costs[month]]
+        projection.append(month_row)
+    io_utils.write_csv("out_projection.csv", projection)
 
 
 if __name__ == "__main__":
