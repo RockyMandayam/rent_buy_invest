@@ -1,6 +1,6 @@
 from abc import ABC
 
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.utils import io_utils, path_utils
 
 
 class Config(ABC):
@@ -11,5 +11,5 @@ class Config(ABC):
     """
 
     @classmethod
-    def parse(cls, filename: str) -> "Config":
-        return cls(**io_utils.load_yaml(filename))
+    def parse(cls, project_path: str) -> "Config":
+        return cls(**io_utils.load_yaml(path_utils.get_abs_path(project_path)))

@@ -39,15 +39,9 @@ class ExperimentConfig(Config):
         Exception, but this approach seems bad.
         """
         self.num_months: int = num_months
-        self.market_config: MarketConfig = MarketConfig.parse(
-            path_utils.get_abs_path(market_config_path)
-        )
-        self.rent_config: RentConfig = RentConfig.parse(
-            path_utils.get_abs_path(rent_config_path)
-        )
-        self.house_config: HouseConfig = HouseConfig.parse(
-            path_utils.get_abs_path(house_config_path)
-        )
+        self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
+        self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
+        self.house_config: HouseConfig = HouseConfig.parse(house_config_path)
         self._validate()
 
     def _validate(self) -> None:
