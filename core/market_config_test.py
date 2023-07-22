@@ -1,8 +1,8 @@
 import pytest
 import yaml
 
-from ..utils import io_utils, path_utils
-from .market_config import MarketConfig
+from rent_buy_invest.core.market_config import MarketConfig
+from rent_buy_invest.utils import io_utils, path_utils
 
 filename = path_utils.get_abs_path(
     "rent_buy_invest/core/test_resources/2023-market-config.yaml"

@@ -1,4 +1,4 @@
-from . import path_utils
+from rent_buy_invest.utils import path_utils
 
 
 def test_get_abs_path() -> None:

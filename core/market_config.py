@@ -2,8 +2,8 @@ from typing import Any, Dict, List
 
 import yaml
 
-from ..utils import io_utils, math_utils
-from .config import Config
+from rent_buy_invest.core.config import Config
+from rent_buy_invest.utils import io_utils, math_utils
 
 
 class MarketConfig(Config):

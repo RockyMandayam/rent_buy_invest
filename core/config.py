@@ -1,6 +1,6 @@
 from abc import ABC
 
-from ..utils import io_utils
+from rent_buy_invest.utils import io_utils
 
 
 class Config(ABC):
