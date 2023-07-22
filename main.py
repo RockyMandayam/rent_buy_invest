@@ -1,7 +1,7 @@
 import argparse
 import datetime
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import yaml
 
@@ -11,7 +11,10 @@ from rent_buy_invest.utils import io_utils
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
 
-def get_args() -> argparse.Namespace:
+# TODO test this file
+
+
+def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="rent_buy_invest",
         description="Calculates the long-term financial pros and cons of decisions related to renting a home, buying a house, and investing in the stock market.",
@@ -26,45 +29,24 @@ def get_args() -> argparse.Namespace:
     return args
 
 
-def make_output_dir() -> str:
+def _make_output_dir() -> str:
     timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     output_dir = os.path.join(OVERALL_OUTPUT_DIR, f"experiment_{timestamp_str}")
     io_utils.make_dirs(output_dir)
     return output_dir
-    # os.makedirs(io_utils.get_abs_path(output_dir))
-    # return output_dir
 
 
-def write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
+def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_yaml(path, obj)
 
 
-def write_output_csv(output_dir: str, filename: str, rows: List[List[str]]) -> None:
+def _write_output_csv(output_dir: str, filename: str, rows: List[List[Optional[Any]]]) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_csv(path, rows)
 
 
-def main() -> None:
-    """Main method; entrypoint for this repo."""
-
-    # get args; set up `--help` and `-h`
-    args = get_args()
-
-    # load configs
-    experiment_config = ExperimentConfig.parse(args.experiment_config)
-    num_months = experiment_config.num_months
-    market_config = experiment_config.market_config
-    rent_config = experiment_config.rent_config
-    house_config = experiment_config.house_config
-
-    # create output dir
-    output_dir = make_output_dir()
-
-    # dump configs in output dir (to keep record of configs)
-    write_output_yaml(output_dir, "configs.yaml", experiment_config)
-
-    # calculate initial state
+def _get_initial_state(house_config: HouseConfig) -> List[List[Optional[Any]]]:
     # TODO are there costs? Moving? Security deposit?
     rent_one_time_costs = 0
     house_one_time_costs = house_config.get_upfront_one_time_cost()
@@ -83,17 +65,40 @@ def main() -> None:
             house_invested_in_house,
         ],
     ]
-    write_output_csv(output_dir, "initial_state.csv", initial_state)
+    return initial_state
+
+
+def main() -> None:
+    """Main method; entrypoint for this repo."""
+
+    # get args; set up `--help` and `-h`
+    args = _get_args()
+
+    # load configs
+    experiment_config = ExperimentConfig.parse(args.experiment_config)
+    num_months = experiment_config.num_months
+    market_config = experiment_config.market_config
+    rent_config = experiment_config.rent_config
+    house_config = experiment_config.house_config
+
+    # create output dir
+    output_dir = _make_output_dir()
+
+    # dump configs in output dir (to keep record of configs)
+    _write_output_yaml(output_dir, "configs.yaml", experiment_config)
+
+    # calculate initial state
+    initial_state = _get_initial_state(house_config)
+    _write_output_csv(output_dir, "initial_state.csv", initial_state)
 
     # project forward in time
-    # some numbers can be calculated ahead of time
+    # some numbers can be calculated ahead of time, others month by month
     rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
-    # calculate the rest month by month
-    projection = []
+    projection = [None, "Rent monthly cost"]
     for month in range(experiment_config.num_months):
         month_row = [month, rent_monthly_costs[month]]
         projection.append(month_row)
-    write_output_csv(output_dir, "projection.csv", projection)
+    _write_output_csv(output_dir, "projection.csv", projection)
 
 
 if __name__ == "__main__":
