@@ -1,7 +1,7 @@
 import yaml
 
 from rent_buy_invest.core.rent_config import RentConfig
-from rent_buy_invest.utils import io_utils, path_utils
+from rent_buy_invest.utils import io_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
 rent_config = RentConfig.parse(TEST_CONFIG_PATH)

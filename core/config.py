@@ -1,6 +1,6 @@
 from abc import ABC
 
-from rent_buy_invest.utils import io_utils, path_utils
+from rent_buy_invest.utils import io_utils
 
 
 class Config(ABC):
@@ -22,5 +22,5 @@ class Config(ABC):
             cls: Object with type equal to the calling class (whicch will be a
                 descendent of this class)
         """
-        abs_path = path_utils.get_abs_path(project_path)
+        abs_path = io_utils.get_abs_path(project_path)
         return cls(**io_utils.load_yaml(abs_path))

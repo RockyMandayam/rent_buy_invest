@@ -3,7 +3,7 @@ from typing import Any, Dict
 import yaml
 
 from rent_buy_invest.core.house_config import HouseConfig
-from rent_buy_invest.utils import io_utils, path_utils
+from rent_buy_invest.utils import io_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
 house_config = HouseConfig.parse(TEST_CONFIG_PATH)
