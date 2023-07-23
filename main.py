@@ -1,12 +1,13 @@
 import argparse
 import datetime
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
 from rent_buy_invest.core.initial_state import InitialState
+from rent_buy_invest.core.rent_calculator import RentCalculator
 from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
@@ -49,6 +50,18 @@ def _write_output_csv(
     io_utils.write_csv(path, rows)
 
 
+def format_projection(
+    projection: Tuple[Tuple[str, List[float]]], num_months: int
+) -> List[List[float]]:
+    formatted = []
+    # add title row
+    formatted.append([None] + [col_name for col_name, _ in projection])
+    # add data
+    for month in range(num_months):
+        formatted.append([month] + [data[month] for _, data in projection])
+    return formatted
+
+
 def main() -> None:
     """Main method; entrypoint for this repo."""
 
@@ -73,11 +86,14 @@ def main() -> None:
     _write_output_csv(output_dir, "initial_state.csv", initial_state.to_csv())
 
     # project forward in time
-    # some numbers can be calculated ahead of time, others month by month
-    rent_monthly_costs = rent_config.get_monthly_costs_of_renting(num_months)
-    rent_investment_monthly = market_config.get_pretax_monthly_wealth(
-        initial_state.rent_invested, num_months
+    # first start with rent
+    rent_calculator = RentCalculator(
+        rent_config, market_config, num_months, initial_state
     )
+    rent_projection = rent_calculator.calculate()
+    formatted_rent_projection = format_projection(rent_projection, num_months)
+    _write_output_csv(output_dir, "rent_projection.csv", formatted_rent_projection)
+    # now do house
     house_values = house_config.get_monthly_house_values(num_months)
     house_monthly_costs_related_to_house_value = (
         house_config.get_house_value_related_monthly_costs(num_months)
@@ -92,23 +108,38 @@ def main() -> None:
     projection = [
         [
             None,
-            "Rent: monthly cost",
-            "Rent: market investment",
+            # "Rent: monthly cost",
+            # "Rent: market investment",
             "House: house value related monthly cost",
             "House: house value",
             "House: inflation related monthly cost",
+            "House: mortgage interest",
+            "House: paid toward equity",
+            "House: total mortgage payment",
+            "House: equity",
         ]
     ]
+    mortgage_amount = house_config.get_initial_mortgage_amount()
+    monthly_mortgage_payment = house_config.get_monthly_mortgage_payment()
     for month in range(experiment_config.num_months):
+        mortgage_interest = (
+            mortgage_amount * house_config.mortgage_annual_interest_rate / 12
+        )
+        toward_equity = monthly_mortgage_payment - mortgage_interest
         month_row = [
             month,
-            rent_monthly_costs[month],
-            rent_investment_monthly[month],
+            # rent_monthly_costs[month],
+            # rent_investment_monthly[month],
             house_monthly_costs_related_to_house_value[month],
             house_values[month],
             house_monthly_costs_related_to_inflation[month],
+            mortgage_interest,
+            toward_equity,
+            monthly_mortgage_payment,
+            house_values[month] - mortgage_amount,
         ]
         projection.append(month_row)
+        mortgage_amount -= toward_equity
     _write_output_csv(output_dir, "projection.csv", projection)
 
 
