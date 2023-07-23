@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import yaml
 
@@ -263,7 +263,7 @@ class HouseConfig(Config):
 
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
-    ) -> float:
+    ) -> List[float]:
         return math_utils.project_growth(
             principal=self._get_first_inflation_related_monthly_cost(),
             annual_growth_rate=annual_inflation_rate,

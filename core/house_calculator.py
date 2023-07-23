@@ -33,6 +33,7 @@ class HouseCalculator:
         mortgage_interests = []
         paid_toward_equity = []
         equities = []
+        pmis = []
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
@@ -44,6 +45,7 @@ class HouseCalculator:
             toward_equity = monthly_mortgage_payment - mortgage_interest
             paid_toward_equity.append(round(toward_equity, 2))
             equities.append(round(house_values[month] - mortgage_amount, 2))
+            pmis.append(self.house_config.pmi_fraction * mortgage_amount)
             # projection.append(month_row)
             mortgage_amount -= toward_equity
         return (
@@ -59,5 +61,6 @@ class HouseCalculator:
             ("Mortgage interest", mortgage_interests),
             ("Paid toward equity", paid_toward_equity),
             ("Total mortgage payment", [monthly_mortgage_payment] * self.num_months),
+            ("PMI", pmis),
             ("Equity", equities),
         )
