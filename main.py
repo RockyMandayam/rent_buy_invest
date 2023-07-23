@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
+from rent_buy_invest.core.house_calculator import HouseCalculator
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.rent_calculator import RentCalculator
 from rent_buy_invest.utils import io_utils
@@ -94,53 +95,12 @@ def main() -> None:
     formatted_rent_projection = format_projection(rent_projection, num_months)
     _write_output_csv(output_dir, "rent_projection.csv", formatted_rent_projection)
     # now do house
-    house_values = house_config.get_monthly_house_values(num_months)
-    house_monthly_costs_related_to_house_value = (
-        house_config.get_house_value_related_monthly_costs(num_months)
+    house_calculator = HouseCalculator(
+        house_config, rent_config, num_months, initial_state
     )
-    house_monthly_costs_related_to_inflation = (
-        # TODO don't use rent inflation maybe? Use something else for utilities for rent and house?
-        house_config.get_inflation_related_monthly_costs(
-            rent_config.annual_rent_inflation_rate, num_months
-        )
-    )
-
-    projection = [
-        [
-            None,
-            # "Rent: monthly cost",
-            # "Rent: market investment",
-            "House: house value related monthly cost",
-            "House: house value",
-            "House: inflation related monthly cost",
-            "House: mortgage interest",
-            "House: paid toward equity",
-            "House: total mortgage payment",
-            "House: equity",
-        ]
-    ]
-    mortgage_amount = house_config.get_initial_mortgage_amount()
-    monthly_mortgage_payment = house_config.get_monthly_mortgage_payment()
-    for month in range(experiment_config.num_months):
-        mortgage_interest = (
-            mortgage_amount * house_config.mortgage_annual_interest_rate / 12
-        )
-        toward_equity = monthly_mortgage_payment - mortgage_interest
-        month_row = [
-            month,
-            # rent_monthly_costs[month],
-            # rent_investment_monthly[month],
-            house_monthly_costs_related_to_house_value[month],
-            house_values[month],
-            house_monthly_costs_related_to_inflation[month],
-            mortgage_interest,
-            toward_equity,
-            monthly_mortgage_payment,
-            house_values[month] - mortgage_amount,
-        ]
-        projection.append(month_row)
-        mortgage_amount -= toward_equity
-    _write_output_csv(output_dir, "projection.csv", projection)
+    house_projection = house_calculator.calculate()
+    formatted_house_projection = format_projection(house_projection, num_months)
+    _write_output_csv(output_dir, "house_projection.csv", formatted_house_projection)
 
 
 if __name__ == "__main__":
