@@ -6,7 +6,8 @@ from rent_buy_invest.core.rent_config import RentConfig
 
 
 class HouseCalculator:
-    """ Calculates projection of financial state when owning a house. """
+    """Calculates projection of financial state when owning a house."""
+
     def __init__(
         self,
         house_config: HouseConfig,
@@ -53,7 +54,9 @@ class HouseCalculator:
             equities.append(round(house_values[month] - mortgage_amount, 2))
             pmis.append(self.house_config.pmi_fraction * mortgage_amount)
             mortgage_amount -= toward_equity
-            assert mortgage_annual_interest_rate >= 0, "Mortgage amount cannot be negative."
+            assert (
+                mortgage_annual_interest_rate >= 0
+            ), "Mortgage amount cannot be negative."
         return (
             (
                 "House value related monthly cost",
