@@ -88,8 +88,8 @@ seller_burden_of_transfer_tax_fraction: !!float 0.9
 # and mortgage information. Expressed as fraction of sale price
 recording_fee_fraction: !!float 0.03
 
-# monthly property tax rate (fraction of house's assessed value)
-monthly_property_tax_rate: !!float 0.01
+# ANNUAL property tax rate (fraction of house's assessed value)
+annual_property_tax_rate: !!float 0.01
 
 
 ##### MISCELLANEOUS CLOSING COSTS
@@ -162,9 +162,9 @@ endorsement_fees: !!float 150
 
 ##### MISCELLANEOUS MONTHLY COSTS
 
-# as fraction of assessed house value
+# ANNUAL as fraction of assessed house value
 # depends a lot on how much you insure, house, conditions, coverage, etc.
-monthly_homeowners_insurance_fraction: !!float 0.005
+annual_homeowners_insurance_fraction: !!float 0.005
 
 # monthly utilities for the first month
 monthly_utilities: !!float 300

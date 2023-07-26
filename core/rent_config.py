@@ -56,8 +56,8 @@ class RentConfig(Config):
             self.inflation_adjustment_period >= 1
         ), "Inflation adjustment period must be at least 1."
 
-    def _get_total_monthly_cost(self) -> float:
-        """Get total monthly cost of renting for the first month"""
+    def _get_first_monthly_cost(self) -> float:
+        """Get monthly cost of renting for the first month"""
         return (
             self.monthly_rent
             + self.monthly_utilities
@@ -76,7 +76,7 @@ class RentConfig(Config):
             AssertionError: If num_months is not positive
         """
         return math_utils.project_growth(
-            self._get_total_monthly_cost(),
+            self._get_first_monthly_cost(),
             self.annual_rent_inflation_rate,
             False,
             num_months,
