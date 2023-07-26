@@ -2,6 +2,7 @@ import csv
 import os
 from typing import Any, Dict, List, Optional
 
+import pandas as pd
 import yaml
 
 from rent_buy_invest.utils import io_utils
@@ -59,3 +60,9 @@ def write_csv(project_path: str, rows: List[List[Optional[Any]]]) -> None:
         writer = csv.writer(f, strict=True)
         for row in rows:
             writer.writerow(row)
+
+
+# TODO use a context manager to always write from relative paths?
+def write_csv_df(project_path: str, df: pd.DataFrame) -> None:
+    abs_path = _get_abs_path(project_path)
+    df.to_csv(abs_path)

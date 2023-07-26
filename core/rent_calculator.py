@@ -1,8 +1,11 @@
 from typing import List, Tuple
 
+import pandas as pd
+
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.core.rent_config import RentConfig
+from rent_buy_invest.utils.data_utils import to_df
 
 
 class RentCalculator:
@@ -25,7 +28,9 @@ class RentCalculator:
         rent_investment_monthly = self.market_config.get_pretax_monthly_wealth(
             self.initial_state.rent_invested, self.num_months
         )
-        return ("Monthly costs", rent_monthly_costs), (
-            "Investment",
-            rent_investment_monthly,
-        )
+        # RELIES on the fact that python dictionaries are now ordered
+        cols = {
+            "Monthly costs": rent_monthly_costs,
+            "Investment": rent_investment_monthly,
+        }
+        return to_df(cols)
