@@ -3,6 +3,7 @@ from typing import List, Tuple
 from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.rent_config import RentConfig
+from rent_buy_invest.utils.data_utils import to_df
 
 
 class HouseCalculator:
@@ -55,21 +56,16 @@ class HouseCalculator:
             pmis.append(self.house_config.pmi_fraction * mortgage_amount)
             mortgage_amount -= toward_equity
             assert (
-                mortgage_annual_interest_rate >= 0
+                self.house_config.mortgage_annual_interest_rate >= 0
             ), "Mortgage amount cannot be negative."
-        return (
-            (
-                "House value related monthly cost",
-                house_monthly_costs_related_to_house_value,
-            ),
-            ("House value", house_values),
-            (
-                "Inflation related monthly cost",
-                house_monthly_costs_related_to_inflation,
-            ),
-            ("Mortgage interest", mortgage_interests),
-            ("Paid toward equity", paid_toward_equity),
-            ("Total mortgage payment", [monthly_mortgage_payment] * self.num_months),
-            ("PMI", pmis),
-            ("Equity", equities),
-        )
+        cols = {
+            "House value related monthly cost": house_monthly_costs_related_to_house_value,
+            "House value": house_values,
+            "Inflation related monthly cost": house_monthly_costs_related_to_inflation,
+            "Mortgage interest": mortgage_interests,
+            "Paid toward equity": paid_toward_equity,
+            "Total mortgage payment": [monthly_mortgage_payment] * self.num_months,
+            "PMI": pmis,
+            "Equity": equities,
+        }
+        return to_df(cols)

@@ -3,6 +3,7 @@ import datetime
 import os
 from typing import Any, Dict, List, Optional, Tuple
 
+import pandas as pd
 import yaml
 
 from rent_buy_invest.core.experiment_config import ExperimentConfig
@@ -51,6 +52,11 @@ def _write_output_csv(
     io_utils.write_csv(path, rows)
 
 
+def _write_output_csv_df(output_dir: str, filename: str, df: pd.DataFrame) -> None:
+    path = os.path.join(output_dir, filename)
+    io_utils.write_csv_df(path, df)
+
+
 def format_projection(
     projection: Tuple[Tuple[str, List[float]]], num_months: int
 ) -> List[List[float]]:
@@ -84,23 +90,24 @@ def main() -> None:
 
     # calculate initial state
     initial_state = InitialState(house_config)
+    # TODO use dataframe?
     _write_output_csv(output_dir, "initial_state.csv", initial_state.to_csv())
 
     # project forward in time
+
     # first start with rent
     rent_calculator = RentCalculator(
         rent_config, market_config, num_months, initial_state
     )
     rent_projection = rent_calculator.calculate()
-    formatted_rent_projection = format_projection(rent_projection, num_months)
-    _write_output_csv(output_dir, "rent_projection.csv", formatted_rent_projection)
+    _write_output_csv_df(output_dir, "rent_projection.csv", rent_projection)
+
     # now do house
     house_calculator = HouseCalculator(
         house_config, rent_config, num_months, initial_state
     )
     house_projection = house_calculator.calculate()
-    formatted_house_projection = format_projection(house_projection, num_months)
-    _write_output_csv(output_dir, "house_projection.csv", formatted_house_projection)
+    _write_output_csv_df(output_dir, "house_projection.csv", house_projection)
 
 
 if __name__ == "__main__":
