@@ -13,8 +13,11 @@ class InitialState:
     house_invested: float
 
     def __init__(self, house_config: HouseConfig) -> None:
-        # TODO what if rent_one_time_cost is non-zero? Can this be negative?
+        # TODO what if rent_one_time_cost is non-zero? Can this be negative? Make this a parameter?
         self.rent_one_time_cost = 0
+        assert (
+            self.rent_one_time_cost < self.house_one_time_cost
+        ), "Renting should have a smaller upfront one-time cost than buying a house."
         self.house_one_time_cost = house_config.get_upfront_one_time_cost()
         self.house_invested = house_config.get_down_payment()
         self.rent_invested = (
