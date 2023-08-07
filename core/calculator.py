@@ -1,10 +1,11 @@
 from typing import List, Tuple
+
 import pandas as pd
 
 from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.initial_state import InitialState
-from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.core.market_config import MarketConfig
+from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils.data_utils import to_df
 
 
@@ -45,7 +46,7 @@ class Calculator:
         # which projects forward month by month
         mortgage_interests = []
         paid_toward_equity = []
-        equities = []
+        equities = [self.house_config.get_down_payment()]
         pmis = []
         # # TODO monthly surplus
         # monthly_surplus_housing = []
@@ -61,12 +62,14 @@ class Calculator:
                 mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12
             )
             mortgage_interests.append(round(mortgage_interest, 2))
-            toward_equity = monthly_mortgage_payment - mortgage_interest
-            paid_toward_equity.append(round(toward_equity, 2))
+            toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
+            paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
             pmis.append(self.house_config.pmi_fraction * mortgage_amount)
             mortgage_amount -= toward_equity
             assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
+        # TODO fix this - for now removing last element to make all cols have same num of rows
+        equities.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
