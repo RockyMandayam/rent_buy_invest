@@ -48,12 +48,10 @@ class Calculator:
         paid_toward_equity = []
         equities = [self.house_config.get_down_payment()]
         pmis = []
-        monthly_surplus_housing = []
-        monthly_surplus_rent = []
+        housing_monthly_surpluses = []
+        rent_monthly_surpluses = []
         rent_investment_monthly = [self.initial_state.rent_invested]
-        # rent_investment_monthly = self.market_config.get_pretax_monthly_wealth(
-        #     self.initial_state.rent_invested, self.num_months
-        # )
+        housing_investment_monthly = [0]
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
@@ -66,11 +64,46 @@ class Calculator:
             toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
-            pmis.append(round(self.house_config.pmi_fraction * mortgage_amount), 2)
+            pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
+            pmis.append(pmi)
             mortgage_amount -= toward_equity
             assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
+            housing_monthly_payment = (
+                house_monthly_costs_related_to_house_value[month]
+                + house_monthly_costs_related_to_inflation[month]
+                + mortgage_interest
+                + toward_equity
+                + pmi
+            )
+            rent_grown_investment = self.market_config.get_pretax_monthly_wealth(
+                rent_investment_monthly[-1], 1
+            )[0]
+            housing_grown_investment = self.market_config.get_pretax_monthly_wealth(
+                housing_investment_monthly[-1], 1
+            )[0]
+            rent_monthly_payment = rent_monthly_costs[month]
+            # Surplus from the perspective of renting
+            surplus = housing_monthly_payment - rent_monthly_payment
+            if surplus > 0:
+                rent_monthly_surpluses.append(surplus)
+                housing_monthly_surpluses.append(0)
+                rent_investment_monthly.append(
+                    round(rent_grown_investment + surplus, 2)
+                )
+                housing_investment_monthly.append(housing_grown_investment)
+            elif surplus < 0:
+                # Now surplus is from the perspective of housing
+                surplus = -surplus
+                rent_monthly_surpluses.append(0)
+                housing_monthly_surpluses.append(surplus)
+                rent_investment_monthly.append(rent_grown_investment)
+                housing_investment_monthly.append(
+                    round(housing_grown_investment + surplus, 2)
+                )
         # TODO fix this - for now removing last element to make all cols have same num of rows
         equities.pop()
+        rent_investment_monthly.pop()
+        housing_investment_monthly.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
@@ -79,12 +112,13 @@ class Calculator:
             "House: Inflation related monthly cost": house_monthly_costs_related_to_inflation,
             "House: Mortgage interest": mortgage_interests,
             "House: Paid toward equity": paid_toward_equity,
-            # black formats the following line in a easy-to-misread way
+            # black formats the following line in an easy-to-misread way
             # fmt: off
             "House: Total mortgage payment": [monthly_mortgage_payment] * self.num_months,
             # fmt: on
             "House: PMI": pmis,
             "House: Equity": equities,
+            "House: Investment": housing_investment_monthly,
             "Rent: Monthly cost": rent_monthly_costs,
             "Rent: Investment": rent_investment_monthly,
         }
