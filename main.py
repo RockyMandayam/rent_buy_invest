@@ -6,10 +6,9 @@ from typing import Any, Dict, List, Optional, Tuple
 import pandas as pd
 import yaml
 
+from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.experiment_config import ExperimentConfig
-from rent_buy_invest.core.house_calculator import HouseCalculator
 from rent_buy_invest.core.initial_state import InitialState
-from rent_buy_invest.core.rent_calculator import RentCalculator
 from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
@@ -86,20 +85,25 @@ def main() -> None:
     _write_output_csv_df(output_dir, "initial_state.csv", initial_state.get_df())
 
     # project forward in time
-
-    # first start with rent
-    rent_calculator = RentCalculator(
-        rent_config, market_config, num_months, initial_state
+    calculator = Calculator(
+        house_config, rent_config, market_config, num_months, initial_state
     )
-    rent_projection = rent_calculator.calculate()
-    _write_output_csv_df(output_dir, "rent_projection.csv", rent_projection)
+    projection = calculator.calculate()
+    _write_output_csv_df(output_dir, "projection.csv", projection)
 
-    # now do house
-    house_calculator = HouseCalculator(
-        house_config, rent_config, num_months, initial_state
-    )
-    house_projection = house_calculator.calculate()
-    _write_output_csv_df(output_dir, "house_projection.csv", house_projection)
+    # # first start with rent
+    # rent_calculator = RentCalculator(
+    #     rent_config, market_config, num_months, initial_state
+    # )
+    # rent_projection = rent_calculator.calculate()
+    # _write_output_csv_df(output_dir, "rent_projection.csv", rent_projection)
+
+    # # now do house
+    # house_calculator = HouseCalculator(
+    #     house_config, rent_config, num_months, initial_state
+    # )
+    # house_projection = house_calculator.calculate()
+    # _write_output_csv_df(output_dir, "house_projection.csv", house_projection)
 
 
 if __name__ == "__main__":
