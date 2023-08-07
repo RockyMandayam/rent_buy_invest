@@ -48,24 +48,25 @@ class Calculator:
         paid_toward_equity = []
         equities = [self.house_config.get_down_payment()]
         pmis = []
-        # # TODO monthly surplus
-        # monthly_surplus_housing = []
-        # monthly_surplus_rent = []
-        rent_investment_monthly = self.market_config.get_pretax_monthly_wealth(
-            self.initial_state.rent_invested, self.num_months
-        )
+        monthly_surplus_housing = []
+        monthly_surplus_rent = []
+        rent_investment_monthly = [self.initial_state.rent_invested]
+        # rent_investment_monthly = self.market_config.get_pretax_monthly_wealth(
+        #     self.initial_state.rent_invested, self.num_months
+        # )
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
         for month in range(self.num_months):
-            mortgage_interest = (
-                mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12
+            mortgage_interest = round(
+                mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12,
+                2,
             )
-            mortgage_interests.append(round(mortgage_interest, 2))
+            mortgage_interests.append(mortgage_interest)
             toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
-            pmis.append(self.house_config.pmi_fraction * mortgage_amount)
+            pmis.append(round(self.house_config.pmi_fraction * mortgage_amount), 2)
             mortgage_amount -= toward_equity
             assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
         # TODO fix this - for now removing last element to make all cols have same num of rows
