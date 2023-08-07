@@ -45,13 +45,6 @@ def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
     io_utils.write_yaml(path, obj)
 
 
-def _write_output_csv(
-    output_dir: str, filename: str, rows: List[List[Optional[Any]]]
-) -> None:
-    path = os.path.join(output_dir, filename)
-    io_utils.write_csv(path, rows)
-
-
 def _write_output_csv_df(output_dir: str, filename: str, df: pd.DataFrame) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_csv_df(path, df)
@@ -90,8 +83,7 @@ def main() -> None:
 
     # calculate initial state
     initial_state = InitialState(house_config)
-    # TODO use dataframe?
-    _write_output_csv(output_dir, "initial_state.csv", initial_state.to_csv())
+    _write_output_csv_df(output_dir, "initial_state.csv", initial_state.get_df())
 
     # project forward in time
 
