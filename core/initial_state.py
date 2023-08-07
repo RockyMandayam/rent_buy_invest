@@ -28,9 +28,9 @@ class InitialState:
         )
 
     def get_df(self) -> List[List[Optional[Any]]]:
+        rows = ["One-time costs", "Invested (in market or house)"]
         cols = {
             "Rent": [self.rent_one_time_cost, self.rent_invested],
             "House": [self.house_one_time_cost, self.house_invested],
         }
-        rows = ["One-time costs", "Invested (in market or house)"]
         return to_df(cols, rows)
