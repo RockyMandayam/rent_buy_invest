@@ -1,7 +1,10 @@
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
+import pandas as pd
+
 from rent_buy_invest.core.house_config import HouseConfig
+from rent_buy_invest.utils.data_utils import to_df
 
 
 @dataclass
@@ -24,13 +27,10 @@ class InitialState:
             self.house_one_time_cost + self.house_invested - self.rent_one_time_cost
         )
 
-    def to_csv(self) -> List[List[Optional[Any]]]:
-        return [
-            [None, "Rent", "House"],
-            ["One-time costs", self.rent_one_time_cost, self.house_one_time_cost],
-            [
-                "Invested (in market or house)",
-                self.rent_invested,
-                self.house_invested,
-            ],
-        ]
+    def get_df(self) -> List[List[Optional[Any]]]:
+        cols = {
+            "Rent": [self.rent_one_time_cost, self.rent_invested],
+            "House": [self.house_one_time_cost, self.house_invested],
+        }
+        rows = ["One-time costs", "Invested (in market or house)"]
+        return to_df(cols, rows)
