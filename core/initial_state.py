@@ -9,6 +9,7 @@ from rent_buy_invest.utils.data_utils import to_df
 
 @dataclass
 class InitialState:
+    # TODO test this class
     rent_one_time_cost: float
     house_one_time_cost: float
     rent_invested: float
