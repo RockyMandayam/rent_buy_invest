@@ -40,7 +40,8 @@ def project_growth(
 
 
 def month_to_year_month(month: int) -> Tuple[int]:
-    """Convert 0-indexed month to year, 1-indexed month.
+    """Convert 0-indexed month to (1-indexed year, 1-indexed month).
     E.g., 11 becomes (0,12) and 12 becomes (1, 1).
     """
+    assert month >= 0, "Month must be non-negative."
     return month // 12 + 1, month % 12 + 1

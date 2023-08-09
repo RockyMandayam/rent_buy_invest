@@ -14,7 +14,7 @@ def test_get_equivalent_monthly_compound_rate() -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_get_monthly_costs() -> None:
+def test_project_growth() -> None:
     # test negative principal
     principal = -1
     annual_growth_rate = 1.07
@@ -73,3 +73,10 @@ def test_get_monthly_costs() -> None:
         principal * (1 + equivalent_monthly_rate) ** m for m in range(num_months)
     ]
     assert actual == pytest.approx(expected)
+
+
+def test_month_to_year_month() -> None:
+    with pytest.raises(AssertionError):
+        math_utils.month_to_year_month(-1)
+    assert math_utils.month_to_year_month(0) == (1, 1)
+    assert math_utils.month_to_year_month(13) == (2, 2)

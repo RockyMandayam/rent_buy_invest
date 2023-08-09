@@ -18,7 +18,7 @@ class Calculator:
         market_config: MarketConfig,
         num_months: int,
         initial_state: InitialState,
-    ):
+    ) -> None:
         self.house_config: HouseConfig = house_config
         self.rent_config: RentConfig = rent_config
         self.market_config: MarketConfig = market_config

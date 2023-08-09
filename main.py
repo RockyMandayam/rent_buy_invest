@@ -49,18 +49,6 @@ def _write_output_csv_df(output_dir: str, filename: str, df: pd.DataFrame) -> No
     io_utils.write_csv_df(path, df)
 
 
-def format_projection(
-    projection: Tuple[Tuple[str, List[float]]], num_months: int
-) -> List[List[float]]:
-    formatted = []
-    # add title row
-    formatted.append([None] + [col_name for col_name, _ in projection])
-    # add data
-    for month in range(num_months):
-        formatted.append([month] + [data[month] for _, data in projection])
-    return formatted
-
-
 def main() -> None:
     """Main method; entrypoint for this repo."""
 

@@ -43,7 +43,6 @@ def read_yaml(project_path: str) -> Dict[str, Any]:
     return general_config
 
 
-# TODO test this
 def write_yaml(project_path: str, obj: Any) -> None:
     """Write objct to given path (from top-level directory) as yaml."""
     abs_path = _get_abs_path(project_path)
@@ -52,7 +51,6 @@ def write_yaml(project_path: str, obj: Any) -> None:
 
 
 # TODO maybe make this a context I can iteratively write to?
-# TODO test this
 def write_csv(project_path: str, rows: List[List[Optional[Any]]]) -> None:
     """Write the given rows to file with given path."""
     abs_path = _get_abs_path(project_path)
