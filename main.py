@@ -89,21 +89,8 @@ def main() -> None:
         house_config, rent_config, market_config, num_months, initial_state
     )
     projection = calculator.calculate()
+    # rows = [f"Year {mon}, Month {}" for month in range(num_months)]
     _write_output_csv_df(output_dir, "projection.csv", projection)
-
-    # # first start with rent
-    # rent_calculator = RentCalculator(
-    #     rent_config, market_config, num_months, initial_state
-    # )
-    # rent_projection = rent_calculator.calculate()
-    # _write_output_csv_df(output_dir, "rent_projection.csv", rent_projection)
-
-    # # now do house
-    # house_calculator = HouseCalculator(
-    #     house_config, rent_config, num_months, initial_state
-    # )
-    # house_projection = house_calculator.calculate()
-    # _write_output_csv_df(output_dir, "house_projection.csv", house_projection)
 
 
 if __name__ == "__main__":
