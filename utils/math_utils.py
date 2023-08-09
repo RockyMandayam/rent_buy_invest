@@ -1,3 +1,6 @@
+from typing import Tuple
+
+
 def get_equivalent_monthly_compound_rate(annual_compound_rate: float) -> float:
     return (1 + annual_compound_rate) ** (1 / 12) - 1
 
@@ -34,3 +37,10 @@ def project_growth(
             monthly_value = round(monthly_value, 2)
         monthly_values.append(monthly_value)
     return monthly_values
+
+
+def month_to_year_month(month: int) -> Tuple[int]:
+    """Convert 0-indexed month to year, 1-indexed month.
+    E.g., 11 becomes (0,12) and 12 becomes (1, 1).
+    """
+    return month // 12 + 1, month % 12 + 1

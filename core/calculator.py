@@ -6,6 +6,7 @@ from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.core.rent_config import RentConfig
+from rent_buy_invest.utils import math_utils
 from rent_buy_invest.utils.data_utils import to_df
 
 
@@ -46,7 +47,7 @@ class Calculator:
         # which projects forward month by month
         mortgage_interests = []
         paid_toward_equity = []
-        equities = [self.house_config.get_down_payment()]
+        equities = []
         pmis = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
@@ -101,7 +102,7 @@ class Calculator:
                     round(housing_grown_investment + surplus, 2)
                 )
         # TODO fix this - for now removing last element to make all cols have same num of rows
-        equities.pop()
+        # equities.pop()
         rent_investment_monthly.pop()
         housing_investment_monthly.pop()
 
@@ -122,4 +123,8 @@ class Calculator:
             "Rent: Monthly cost": rent_monthly_costs,
             "Rent: Investment": rent_investment_monthly,
         }
-        return to_df(cols)
+        rows = []
+        for month in range(self.num_months):
+            y, m = math_utils.month_to_year_month(month)
+            rows.append(f"Year {y}, Month {m}")
+        return to_df(cols, rows)
