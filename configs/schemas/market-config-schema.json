@@ -1,5 +1,5 @@
 {
-  "title": "Market config schema",
+  "title": "Market Configuration",
   "description": "Config file relating to assumptions about the 'market'.",
   "type": "object",
   "properties": {
