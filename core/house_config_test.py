@@ -3,10 +3,6 @@ import jsonschema
 from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.utils import io_utils
 
-TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
-house_config = HouseConfig.parse(TEST_CONFIG_PATH)
-
-
 TEST_SCHEMA_PATH = "rent_buy_invest/configs/schemas/house-config-schema.json"
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
 house_config_schema = io_utils.read_json(TEST_SCHEMA_PATH)
