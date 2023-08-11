@@ -1,5 +1,5 @@
 {
-  "title": "Experiment Config",
+  "title": "Experiment Configuration",
   "description": "Configuration for one 'experiment'.",
   "type": "object",
   "properties": {
@@ -20,5 +20,10 @@
       "type": "string"
     }
   },
-  "required": [ "num_months" ]
+  "required": [
+    "num_months",
+    "market_config_path",
+    "rent_config_path",
+    "house_config_path"
+  ]
 }

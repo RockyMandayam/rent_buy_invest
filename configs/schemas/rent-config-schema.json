@@ -1,5 +1,5 @@
 {
-  "title": "Rent config schema",
+  "title": "Rent Configuration",
   "description": "Config file relating to assumptions about rent.",
   "type": "object",
   "properties": {
