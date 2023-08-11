@@ -1,0 +1,12 @@
+# Config file relating to assumptions about the market
+
+
+# annual return on money invested in the market, as a decimal
+market_rate_of_return: !!float 0.
+
+# tax information - assume only capital gains tax
+# assume the investor will remain in the market long-term
+# therefore, only list long-term capital gains rates
+tax_brackets:
+  tax_brackets:
+    
