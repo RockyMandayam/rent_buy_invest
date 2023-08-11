@@ -1,0 +1,35 @@
+{
+  "title": "Market config schema",
+  "description": "Schema for market config yamlm file.",
+  "type": "object",
+  "properties": {
+    "market_rate_of_return": {
+      "description": "market rate of return",
+      "type": "number"
+    },
+    "tax_brackets": {
+      "description": "tax brackets object",
+      "type": "object",
+      "properties": {
+        "tax_brackets": {
+          "description": "tax brackets list",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "upper_limit": {
+                "type": "number"
+              },
+              "tax_rate": {
+                "type": "number"
+              }
+            },
+            "required": ["upper_limit", "tax_rate"]
+          }
+        }
+      },
+      "required": ["tax_brackets"]
+    }
+  },
+  "required": ["market_rate_of_return", "tax_brackets"]
+}

@@ -1,6 +1,6 @@
-import csv
+import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import pandas as pd
 import yaml
@@ -50,17 +50,13 @@ def write_yaml(project_path: str, obj: Any) -> None:
         yaml.dump(obj, f)
 
 
-# TODO maybe make this a context I can iteratively write to?
-def write_csv(project_path: str, rows: List[List[Optional[Any]]]) -> None:
-    """Write the given rows to file with given path."""
-    abs_path = _get_abs_path(project_path)
-    with open(abs_path, mode="x", newline="") as f:
-        writer = csv.writer(f, strict=True)
-        for row in rows:
-            writer.writerow(row)
-
-
 # TODO use a context manager to always write from relative paths?
 def write_csv_df(project_path: str, df: pd.DataFrame) -> None:
     abs_path = _get_abs_path(project_path)
     df.to_csv(abs_path)
+
+
+def read_json(project_path: str) -> Dict:
+    abs_path = _get_abs_path(project_path)
+    with open(abs_path, mode="r") as f:
+        return json.load(f)
