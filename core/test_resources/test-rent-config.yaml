@@ -5,13 +5,13 @@
 monthly_rent: !!float 2000.0
 
 # monthly utilities for the first month
-monthly_utilities: !!float 300
+monthly_utilities: !!float 300.
 
 # monthly renters insurance for the first month
-monthly_renters_insurance: !!float 20
+monthly_renters_insurance: !!float 20.
 
 # monthly parking fee
-monthly_parking_fee: !!float 100
+monthly_parking_fee: !!float 100.
 
 # ANNUAL rent inflation rate
 # this will be applied to all rent-related expenses

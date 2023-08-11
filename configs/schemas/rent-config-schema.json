@@ -1,0 +1,39 @@
+{
+  "title": "Rent config schema",
+  "description": "Schema for rent config yaml file.",
+  "type": "object",
+  "properties": {
+    "monthly_rent": {
+      "description": "monthly_rent",
+      "type": "number"
+    },
+    "monthly_utilities": {
+      "description": "monthly_utilities",
+      "type": "number"
+    },
+    "monthly_renters_insurance": {
+      "description": "monthly_renters_insurance",
+      "type": "number"
+    },
+    "monthly_parking_fee": {
+      "description": "monthly_parking_fee",
+      "type": "number"
+    },
+    "annual_rent_inflation_rate": {
+      "description": "annual_rent_inflation_rate",
+      "type": "number"
+    },
+    "inflation_adjustment_period": {
+      "description": "inflation_adjustment_period",
+      "type": "number"
+    }
+  },
+  "required": [
+    "monthly_rent",
+    "monthly_utilities",
+    "monthly_renters_insurance",
+    "monthly_parking_fee",
+    "annual_rent_inflation_rate",
+    "inflation_adjustment_period"
+  ]
+}

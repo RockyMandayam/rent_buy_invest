@@ -27,3 +27,6 @@ class Config(ABC):
                 descendent of this class)
         """
         return cls(**io_utils.read_yaml(project_path))
+
+    # @classmethod
+    # def parse(cls, kw)

@@ -1,0 +1,24 @@
+{
+  "title": "Experiment Config",
+  "description": "Experiment config.",
+  "type": "object",
+  "properties": {
+    "num_months": {
+      "description": "The number of months to project the finances forward.",
+      "type": "integer"
+    },
+    "market_config_path": {
+      "description": "market_config_path",
+      "type": "string"
+    },
+    "rent_config_path": {
+      "description": "rent_config_path",
+      "type": "string"
+    },
+    "house_config_path": {
+      "description": "house_config_path",
+      "type": "string"
+    }
+  },
+  "required": [ "num_months" ]
+}
