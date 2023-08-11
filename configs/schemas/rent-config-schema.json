@@ -1,30 +1,30 @@
 {
   "title": "Rent config schema",
-  "description": "Schema for rent config yaml file.",
+  "description": "Config file relating to assumptions about rent.",
   "type": "object",
   "properties": {
     "monthly_rent": {
-      "description": "monthly_rent",
+      "description": "Monthly rent for the first month.",
       "type": "number"
     },
     "monthly_utilities": {
-      "description": "monthly_utilities",
+      "description": "Monthly utilities for the first month.",
       "type": "number"
     },
     "monthly_renters_insurance": {
-      "description": "monthly_renters_insurance",
+      "description": "Monthly renters insurance for the first month.",
       "type": "number"
     },
     "monthly_parking_fee": {
-      "description": "monthly_parking_fee",
+      "description": "Monthly parking fee",
       "type": "number"
     },
     "annual_rent_inflation_rate": {
-      "description": "annual_rent_inflation_rate",
+      "description": "ANNUAL rent inflation rate as a fraction. This will be applied to all rent-related expenses (e.g., rent, utilities, parking).",
       "type": "number"
     },
     "inflation_adjustment_period": {
-      "description": "inflation_adjustment_period",
+      "description": "How often, in months, to update rent-related expenses for inflation. Twelve is a good number here, as leases are often for 12-month periods and rents change when leases end.",
       "type": "number"
     }
   },
