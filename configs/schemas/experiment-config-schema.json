@@ -1,22 +1,22 @@
 {
   "title": "Experiment Config",
-  "description": "Experiment config.",
+  "description": "Configuration for one 'experiment'.",
   "type": "object",
   "properties": {
     "num_months": {
-      "description": "The number of months to project the finances forward.",
+      "description": "The number of months to run the calculations for (max of 2400).",
       "type": "integer"
     },
     "market_config_path": {
-      "description": "market_config_path",
+      "description": "Market config file path from top-level directory",
       "type": "string"
     },
     "rent_config_path": {
-      "description": "rent_config_path",
+      "description": "Rent config file path from top-level directory.",
       "type": "string"
     },
     "house_config_path": {
-      "description": "house_config_path",
+      "description": "House config file path from top-level directory.",
       "type": "string"
     }
   },

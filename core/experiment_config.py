@@ -52,5 +52,5 @@ class ExperimentConfig(Config):
         """
         # make 150 if parameter and maybe appropriately update the yaml comment
         assert (
-            self.num_months > 0 and self.num_months <= 150
-        ), "Number of months must be positive and at most 150."
+            self.num_months > 0 and self.num_months <= 2400
+        ), "Number of months must be positive and at most 2400."
