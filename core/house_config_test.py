@@ -1,17 +1,7 @@
-import jsonschema
-
 from rent_buy_invest.core.house_config import HouseConfig
-from rent_buy_invest.utils import io_utils
 
-TEST_SCHEMA_PATH = "rent_buy_invest/configs/schemas/house-config-schema.json"
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
-house_config_schema = io_utils.read_json(TEST_SCHEMA_PATH)
-house_config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
-jsonschema.validate(instance=house_config_kwargs, schema=house_config_schema)
-# tests creating HouseConfig directly
-house_config = HouseConfig(**house_config_kwargs)
-# tests creating HouseConfig via parse()
-house_config = HouseConfig.parse(TEST_CONFIG_PATH)
+HOUSE_CONFIG = HouseConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestHouseConfig:
@@ -19,12 +9,12 @@ class TestHouseConfig:
         # Sale price is $500,000. Down payment is 20%. So initial mortgage amount is $400,000
         # Mortgage term is 360 months
         # Annual interest rate is 0.06
-        actual = house_config.get_monthly_mortgage_payment()
+        actual = HOUSE_CONFIG.get_monthly_mortgage_payment()
         expected = 2398.20
         assert actual == expected
 
     def test_get_upfront_one_time_cost(self) -> None:
-        actual = house_config.get_upfront_one_time_cost()
+        actual = HOUSE_CONFIG.get_upfront_one_time_cost()
         expected = (
             0.015 * 400000
             + 300

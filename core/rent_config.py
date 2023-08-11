@@ -1,16 +1,15 @@
 from typing import Any, Dict
 
-import yaml
-
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.utils import io_utils, math_utils
+from rent_buy_invest.utils import math_utils
 
 
 class RentConfig(Config):
     """Stores rent config.
 
-    TODO: maybe I don't need this documentation
-    Documentation of the instance variable types:
+    Class attributes:
+        rent_config_schema_path: Rent config schema path
+    Instance attributes:
         self.monthly_rent (float): Monthly rent for first month
         self.monthly_utilities (float): Monthly utilities for the first month
         self.monthly_renters_insurance (float): Monthly renters insurance for
@@ -23,6 +22,11 @@ class RentConfig(Config):
             rent-related expenses for inflation. If you rent with 12-month
             leases, 12 is a good number here.
     """
+
+    @classmethod
+    @property
+    def schema_path(cls) -> str:
+        return "rent_buy_invest/configs/schemas/rent-config-schema.json"
 
     def __init__(self, **kwargs: Dict[str, Any]) -> None:  # too many to type
         """Initializes the class.

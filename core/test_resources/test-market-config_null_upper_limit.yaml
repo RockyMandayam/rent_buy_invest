@@ -1,0 +1,7 @@
+market_rate_of_return: !!float 0.07
+
+tax_brackets:
+  tax_brackets:
+    -
+      upper_limit: null
+      tax_rate: !!float 0.

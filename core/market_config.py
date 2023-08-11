@@ -1,24 +1,31 @@
-from typing import Any, Dict, List
-
-import yaml
+import math
+from typing import Dict, List
 
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.utils import io_utils, math_utils
+from rent_buy_invest.utils import math_utils
 
 
 class MarketConfig(Config):
     """Stores market config.
 
-    Documentation of the instance variable types:
-        self.market_rate_of_return (float): ANNUAL rate of return in the
+    Class attributes:
+        market_config_schema_path: Market config schema path
+
+    Instance Attributes:
+        self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
-        self.tax_brackets ('TaxBrackets'): A TaxBrackets object
+        self.tax_brackets: A TaxBrackets object
     """
+
+    @classmethod
+    @property
+    def schema_path(cls) -> str:
+        return "rent_buy_invest/configs/schemas/market-config-schema.json"
 
     class TaxBrackets:
         """Stores tax bracket config.
 
-        Documentation of the instance variable types:
+        Attributes:
             self.tax_brackets (List[Dict[str, float]]): A list of tax brackets,
                 where each bracket contains two keys, "upper_limit" and "tax_rate".
                 "tax_rate" is the marginal tax rate of that bracket. "upper_limit"
@@ -47,6 +54,12 @@ class MarketConfig(Config):
             upper_limit = 0
             tax_rate = -1
             for bracket in self.tax_brackets:
+                assert (
+                    bracket["upper_limit"] > 0
+                ), "Tax bracket's upper limit must be positive."
+                assert (
+                    bracket["tax_rate"] >= 0
+                ), "Tax bracket's tax rate must be non-negative."
                 assert (
                     bracket["upper_limit"] > upper_limit
                 ), "Tax brackets must be listed in order."
@@ -97,6 +110,7 @@ class MarketConfig(Config):
         self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
             tax_brackets["tax_brackets"]
         )
+        self._validate()
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -104,6 +118,9 @@ class MarketConfig(Config):
         Raises:
             AssertionError: If any market configs are invalid
         """
+        assert math.isfinite(
+            self.market_rate_of_return
+        ), "Market rate of return must not be NaN, infinity, or negative infinity."
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
 
     def get_tax(self, income: float) -> float:

@@ -1,23 +1,11 @@
-# Config file relating to assumptions about rent
-
-
-# monthly rent for the first month
 monthly_rent: !!float 2000.0
 
-# monthly utilities for the first month
 monthly_utilities: !!float 300.
 
-# monthly renters insurance for the first month
 monthly_renters_insurance: !!float 20.
 
-# monthly parking fee
 monthly_parking_fee: !!float 100.
 
-# ANNUAL rent inflation rate
-# this will be applied to all rent-related expenses
-# e.g., not just rent but also utilities, etc.
 annual_rent_inflation_rate: !!float 0.03
 
-# how often (in months) to update rent-related expenses for inflation
-# if you rent with 12-month leases, 12 is a good number here
 inflation_adjustment_period: !!int 12
