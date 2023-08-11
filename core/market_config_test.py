@@ -59,7 +59,7 @@ class TestMarketConfig:
             allow_negative=False,
         )
 
-        # check that there is an final upper limit of infinity
+        # check that there is a final upper limit of infinity
         invalid_kwargs = copy.deepcopy(config_kwargs)
         invalid_kwargs["tax_brackets"]["tax_brackets"].pop()
         with pytest.raises(AssertionError):

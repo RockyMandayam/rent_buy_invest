@@ -32,7 +32,7 @@ class MarketConfig(Config):
                 is the upper income limit of that bracket (beyond that limit, the
                 next tax bracket begins). This list is ordered from lowest tax
                 bracket to highest tax bracket. The highest tax bracket will have
-                an upper limit of positive infinity.
+                an upper limit of infinity.
         """
 
         def __init__(self, tax_brackets: List[Dict[str, float]]) -> None:
@@ -52,26 +52,29 @@ class MarketConfig(Config):
             """
             assert self.tax_brackets, "Tax brackets must not be null or empty"
             upper_limit = 0
-            tax_rate = -1
-            for bracket in self.tax_brackets:
+            # tax_rate = -1
+            for i, bracket in enumerate(self.tax_brackets):
+                if i == len(self.tax_brackets) - 1:
+                    assert bracket["upper_limit"] == float(
+                        "inf"
+                    ), "The last tax bracket's upper limit must be infinity."
+                else:
+                    assert (
+                        math.isfinite(bracket["upper_limit"])
+                        and bracket["upper_limit"] > 0
+                    ), "All tax brackets except the last one must have an upper limit that is positive and non-infinite."
                 assert (
-                    bracket["upper_limit"] > 0
-                ), "Tax bracket's upper limit must be positive."
-                assert (
-                    bracket["tax_rate"] >= 0
-                ), "Tax bracket's tax rate must be non-negative."
+                    math.isfinite(bracket["tax_rate"]) and bracket["tax_rate"] >= 0
+                ), "Tax bracket's tax rate must be non-negative and not negative infinity."
                 assert (
                     bracket["upper_limit"] > upper_limit
                 ), "Tax brackets must be listed in order."
-                # Assumes "progressive" tax brackets
-                assert (
-                    bracket["tax_rate"] > tax_rate
-                ), "Tax brackets must be listed in order."
+                # # Assumes "progressive" tax brackets
+                # assert (
+                #     math.isfinite(bracket["tax_rate"]) and bracket["tax_rate"] > tax_rate
+                # ), "Tax brackets must be listed in order."
                 upper_limit = bracket["upper_limit"]
-                tax_rate = bracket["tax_rate"]
-            assert self.tax_brackets[-1]["upper_limit"] == float(
-                "inf"
-            ), "The last tax bracket's upper limit must be infinity."
+                # tax_rate = bracket["tax_rate"]
 
         def _get_tax(self, income: float) -> float:
             """Calculates tax owed given income.
