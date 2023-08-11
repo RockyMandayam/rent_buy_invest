@@ -15,6 +15,7 @@ def check_float_field(
 ) -> None:
     # TODO test this
     # TODO document this
+    # NOTE: this func can also be used for ints. schema at least checks that finite floats are not passed in to an int field
     assert field_keys, "field_keys must be a non-empty list"
     config_kwargs = copy.deepcopy(config_kwargs)
     field = config_kwargs
@@ -26,6 +27,18 @@ def check_float_field(
     if not allow_zero:
         invalid_values.append(0)
     for val in invalid_values:
-        field[field_keys[-1]] = float("nan")
+        field[field_keys[-1]] = val
         with pytest.raises(AssertionError):
             clz(**config_kwargs)
+
+
+# def check_int_field(
+#     clz: Type,
+#     config_kwargs: Config,
+#     field_keys: List,
+#     allow_negative: bool = True,
+#     allow_zero: bool = True,
+# ) -> None:
+#     # TODO test this
+#     # TODO document this
+#     pass

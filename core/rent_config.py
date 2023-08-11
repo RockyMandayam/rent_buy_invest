@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict
 
 from rent_buy_invest.core.config import Config
@@ -48,17 +49,26 @@ class RentConfig(Config):
         Raises:
             AssertionError: If any rent configs are invalid
         """
-        assert self.monthly_rent >= 0, "Monthly rent must be non-negative."
-        assert self.monthly_utilities >= 0, "Monthly utilities must be non-negative."
         assert (
-            self.monthly_renters_insurance >= 0
+            math.isfinite(self.monthly_rent) and self.monthly_rent >= 0
+        ), "Monthly rent must be non-negative and not infinity."
+        assert (
+            math.isfinite(self.monthly_utilities) and self.monthly_utilities >= 0
+        ), "Monthly utilities must be non-negative and not infinity."
+        assert (
+            math.isfinite(self.monthly_renters_insurance)
+            and self.monthly_renters_insurance >= 0
         ), "Monthly renter's insurance must be non-negative."
         assert (
-            self.monthly_parking_fee >= 0
+            math.isfinite(self.monthly_parking_fee) and self.monthly_parking_fee >= 0
         ), "Monthly parking fee must be non-negative."
+        assert math.isfinite(
+            self.annual_rent_inflation_rate
+        ), "Annual rent inflation rate must not be NaN, infinity, or negative infinity."
         assert (
-            self.inflation_adjustment_period >= 1
-        ), "Inflation adjustment period must be at least 1."
+            math.isfinite(self.inflation_adjustment_period)
+            and self.inflation_adjustment_period >= 1
+        ), "Inflation adjustment period must be a finite integer of at least 1."
 
     def _get_first_monthly_cost(self) -> float:
         """Get monthly cost of renting for the first month"""

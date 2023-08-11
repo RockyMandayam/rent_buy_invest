@@ -1,0 +1,11 @@
+monthly_rent: null
+
+monthly_utilities: !!float 300.
+
+monthly_renters_insurance: !!float 20.
+
+monthly_parking_fee: !!float 100.
+
+annual_rent_inflation_rate: !!float 0.03
+
+inflation_adjustment_period: !!int 12
