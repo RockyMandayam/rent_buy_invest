@@ -4,7 +4,7 @@
 ##### BASICS AND GENERAL CONFIGS
 
 # sale price of the house
-sale_price: !!float 500000
+sale_price: !!float 500000.
 
 # ANNUAL inflation rate of house assessed value as a fraction
 annual_assessed_value_inflation_rate: !!float 0.05
@@ -50,10 +50,10 @@ pmi_fraction: !!float 0.005
 mortgage_origination_points_fee_fraction: !!float 0.015
 
 # processing fee. Maybe included in the origination fee
-mortgage_processing_fee: !!float 300
+mortgage_processing_fee: !!float 300.
 
 # underwriting fee. Maybe included in the origination fee.
-mortgage_underwriting_fee: !!float 500
+mortgage_underwriting_fee: !!float 500.
 
 # mortgage discount points (a.k.a. mortgage points) are a fee you can pay up
 # front to lower your mortgage interest rate. In this config, it is assumed that
@@ -66,10 +66,10 @@ mortgage_discount_points_fee_fraction: !!float 0.005
 # it is assumed the buyer pays this fee up front, regardless of whether the 
 # house purchase/mortgage are finalized and completed
 # this is often requird by the lender
-house_appraisal_cost: !!float 500
+house_appraisal_cost: !!float 500.
 
 # credit report fee charged by lender to do a credit check
-credit_report_fee: !!float 50
+credit_report_fee: !!float 50.
 
 ##### TAXES
 
@@ -98,7 +98,7 @@ annual_property_tax_rate: !!float 0.01
 realtor_commission_fraction: !!float 0.025
 
 # fee to sell home in HOA (Homee Owners Association)
-hoa_transfer_fee: !!float 300
+hoa_transfer_fee: !!float 300.
 
 # sellre's burdene of HOA transfer fee as a fraction of the fee
 seller_burden_of_hoa_transfer_fee: !!float 1.0
@@ -106,28 +106,28 @@ seller_burden_of_hoa_transfer_fee: !!float 1.0
 # house inspection should include at least the following types: general,
 # foundation, plumbing, septic tank, termite, mold, chimney
 # typically a house inspection does NOT include a pest inspection
-house_inspection_cost: !!float 500
+house_inspection_cost: !!float 500.
 
 # pest inspection cost
 # house inspection probably does not include pest inspection
-pest_inspection_cost: !!float 500
+pest_inspection_cost: !!float 500.
 
 # fixed fee
 # I don't think there is a basic price-based fee except for specific
 # line items, e.g., flood certification fee
-escrow_fixed_fee: !!float 500
+escrow_fixed_fee: !!float 500.
 
 # flood certification fee
-flood_certification_fee: !!float 20
+flood_certification_fee: !!float 20.
 
 # title search fee
-title_search_fee: !!float 100 # 
+title_search_fee: !!float 100. 
 
 # seller burden of the title search fee as a fraction
-seller_burden_of_title_search_fee_fraction: !!float 1
+seller_burden_of_title_search_fee_fraction: !!float 1.
 
 # attorney fee
-attorney_fee: !!float 800
+attorney_fee: !!float 800.
 
 # closing protection letter (CPL) fee
 closing_protection_letter_fee: !!float 35
@@ -142,7 +142,7 @@ survey_fee: !!float 500
 notary_fee: !!float 100
 
 # part of loosely defined "settlement fees"
-deep_prep_fee: !!float 50
+deep_prep_fee: !!float 50.
 
 # lender's title insurance (protects the lender) as a fraction of the mortgage
 # amount. Apparently there is a wide range of typical values here.
@@ -157,7 +157,7 @@ owners_title_insurance_fraction: !!float 0.01
 # The expected price per-endorsement is about $75. Enter the total amount you
 # expect for all endorsements.
 # TODO not sure if this is for lenders, owners, or both
-endorsement_fees: !!float 150
+endorsement_fees: !!float 150.
 
 
 ##### MISCELLANEOUS MONTHLY COSTS
@@ -167,14 +167,14 @@ endorsement_fees: !!float 150
 annual_homeowners_insurance_fraction: !!float 0.005
 
 # monthly utilities for the first month
-monthly_utilities: !!float 300
+monthly_utilities: !!float 300.
 
 # ANNUAL maintenance cost as a fraction of the assessed house value (not 
 # sale price)
 annual_maintenance_cost_fraction: !!float 0.02
 
 # monthly HOA (Home Owners Association) fees
-monthly_hoa_fees: !!float 250
+monthly_hoa_fees: !!float 250.
 
 ##### MANAGEMENT COSTS
 

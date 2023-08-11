@@ -1,0 +1,204 @@
+{
+  "title": "House config schema",
+  "description": "Schema for house config yaml file.",
+  "type": "object",
+  "properties": {
+    "sale_price": {
+      "description": "sale_price",
+      "type": "number"
+    },
+    "annual_assessed_value_inflation_rate": {
+      "description": "annual_assessed_value_inflation_rate",
+      "type": "number"
+    },
+    "down_payment_fraction": {
+      "description": "down_payment_fraction",
+      "type": "number"
+    },
+    "mortgage_annual_interest_rate": {
+      "description": "mortgage_annual_interest_rate",
+      "type": "number"
+    },
+    "mortgage_term_months": {
+      "description": "mortgage_term_months",
+      "type": "number"
+    },
+    "pmi_fraction": {
+      "description": "pmi_fraction",
+      "type": "number"
+    },
+    "mortgage_origination_points_fee_fraction": {
+      "description": "mortgage_origination_points_fee_fraction",
+      "type": "number"
+    },
+    "mortgage_processing_fee": {
+      "description": "mortgage_processing_fee",
+      "type": "number"
+    },
+    "mortgage_underwriting_fee": {
+      "description": "mortgage_underwriting_fee",
+      "type": "number"
+    },
+    "mortgage_discount_points_fee_fraction": {
+      "description": "mortgage_discount_points_fee_fraction",
+      "type": "number"
+    },
+    "house_appraisal_cost": {
+      "description": "house_appraisal_cost",
+      "type": "number"
+    },
+    "credit_report_fee": {
+      "description": "credit_report_fee",
+      "type": "number"
+    },
+    "transfer_tax_fraction": {
+      "description": "transfer_tax_fraction",
+      "type": "number"
+    },
+    "seller_burden_of_transfer_tax_fraction": {
+      "description": "seller_burden_of_transfer_tax_fraction",
+      "type": "number"
+    },
+    "recording_fee_fraction": {
+      "description": "recording_fee_fraction",
+      "type": "number"
+    },
+    "annual_property_tax_rate": {
+      "description": "annual_property_tax_rate",
+      "type": "number"
+    },
+    "realtor_commission_fraction": {
+      "description": "realtor_commission_fraction",
+      "type": "number"
+    },
+    "hoa_transfer_fee": {
+      "description": "hoa_transfer_fee",
+      "type": "number"
+    },
+    "seller_burden_of_hoa_transfer_fee": {
+      "description": "seller_burden_of_hoa_transfer_fee",
+      "type": "number"
+    },
+    "house_inspection_cost": {
+      "description": "house_inspection_cost",
+      "type": "number"
+    },
+    "pest_inspection_cost": {
+      "description": "pest_inspection_cost",
+      "type": "number"
+    },
+    "escrow_fixed_fee": {
+      "description": "escrow_fixed_fee",
+      "type": "number"
+    },
+    "flood_certification_fee": {
+      "description": "flood_certification_fee",
+      "type": "number"
+    },
+    "title_search_fee": {
+      "description": "title_search_fee",
+      "type": "number"
+    },
+    "seller_burden_of_title_search_fee_fraction": {
+      "description": "seller_burden_of_title_search_fee_fraction",
+      "type": "number"
+    },
+    "attorney_fee": {
+      "description": "attorney_fee",
+      "type": "number"
+    },
+    "closing_protection_letter_fee": {
+      "description": "closing_protection_letter_fee",
+      "type": "number"
+    },
+    "search_abstract_fee": {
+      "description": "search_abstract_fee",
+      "type": "number"
+    },
+    "survey_fee": {
+      "description": "survey_fee",
+      "type": "number"
+    },
+    "notary_fee": {
+      "description": "notary_fee",
+      "type": "number"
+    },
+    "deep_prep_fee": {
+      "description": "deep_prep_fee",
+      "type": "number"
+    },
+    "lenders_title_insurance_fraction": {
+      "description": "lenders_title_insurance_fraction",
+      "type": "number"
+    },
+    "owners_title_insurance_fraction": {
+      "description": "owners_title_insurance_fraction",
+      "type": "number"
+    },
+    "endorsement_fees": {
+      "description": "endorsement_fees",
+      "type": "number"
+    },
+    "annual_homeowners_insurance_fraction": {
+      "description": "annual_homeowners_insurance_fraction",
+      "type": "number"
+    },
+    "monthly_utilities": {
+      "description": "monthly_utilities",
+      "type": "number"
+    },
+    "annual_maintenance_cost_fraction": {
+      "description": "annual_maintenance_cost_fraction",
+      "type": "number"
+    },
+    "monthly_hoa_fees": {
+      "description": "monthly_hoa_fees",
+      "type": "number"
+    },
+    "annual_management_cost_fraction": {
+      "description": "annual_management_cost_fraction",
+      "type": "number"
+    }
+  },
+  "required": [
+    "sale_price",
+    "annual_assessed_value_inflation_rate",
+    "down_payment_fraction",
+    "mortgage_annual_interest_rate",
+    "mortgage_term_months",
+    "pmi_fraction",
+    "mortgage_origination_points_fee_fraction",
+    "mortgage_processing_fee",
+    "mortgage_underwriting_fee",
+    "mortgage_discount_points_fee_fraction",
+    "house_appraisal_cost",
+    "credit_report_fee",
+    "transfer_tax_fraction",
+    "seller_burden_of_transfer_tax_fraction",
+    "recording_fee_fraction",
+    "annual_property_tax_rate",
+    "realtor_commission_fraction",
+    "hoa_transfer_fee",
+    "seller_burden_of_hoa_transfer_fee",
+    "house_inspection_cost",
+    "pest_inspection_cost",
+    "escrow_fixed_fee",
+    "flood_certification_fee",
+    "title_search_fee",
+    "seller_burden_of_title_search_fee_fraction",
+    "attorney_fee",
+    "closing_protection_letter_fee",
+    "search_abstract_fee",
+    "survey_fee",
+    "notary_fee",
+    "deep_prep_fee",
+    "lenders_title_insurance_fraction",
+    "owners_title_insurance_fraction",
+    "endorsement_fees",
+    "annual_homeowners_insurance_fraction",
+    "monthly_utilities",
+    "annual_maintenance_cost_fraction",
+    "monthly_hoa_fees",
+    "annual_management_cost_fraction"
+  ]
+}
