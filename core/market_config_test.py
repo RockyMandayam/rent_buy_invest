@@ -4,15 +4,13 @@ import pytest
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.utils import io_utils
 
-TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/2023-market-config.yaml"
-market_config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
 TEST_SCHEMA_PATH = "rent_buy_invest/configs/schemas/market-config-schema.json"
+TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/2023-market-config.yaml"
 market_config_schema = io_utils.read_json(TEST_SCHEMA_PATH)
+market_config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
 jsonschema.validate(instance=market_config_kwargs, schema=market_config_schema)
-
 # tests creating MarketConfig directly
 market_config = MarketConfig(**market_config_kwargs)
-
 # tests creating MarketConfig via parse()
 market_config = MarketConfig.parse(TEST_CONFIG_PATH)
 

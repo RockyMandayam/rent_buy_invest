@@ -1,6 +1,6 @@
 {
   "title": "Market config schema",
-  "description": "Schema for market config yamlm file.",
+  "description": "Schema for market config yaml file.",
   "type": "object",
   "properties": {
     "market_rate_of_return": {
