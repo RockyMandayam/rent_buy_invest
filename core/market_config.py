@@ -1,3 +1,4 @@
+import math
 from typing import Dict, List
 
 from rent_buy_invest.core.config import Config
@@ -9,7 +10,7 @@ class MarketConfig(Config):
 
     Class attributes:
         market_config_schema_path: Market config schema path
-    
+
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
@@ -20,7 +21,7 @@ class MarketConfig(Config):
     @property
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/market-config-schema.json"
-    
+
     class TaxBrackets:
         """Stores tax bracket config.
 
@@ -103,6 +104,7 @@ class MarketConfig(Config):
         self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
             tax_brackets["tax_brackets"]
         )
+        self._validate()
 
     def _validate(self) -> None:
         """Sanity checks the configs.
@@ -110,6 +112,9 @@ class MarketConfig(Config):
         Raises:
             AssertionError: If any market configs are invalid
         """
+        assert math.isfinite(
+            self.market_rate_of_return
+        ), "Market rate of return must not be NaN, infinity, or negative infinity."
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
 
     def get_tax(self, income: float) -> float:
