@@ -55,6 +55,12 @@ class MarketConfig(Config):
             tax_rate = -1
             for bracket in self.tax_brackets:
                 assert (
+                    bracket["upper_limit"] > 0
+                ), "Tax bracket's upper limit must be positive."
+                assert (
+                    bracket["tax_rate"] >= 0
+                ), "Tax bracket's tax rate must be non-negative."
+                assert (
                     bracket["upper_limit"] > upper_limit
                 ), "Tax brackets must be listed in order."
                 # Assumes "progressive" tax brackets
