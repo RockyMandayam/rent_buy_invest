@@ -1,9 +1,7 @@
 from typing import Any, Dict, List
 
-import yaml
-
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.utils import io_utils, math_utils
+from rent_buy_invest.utils import math_utils
 
 
 class HouseConfig(Config):
@@ -13,6 +11,11 @@ class HouseConfig(Config):
     # TODO add documentation
     # TODO maybe just point to the yaml file
     """
+
+    @classmethod
+    @property
+    def schema_path(cls) -> str:
+        return "rent_buy_invest/configs/schemas/house-config-schema.json"
 
     def __init__(
         self,

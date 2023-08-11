@@ -1,16 +1,6 @@
-import jsonschema
-
 from rent_buy_invest.core.house_config import HouseConfig
-from rent_buy_invest.utils import io_utils
 
-TEST_SCHEMA_PATH = "rent_buy_invest/configs/schemas/house-config-schema.json"
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
-house_config_schema = io_utils.read_json(TEST_SCHEMA_PATH)
-house_config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
-jsonschema.validate(instance=house_config_kwargs, schema=house_config_schema)
-# tests creating HouseConfig directly
-house_config = HouseConfig(**house_config_kwargs)
-# tests creating HouseConfig via parse()
 house_config = HouseConfig.parse(TEST_CONFIG_PATH)
 
 

@@ -1,10 +1,9 @@
 import argparse
 import datetime
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
-import yaml
 
 from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.experiment_config import ExperimentConfig
@@ -12,7 +11,6 @@ from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
-
 
 # TODO test this file
 

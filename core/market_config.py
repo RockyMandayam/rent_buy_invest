@@ -1,24 +1,30 @@
-from typing import Any, Dict, List
-
-import yaml
+from typing import Dict, List
 
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.utils import io_utils, math_utils
+from rent_buy_invest.utils import math_utils
 
 
 class MarketConfig(Config):
     """Stores market config.
 
-    Documentation of the instance variable types:
-        self.market_rate_of_return (float): ANNUAL rate of return in the
+    Class attributes:
+        market_config_schema_path: Market config schema path
+    
+    Instance Attributes:
+        self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
-        self.tax_brackets ('TaxBrackets'): A TaxBrackets object
+        self.tax_brackets: A TaxBrackets object
     """
 
+    @classmethod
+    @property
+    def schema_path(cls) -> str:
+        return "rent_buy_invest/configs/schemas/market-config-schema.json"
+    
     class TaxBrackets:
         """Stores tax bracket config.
 
-        Documentation of the instance variable types:
+        Attributes:
             self.tax_brackets (List[Dict[str, float]]): A list of tax brackets,
                 where each bracket contains two keys, "upper_limit" and "tax_rate".
                 "tax_rate" is the marginal tax rate of that bracket. "upper_limit"

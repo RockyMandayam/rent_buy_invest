@@ -1,16 +1,6 @@
-import jsonschema
-
 from rent_buy_invest.core.rent_config import RentConfig
-from rent_buy_invest.utils import io_utils
 
-TEST_SCHEMA_PATH = "rent_buy_invest/configs/schemas/rent-config-schema.json"
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
-rent_config_schema = io_utils.read_json(TEST_SCHEMA_PATH)
-rent_config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
-jsonschema.validate(instance=rent_config_kwargs, schema=rent_config_schema)
-# tests creating RentConfig directly
-rent_config = RentConfig(**rent_config_kwargs)
-# tests creating RentConfig via parse()
 rent_config = RentConfig.parse(TEST_CONFIG_PATH)
 
 
