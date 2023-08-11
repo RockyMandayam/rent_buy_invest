@@ -1,26 +1,28 @@
 {
   "title": "Market config schema",
-  "description": "Schema for market config yaml file.",
+  "description": "Config file relating to assumptions about the 'market'.",
   "type": "object",
   "properties": {
     "market_rate_of_return": {
-      "description": "market rate of return",
+      "description": "ANNUAL rate of return in the market, as a fraction",
       "type": "number"
     },
     "tax_brackets": {
-      "description": "tax brackets object",
+      "description": "Tax brackets. Assume only capital gains tax, and assume the investor is in the market long-term - so only list long-term capital gains tax brackets.",
       "type": "object",
       "properties": {
         "tax_brackets": {
-          "description": "tax brackets list",
+          "description": "List of tax brackets ordered from lowest bracket to highest bracket. Each bracket has a lower limit, upper limit, and marginal tax rate. The first bracket's lower limit is assumed to be 0, and every other bracket's lower limit is equal to its previous bracket's upper limit. The last bracket's upper limit must be infinity.",
           "type": "array",
           "items": {
             "type": "object",
             "properties": {
               "upper_limit": {
+                "description": "The upper limit of this tax bracket.",
                 "type": "number"
               },
               "tax_rate": {
+                "description": "The marginal tax rate for this tax bracket.",
                 "type": "number"
               }
             },
