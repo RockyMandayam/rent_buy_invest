@@ -101,7 +101,7 @@ realtor_commission_fraction: !!float 0.025
 hoa_transfer_fee: !!float 300.
 
 # sellre's burdene of HOA transfer fee as a fraction of the fee
-seller_burden_of_hoa_transfer_fee: !!float 1.0
+seller_burden_of_hoa_transfer_fee: null
 
 # house inspection should include at least the following types: general,
 # foundation, plumbing, septic tank, termite, mold, chimney

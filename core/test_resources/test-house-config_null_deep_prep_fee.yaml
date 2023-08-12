@@ -142,7 +142,7 @@ survey_fee: !!float 500.
 notary_fee: !!float 100.
 
 # part of loosely defined "settlement fees"
-deep_prep_fee: !!float 50.
+deep_prep_fee: null
 
 # lender's title insurance (protects the lender) as a fraction of the mortgage
 # amount. Apparently there is a wide range of typical values here.

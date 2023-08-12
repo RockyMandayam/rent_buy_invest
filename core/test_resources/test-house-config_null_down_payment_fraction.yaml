@@ -28,7 +28,7 @@ annual_assessed_value_inflation_rate: !!float 0.05
 
 # fraction of the house price put down as the down payment
 # the remaining fraction is assumed to be the mortgage principal
-down_payment_fraction: !!float 0.2
+down_payment_fraction: null
 
 # mortgage ANNUAL interest rate
 # an "equivalent" monthly interest rate can be calculated from this. Note that

@@ -150,7 +150,7 @@ lenders_title_insurance_fraction: !!float 0.02
 
 # owner's title insurance (protects the owner (you)) as a fraction of the
 # mortgage amount. Apparently there is a wide range of typical values here.
-owners_title_insurance_fraction: !!float 0.01 
+owners_title_insurance_fraction: null
 
 # these are for add-ons ("endorsements") that are not included in a standard
 # title insurance, e.g., Easements And Encroachments, Zoning.

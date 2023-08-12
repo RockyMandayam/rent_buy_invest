@@ -164,7 +164,7 @@ endorsement_fees: !!float 150.
 
 # ANNUAL as fraction of assessed house value
 # depends a lot on how much you insure, house, conditions, coverage, etc.
-annual_homeowners_insurance_fraction: !!float 0.005
+annual_homeowners_insurance_fraction: null
 
 # monthly utilities for the first month
 monthly_utilities: !!float 300.

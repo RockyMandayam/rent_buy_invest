@@ -50,7 +50,7 @@ pmi_fraction: !!float 0.005
 mortgage_origination_points_fee_fraction: !!float 0.015
 
 # processing fee. Maybe included in the origination fee
-mortgage_processing_fee: !!float 300.
+mortgage_processing_fee: null
 
 # underwriting fee. Maybe included in the origination fee.
 mortgage_underwriting_fee: !!float 500.

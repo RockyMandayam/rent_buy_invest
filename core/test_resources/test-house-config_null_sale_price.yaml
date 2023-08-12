@@ -4,7 +4,7 @@
 ##### BASICS AND GENERAL CONFIGS
 
 # sale price of the house
-sale_price: !!float 500000.
+sale_price: null
 
 # ANNUAL inflation rate of house assessed value as a fraction
 annual_assessed_value_inflation_rate: !!float 0.05

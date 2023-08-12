@@ -127,7 +127,7 @@ title_search_fee: !!float 100.
 seller_burden_of_title_search_fee_fraction: !!float 1.
 
 # attorney fee
-attorney_fee: !!float 800.
+attorney_fee: null
 
 # closing protection letter (CPL) fee
 closing_protection_letter_fee: !!float 35.

@@ -121,7 +121,7 @@ escrow_fixed_fee: !!float 500.
 flood_certification_fee: !!float 20.
 
 # title search fee
-title_search_fee: !!float 100. 
+title_search_fee: null
 
 # seller burden of the title search fee as a fraction
 seller_burden_of_title_search_fee_fraction: !!float 1.

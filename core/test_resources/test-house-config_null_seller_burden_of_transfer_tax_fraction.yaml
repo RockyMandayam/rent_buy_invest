@@ -81,7 +81,7 @@ transfer_tax_fraction: !!float 0.0011
 
 # what fraction of the transfer tax burden is borne by the seller
 # the rest is borne by the buyer
-seller_burden_of_transfer_tax_fraction: !!float 0.9
+seller_burden_of_transfer_tax_fraction: null
 
 # often considered part of title fees and therefore part of closing costs.
 # tax charged by the county (state?) to legally record the property's deed

@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict, List
 
 from rent_buy_invest.core.config import Config
@@ -99,7 +100,13 @@ class HouseConfig(Config):
         Raises:
             AssertionError: If any house configs are invalid
         """
-        assert self.sale_price > 0, "House sale price must be positive."
+        for attribute, value in self.__dict__.items():
+            assert math.isfinite(
+                value
+            ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
+        assert (
+            self.sale_price > 0
+        ), "House sale price must be positive and not infinity."
         assert (
             self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
         ), "Down payment fraction must be between 0 and 1 inclusive."

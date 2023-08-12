@@ -139,7 +139,7 @@ search_abstract_fee: !!float 300.
 survey_fee: !!float 500.
 
 # part of loosely defined "settlement fees"
-notary_fee: !!float 100.
+notary_fee: null
 
 # part of loosely defined "settlement fees"
 deep_prep_fee: !!float 50.

@@ -146,7 +146,7 @@ deep_prep_fee: !!float 50.
 
 # lender's title insurance (protects the lender) as a fraction of the mortgage
 # amount. Apparently there is a wide range of typical values here.
-lenders_title_insurance_fraction: !!float 0.02
+lenders_title_insurance_fraction: null
 
 # owner's title insurance (protects the owner (you)) as a fraction of the
 # mortgage amount. Apparently there is a wide range of typical values here.
