@@ -42,7 +42,7 @@ class TestHouseConfig:
             "search_abstract_fee",
             "survey_fee",
             "notary_fee",
-            "deep_prep_fee",
+            "deed_prep_fee",
             "lenders_title_insurance_fraction",
             "owners_title_insurance_fraction",
             "endorsement_fees",
@@ -244,7 +244,7 @@ class TestHouseConfig:
         check_float_field(
             HouseConfig,
             config_kwargs,
-            ["deep_prep_fee"],
+            ["deed_prep_fee"],
             allow_negative=False,
         )
         check_float_field(

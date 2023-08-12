@@ -73,7 +73,7 @@ class HouseConfig(Config):
         self.search_abstract_fee: float = kwargs["search_abstract_fee"]
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
-        self.deep_prep_fee: float = kwargs["deep_prep_fee"]
+        self.deed_prep_fee: float = kwargs["deed_prep_fee"]
         self.lenders_title_insurance_fraction: float = kwargs[
             "lenders_title_insurance_fraction"
         ]
@@ -178,7 +178,7 @@ class HouseConfig(Config):
         ), "Search abstract fee must be non-negative."
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
-        assert self.deep_prep_fee >= 0, "Dead prep fee must be non-negative."
+        assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
         assert (
             self.lenders_title_insurance_fraction >= 0
         ), "Lenders title insurance fraction must be non-negative"
@@ -231,7 +231,7 @@ class HouseConfig(Config):
             + self.search_abstract_fee
             + self.survey_fee
             + self.notary_fee
-            + self.deep_prep_fee
+            + self.deed_prep_fee
             + self.lenders_title_insurance_fraction * self.get_initial_mortgage_amount()
             + self.owners_title_insurance_fraction * self.get_initial_mortgage_amount()
             + self.endorsement_fees
