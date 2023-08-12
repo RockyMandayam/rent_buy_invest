@@ -1,4 +1,4 @@
-name: Run isort
+name: isort import sorter
 on:
   - push
 
