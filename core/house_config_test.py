@@ -77,7 +77,9 @@ class TestHouseConfig:
             config_kwargs,
             ["down_payment_fraction"],
             allow_negative=False,
+            allow_greater_than_one=False,
         )
+
         check_float_field(
             HouseConfig,
             config_kwargs,
@@ -144,6 +146,7 @@ class TestHouseConfig:
             config_kwargs,
             ["seller_burden_of_transfer_tax_fraction"],
             allow_negative=False,
+            allow_greater_than_one=False,
         )
         check_float_field(
             HouseConfig,
@@ -174,6 +177,7 @@ class TestHouseConfig:
             config_kwargs,
             ["seller_burden_of_hoa_transfer_fee"],
             allow_negative=False,
+            allow_greater_than_one=False,
         )
         check_float_field(
             HouseConfig,
@@ -210,6 +214,7 @@ class TestHouseConfig:
             config_kwargs,
             ["seller_burden_of_title_search_fee_fraction"],
             allow_negative=False,
+            allow_greater_than_one=False,
         )
         check_float_field(
             HouseConfig,

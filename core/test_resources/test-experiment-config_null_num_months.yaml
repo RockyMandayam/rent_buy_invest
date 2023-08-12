@@ -1,0 +1,7 @@
+num_months: null
+
+market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-config.yaml"
+
+rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.yaml"
+
+house_config_path: !!str "rent_buy_invest/core/test_resources/test-house-config.yaml"

@@ -1,4 +1,4 @@
-name: Run isort
+name: isort import sorter
 on:
   - push
 
@@ -14,3 +14,4 @@ jobs:
         with:
             requirementsFiles: "requirements.txt"
             version: "5.11.5"
+      
