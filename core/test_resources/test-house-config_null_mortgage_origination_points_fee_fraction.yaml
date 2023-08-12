@@ -47,7 +47,7 @@ pmi_fraction: !!float 0.005
 # originating (creating), reviewing, processing, etc. the loan.
 # Also called loan origination fee?
 # Expressed as a fraction of the mortgage amount
-mortgage_origination_points_fee_fraction: !!float 0.015
+mortgage_origination_points_fee_fraction: null
 
 # processing fee. Maybe included in the origination fee
 mortgage_processing_fee: !!float 300.

@@ -53,7 +53,7 @@ mortgage_origination_points_fee_fraction: !!float 0.015
 mortgage_processing_fee: !!float 300.
 
 # underwriting fee. Maybe included in the origination fee.
-mortgage_underwriting_fee: !!float 500.
+mortgage_underwriting_fee: null
 
 # mortgage discount points (a.k.a. mortgage points) are a fee you can pay up
 # front to lower your mortgage interest rate. In this config, it is assumed that

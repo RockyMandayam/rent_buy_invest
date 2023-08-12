@@ -38,7 +38,7 @@ down_payment_fraction: !!float 0.2
 mortgage_annual_interest_rate: !!float 0.06
 
 # mortgage term (length) in months
-mortgage_term_months: !!int 360
+mortgage_term_months: null
 
 # private mortgage insurance cost as fraction of mortgage principal
 pmi_fraction: !!float 0.005

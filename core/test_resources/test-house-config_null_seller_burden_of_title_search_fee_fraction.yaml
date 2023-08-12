@@ -124,7 +124,7 @@ flood_certification_fee: !!float 20.
 title_search_fee: !!float 100. 
 
 # seller burden of the title search fee as a fraction
-seller_burden_of_title_search_fee_fraction: !!float 1.
+seller_burden_of_title_search_fee_fraction: null
 
 # attorney fee
 attorney_fee: !!float 800.

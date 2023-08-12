@@ -35,7 +35,7 @@ down_payment_fraction: !!float 0.2
 # the equivalent monthly interest rate is not just 1/12 of the annual rate, due
 # to the fact that the monthly rate is compounded monthly (i.e., it is a
 # compound interst rate not a simple interest rate)
-mortgage_annual_interest_rate: !!float 0.06
+mortgage_annual_interest_rate: null
 
 # mortgage term (length) in months
 mortgage_term_months: !!int 360

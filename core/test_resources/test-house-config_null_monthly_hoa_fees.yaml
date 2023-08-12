@@ -174,7 +174,7 @@ monthly_utilities: !!float 300.
 annual_maintenance_cost_fraction: !!float 0.02
 
 # monthly HOA (Home Owners Association) fees
-monthly_hoa_fees: !!float 250.
+monthly_hoa_fees: null
 
 ##### MANAGEMENT COSTS
 

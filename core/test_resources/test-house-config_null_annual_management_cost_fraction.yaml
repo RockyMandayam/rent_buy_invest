@@ -187,4 +187,4 @@ monthly_hoa_fees: !!float 250.
 # parameter can include paying a management company, advertising the house, any
 # trips you may have to make, anything associated with managing / landlord
 # Expressed as fraction of assessed house price
-annual_management_cost_fraction: !!float 0.02
+annual_management_cost_fraction: null

@@ -95,7 +95,7 @@ annual_property_tax_rate: !!float 0.01
 ##### MISCELLANEOUS CLOSING COSTS
 
 # buyer's realtor's commission as a fraction of sale price 
-realtor_commission_fraction: !!float 0.025
+realtor_commission_fraction: null
 
 # fee to sell home in HOA (Homee Owners Association)
 hoa_transfer_fee: !!float 300.

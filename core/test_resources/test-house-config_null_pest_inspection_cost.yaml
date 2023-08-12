@@ -110,7 +110,7 @@ house_inspection_cost: !!float 500.
 
 # pest inspection cost
 # house inspection probably does not include pest inspection
-pest_inspection_cost: !!float 500.
+pest_inspection_cost: null
 
 # fixed fee
 # I don't think there is a basic price-based fee except for specific

@@ -106,7 +106,7 @@ seller_burden_of_hoa_transfer_fee: !!float 1.0
 # house inspection should include at least the following types: general,
 # foundation, plumbing, septic tank, termite, mold, chimney
 # typically a house inspection does NOT include a pest inspection
-house_inspection_cost: !!float 500.
+house_inspection_cost: null
 
 # pest inspection cost
 # house inspection probably does not include pest inspection

@@ -115,7 +115,7 @@ pest_inspection_cost: !!float 500.
 # fixed fee
 # I don't think there is a basic price-based fee except for specific
 # line items, e.g., flood certification fee
-escrow_fixed_fee: !!float 500.
+escrow_fixed_fee: null
 
 # flood certification fee
 flood_certification_fee: !!float 20.

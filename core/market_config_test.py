@@ -16,29 +16,20 @@ class TestMarketConfig:
     # TODO test edge cases
 
     def test_inputs_with_invalid_schema(self) -> None:
-        with pytest.raises(jsonschema.ValidationError):
-            MarketConfig.parse(
-                "rent_buy_invest/core/test_resources/test-market-config_null_market_rate_of_return.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            MarketConfig.parse(
-                "rent_buy_invest/core/test_resources/test-market-config_null_tax_brackets.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            MarketConfig.parse(
-                "rent_buy_invest/core/test_resources/test-market-config_null_tax_brackets_2.yaml"
-            )
+        attributes = [
+            "market_rate_of_return",
+            "tax_brackets",
+            "tax_brackets_2",
+            "upper_limit",
+            "tax_rate",
+        ]
+        for attribute in attributes:
+            test_config_filename = f"rent_buy_invest/core/test_resources/test-market-config_null_{attribute}.yaml"
+            with pytest.raises(jsonschema.ValidationError):
+                MarketConfig.parse(test_config_filename)
         with pytest.raises(jsonschema.ValidationError):
             MarketConfig.parse(
                 "rent_buy_invest/core/test_resources/test-market-config_empty_tax_brackets.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            MarketConfig.parse(
-                "rent_buy_invest/core/test_resources/test-market-config_null_upper_limit.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            MarketConfig.parse(
-                "rent_buy_invest/core/test_resources/test-market-config_null_tax_rate.yaml"
             )
 
     def test_invalid_inputs(self) -> None:

@@ -13,30 +13,18 @@ class TestRentConfig:
     # TODO test edge cases
 
     def test_inputs_with_invalid_schema(self) -> None:
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_null_monthly_rent.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_null_monthly_utilities.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_null_monthly_renters_insurance.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_null_monthly_parking_fee.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_null_annual_rent_inflation_rate.yaml"
-            )
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_null_inflation_adjustment_period.yaml"
-            )
+        attributes = [
+            "monthly_rent",
+            "monthly_utilities",
+            "monthly_renters_insurance",
+            "monthly_parking_fee",
+            "annual_rent_inflation_rate",
+            "inflation_adjustment_period",
+        ]
+        for attribute in attributes:
+            test_config_filename = f"rent_buy_invest/core/test_resources/test-rent-config_null_{attribute}.yaml"
+            with pytest.raises(jsonschema.ValidationError):
+                RentConfig.parse(test_config_filename)
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)

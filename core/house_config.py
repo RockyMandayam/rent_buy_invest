@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict, List
 
 from rent_buy_invest.core.config import Config
@@ -72,7 +73,7 @@ class HouseConfig(Config):
         self.search_abstract_fee: float = kwargs["search_abstract_fee"]
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
-        self.deep_prep_fee: float = kwargs["deep_prep_fee"]
+        self.deed_prep_fee: float = kwargs["deed_prep_fee"]
         self.lenders_title_insurance_fraction: float = kwargs[
             "lenders_title_insurance_fraction"
         ]
@@ -99,7 +100,13 @@ class HouseConfig(Config):
         Raises:
             AssertionError: If any house configs are invalid
         """
-        assert self.sale_price > 0, "House sale price must be positive."
+        for attribute, value in self.__dict__.items():
+            assert math.isfinite(
+                value
+            ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
+        assert (
+            self.sale_price > 0
+        ), "House sale price must be positive and not infinity."
         assert (
             self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
         ), "Down payment fraction must be between 0 and 1 inclusive."
@@ -171,7 +178,7 @@ class HouseConfig(Config):
         ), "Search abstract fee must be non-negative."
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
-        assert self.deep_prep_fee >= 0, "Dead prep fee must be non-negative."
+        assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
         assert (
             self.lenders_title_insurance_fraction >= 0
         ), "Lenders title insurance fraction must be non-negative"
@@ -224,7 +231,7 @@ class HouseConfig(Config):
             + self.search_abstract_fee
             + self.survey_fee
             + self.notary_fee
-            + self.deep_prep_fee
+            + self.deed_prep_fee
             + self.lenders_title_insurance_fraction * self.get_initial_mortgage_amount()
             + self.owners_title_insurance_fraction * self.get_initial_mortgage_amount()
             + self.endorsement_fees

@@ -89,7 +89,7 @@ seller_burden_of_transfer_tax_fraction: !!float 0.9
 recording_fee_fraction: !!float 0.03
 
 # ANNUAL property tax rate (fraction of house's assessed value)
-annual_property_tax_rate: !!float 0.01
+annual_property_tax_rate: null
 
 
 ##### MISCELLANEOUS CLOSING COSTS
