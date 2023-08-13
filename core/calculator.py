@@ -84,20 +84,20 @@ class Calculator:
             )[0]
             rent_monthly_payment = rent_monthly_costs[month]
             # Surplus from the perspective of renting
-            surplus = housing_monthly_payment - rent_monthly_payment
+            surplus = round(housing_monthly_payment - rent_monthly_payment, 2)
             if surplus > 0:
                 rent_monthly_surpluses.append(surplus)
-                housing_monthly_surpluses.append(0)
                 rent_investment_monthly.append(
                     round(rent_grown_investment + surplus, 2)
                 )
+                housing_monthly_surpluses.append(0)
                 housing_investment_monthly.append(housing_grown_investment)
             elif surplus < 0:
                 # Now surplus is from the perspective of housing
                 surplus = -surplus
                 rent_monthly_surpluses.append(0)
-                housing_monthly_surpluses.append(surplus)
                 rent_investment_monthly.append(rent_grown_investment)
+                housing_monthly_surpluses.append(surplus)
                 housing_investment_monthly.append(
                     round(housing_grown_investment + surplus, 2)
                 )
@@ -119,8 +119,10 @@ class Calculator:
             # fmt: on
             "House: PMI": pmis,
             "House: Equity": equities,
+            "House: Monthly surplus": housing_monthly_surpluses,
             "House: Investment": housing_investment_monthly,
             "Rent: Monthly cost": rent_monthly_costs,
+            "Rent: Monthly surplus": rent_monthly_surpluses,
             "Rent: Investment": rent_investment_monthly,
         }
         rows = []
