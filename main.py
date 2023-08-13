@@ -75,7 +75,6 @@ def main() -> None:
         house_config, rent_config, market_config, num_months, initial_state
     )
     projection = calculator.calculate()
-    # rows = [f"Year {mon}, Month {}" for month in range(num_months)]
     _write_output_csv_df(output_dir, "projection.csv", projection)
 
 

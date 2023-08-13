@@ -5,3 +5,5 @@ market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-confi
 rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.yaml"
 
 house_config_path: null
+
+start_date: !!timestamp "2030-07-01"

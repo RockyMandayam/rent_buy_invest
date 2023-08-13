@@ -15,6 +15,14 @@ from rent_buy_invest.utils import io_utils
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-experiment-config.yaml"
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TEST_CONFIG_PATH)
 
+# TODO document in dev instructions how to add field:
+# update appropriate config class
+# add to all configs, examples and tests
+# update json schema (add the field and also make it required if required)
+# update tests, both invalid_schema and invalid_inputs
+# make sure all tests pass
+# make sure you can run it
+
 
 class TestExperimentConfig:
     def test_inputs_with_invalid_schema(self) -> None:
@@ -28,6 +36,11 @@ class TestExperimentConfig:
             test_config_filename = f"rent_buy_invest/core/test_resources/test-experiment-config_null_{attribute}.yaml"
             with pytest.raises(jsonschema.ValidationError):
                 ExperimentConfig.parse(test_config_filename)
+        # test start_date separately since jsonschema does not check this field (it cannot test a datetime object)
+        with pytest.raises(AssertionError):
+            ExperimentConfig.parse(
+                "rent_buy_invest/core/test_resources/test-experiment-config_null_start_date.yaml"
+            )
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)

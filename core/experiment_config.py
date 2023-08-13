@@ -1,4 +1,4 @@
-from typing import Any, Dict
+import datetime
 
 from rent_buy_invest.core.config import Config
 from rent_buy_invest.core.house_config import HouseConfig
@@ -25,6 +25,7 @@ class ExperimentConfig(Config):
         market_config_path: str,
         rent_config_path: str,
         house_config_path: str,
+        start_date: datetime.datetime,
     ) -> None:
         """Initializes the class.
 
@@ -44,6 +45,7 @@ class ExperimentConfig(Config):
         self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
         self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
         self.house_config: HouseConfig = HouseConfig.parse(house_config_path)
+        self.start_date: datetime.datetime = start_date
         self._validate()
 
     def _validate(self) -> None:
@@ -56,3 +58,6 @@ class ExperimentConfig(Config):
         assert (
             self.num_months > 0 and self.num_months <= 2400
         ), "Number of months must be positive and at most 2400."
+        assert isinstance(
+            self.start_date, datetime.date
+        ), "Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date)."
