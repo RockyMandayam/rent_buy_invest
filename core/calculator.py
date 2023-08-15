@@ -132,8 +132,4 @@ class Calculator:
         for _ in range(self.num_months):
             rows.append(date.strftime("%b %d, %Y"))
             date = math_utils.increment_month(date)
-        # for month in range(self.num_months):
-        #     y, m = math_utils.month_to_year_month(month)
-        #     self.start_date.replace(month=)
-        #     rows.append(f"Year {y}, Month {m}")
         return to_df(cols, rows)
