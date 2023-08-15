@@ -1,0 +1,12 @@
+num_months: !!int 360
+
+# TODO don't point to test files
+market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-config.yaml"
+
+# TODO don't point to test files
+rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.yaml"
+
+# TODO don't point to test files
+house_config_path: !!str "rent_buy_invest/core/test_resources/test-house-config.yaml"
+
+start_date: !!timestamp "2030-07-01"
