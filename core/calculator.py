@@ -1,4 +1,4 @@
-from typing import List, Tuple
+import datetime
 
 import pandas as pd
 
@@ -17,12 +17,14 @@ class Calculator:
         rent_config: RentConfig,
         market_config: MarketConfig,
         num_months: int,
+        start_date: datetime.date,
         initial_state: InitialState,
     ) -> None:
         self.house_config: HouseConfig = house_config
         self.rent_config: RentConfig = rent_config
         self.market_config: MarketConfig = market_config
         self.num_months: int = num_months
+        self.start_date: datetime.date = start_date
         self.initial_state: InitialState = initial_state
 
     def calculate(self) -> pd.DataFrame:
@@ -126,7 +128,8 @@ class Calculator:
             "Rent: Investment": rent_investment_monthly,
         }
         rows = []
-        for month in range(self.num_months):
-            y, m = math_utils.month_to_year_month(month)
-            rows.append(f"Year {y}, Month {m}")
+        date = self.start_date
+        for _ in range(self.num_months):
+            rows.append(date.strftime("%b %d, %Y"))
+            date = math_utils.increment_month(date)
         return to_df(cols, rows)

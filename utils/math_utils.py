@@ -1,3 +1,4 @@
+import datetime
 from typing import Tuple
 
 
@@ -45,3 +46,14 @@ def month_to_year_month(month: int) -> Tuple[int]:
     """
     assert month >= 0, "Month must be non-negative."
     return month // 12 + 1, month % 12 + 1
+
+
+def increment_month(date: datetime.date) -> datetime.date:
+    # TODO test
+    # not using dateutils b/c don't want to depend on it just for this one function
+    year, month = date.year, date.month
+    month += 1
+    if month == 13:
+        month = 1
+        year += 1
+    return date.replace(year=year, month=month)

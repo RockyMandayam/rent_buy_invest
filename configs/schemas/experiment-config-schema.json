@@ -18,12 +18,16 @@
     "house_config_path": {
       "description": "House config file path from top-level directory.",
       "type": "string"
+    },
+    "start_date": {
+      "description": "Start date of the financial projection (the date when the house ownership is transferred to you)."
     }
   },
   "required": [
     "num_months",
     "market_config_path",
     "rent_config_path",
-    "house_config_path"
+    "house_config_path",
+    "start_date"
   ]
 }

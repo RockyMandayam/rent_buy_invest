@@ -59,6 +59,7 @@ def main() -> None:
     market_config = experiment_config.market_config
     rent_config = experiment_config.rent_config
     house_config = experiment_config.house_config
+    start_date = experiment_config.start_date
 
     # create output dir
     output_dir = _make_output_dir()
@@ -72,10 +73,9 @@ def main() -> None:
 
     # project forward in time
     calculator = Calculator(
-        house_config, rent_config, market_config, num_months, initial_state
+        house_config, rent_config, market_config, num_months, start_date, initial_state
     )
     projection = calculator.calculate()
-    # rows = [f"Year {mon}, Month {}" for month in range(num_months)]
     _write_output_csv_df(output_dir, "projection.csv", projection)
 
 
