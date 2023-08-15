@@ -67,7 +67,10 @@ class Calculator:
             toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
-            pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
+            if mortgage_amount < 0.8 * self.house_config.sale_price:
+                pmi = 0
+            else:
+                pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
             pmis.append(pmi)
             mortgage_amount -= toward_equity
             assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
