@@ -52,7 +52,8 @@ def write_yaml(project_path: str, obj: Any) -> None:
 # TODO use a context manager to always write from relative paths?
 def write_csv_df(project_path: str, df: pd.DataFrame) -> None:
     abs_path = _get_abs_path(project_path)
-    df.to_csv(abs_path)
+    abs_path = abs_path[:-3] + "xlsx"
+    df.to_excel(abs_path)
 
 
 def read_json(project_path: str) -> Union[Dict, List]:

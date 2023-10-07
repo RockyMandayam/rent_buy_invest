@@ -6,7 +6,11 @@ import pandas as pd
 import yaml
 
 
-def to_df(cols: Dict[str, List[Any]], rows: Optional[List[str]] = None) -> pd.DataFrame:
+def to_df(
+    cols: Dict[str, List[Any]],
+    rows: Optional[List[str]] = None,
+    multi_col: bool = False,
+) -> pd.DataFrame:
     """
     Args:
         cols: Map from column name to col (list of values)
@@ -14,6 +18,20 @@ def to_df(cols: Dict[str, List[Any]], rows: Optional[List[str]] = None) -> pd.Da
     Returns:
         pd.DataFrame: DataFrame constructed from given cols
     """
-    if rows:
-        return pd.DataFrame(cols, index=pd.Index(rows))
-    return pd.DataFrame(cols)
+    index = index = pd.Index(rows) if rows else None
+    df = pd.DataFrame(data=cols, index=index)
+    if multi_col:
+        tuples = []
+        for col in cols.keys():
+            if col.startswith("Rent"):
+                category = "Rent"
+            elif col.startswith("House"):
+                category = "House"
+            else:
+                raise ValueError(
+                    "All columns in projection table must start with 'Rent' or 'House'"
+                )
+            tuples.append((category, col))
+        columns = pd.MultiIndex.from_tuples(tuples)
+        df.columns = columns
+    return df

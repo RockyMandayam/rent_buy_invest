@@ -49,7 +49,7 @@ class Calculator:
         # which projects forward month by month
         mortgage_interests = []
         paid_toward_equity = []
-        equities = []
+        equities = [self.house_config.get_down_payment()]
         pmis = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
@@ -66,13 +66,13 @@ class Calculator:
             mortgage_interests.append(mortgage_interest)
             toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
-            equities.append(round(house_values[month] - mortgage_amount, 2))
             if mortgage_amount < 0.8 * self.house_config.sale_price:
                 pmi = 0
             else:
                 pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
             pmis.append(pmi)
             mortgage_amount -= toward_equity
+            equities.append(round(house_values[month] - mortgage_amount, 2))
             assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
             housing_monthly_payment = (
                 house_monthly_costs_related_to_house_value[month]
@@ -110,6 +110,7 @@ class Calculator:
         # equities.pop()
         rent_investment_monthly.pop()
         housing_investment_monthly.pop()
+        equities.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
@@ -135,4 +136,4 @@ class Calculator:
         for _ in range(self.num_months):
             rows.append(date.strftime("%b %d, %Y"))
             date = math_utils.increment_month(date)
-        return to_df(cols, rows)
+        return to_df(cols, rows, multi_col=True)
