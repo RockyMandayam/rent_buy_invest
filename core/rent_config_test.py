@@ -1,3 +1,5 @@
+import itertools
+
 import jsonschema
 import pytest
 
@@ -75,11 +77,32 @@ class TestRentConfig:
             allow_zero=False,
         )
 
-    def test_get_monthly_costs_of_renting(self) -> None:
-        actual = RENT_CONFIG.get_monthly_costs_of_renting(25)
-        expected = (
-            [2420.0] * 12
-            + [round(2420.0 * 1.03, 2)] * 12
-            + [round(2420.0 * 1.03**2, 2)]
+    def test_get_upfront_one_time_cost(self) -> None:
+        act = RENT_CONFIG.get_upfront_one_time_cost()
+        exp = (
+            RENT_CONFIG.security_deposit
+            * RENT_CONFIG.unrecoverable_fraction_of_security_deposit
         )
-        assert actual == expected
+        assert act == exp
+
+    def test_get_monthly_costs_of_renting(self) -> None:
+        for num_months in [1, 2, 24, 25]:
+            actual = RENT_CONFIG.get_monthly_costs_of_renting(num_months)
+
+            num_full_years = num_months // 12
+            exp = []
+            # calculate for all but last year
+            for year in range(num_full_years):
+                monthly_rent = round(
+                    2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** year,
+                    2,
+                )
+                exp.extend([monthly_rent] * 12)
+            # calculate for last year
+            monthly_rent = round(
+                2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** num_full_years,
+                2,
+            )
+            exp.extend([monthly_rent] * (num_months % 12))
+
+            assert actual == exp
