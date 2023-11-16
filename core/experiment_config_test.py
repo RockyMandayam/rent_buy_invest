@@ -27,6 +27,7 @@ EXPERIMENT_CONFIG = ExperimentConfig.parse(TEST_CONFIG_PATH)
 class TestExperimentConfig:
     def test_inputs_with_invalid_schema(self) -> None:
         # TODO for all these for all classes, I shouldn't have to add attributes manually to this list
+        # check null fields
         attributes = [
             "num_months",
             "market_config_path",
@@ -41,6 +42,12 @@ class TestExperimentConfig:
         with pytest.raises(AssertionError):
             ExperimentConfig.parse(
                 "rent_buy_invest/core/test_resources/test-experiment-config_null_start_date.yaml"
+            )
+
+        # check missing field
+        with pytest.raises(jsonschema.ValidationError):
+            ExperimentConfig.parse(
+                "rent_buy_invest/core/test_resources/test-experiment-config_missing_start_date.yaml"
             )
 
     def test_invalid_inputs(self) -> None:
