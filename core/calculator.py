@@ -114,21 +114,21 @@ class Calculator:
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
-            "House: House value related monthly cost": house_monthly_costs_related_to_house_value,
-            "House: House value": house_values,
-            "House: Inflation related monthly cost": house_monthly_costs_related_to_inflation,
-            "House: Mortgage interest": mortgage_interests,
-            "House: Paid toward equity": paid_toward_equity,
+            "House: Monthly cost tied to house value": house_monthly_costs_related_to_house_value,
+            "House: Monthly cost tied to inflation": house_monthly_costs_related_to_inflation,
+            "House: Monthly mortgage interest payment": mortgage_interests,
+            "House: Monthly mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "House: Total mortgage payment": [monthly_mortgage_payment] * self.num_months,
+            "House: Monthly mortgage total payment": [monthly_mortgage_payment] * self.num_months,
             # fmt: on
-            "House: PMI": pmis,
-            "House: Equity": equities,
-            "House: Monthly surplus": housing_monthly_surpluses,
-            "House: Investment": housing_investment_monthly,
-            "Rent: Monthly cost": rent_monthly_costs,
-            "Rent: Monthly surplus": rent_monthly_surpluses,
+            "House: Monthly cost of PMI": pmis,
+            "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
+            "House: House value": house_values,
+            "House: Equity value": equities,
+            "House: Investment (excluding house) value": housing_investment_monthly,
+            "Rent: Monthly cost tied to inflation": rent_monthly_costs,
+            "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
             "Rent: Investment": rent_investment_monthly,
         }
         rows = []
