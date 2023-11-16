@@ -41,6 +41,10 @@ class RentConfig(Config):
         self.monthly_parking_fee: float = kwargs["monthly_parking_fee"]
         self.annual_rent_inflation_rate: float = kwargs["annual_rent_inflation_rate"]
         self.inflation_adjustment_period: int = kwargs["inflation_adjustment_period"]
+        self.security_deposit: float = kwargs["security_deposit"]
+        self.unrecoverable_fraction_of_security_deposit: float = kwargs[
+            "unrecoverable_fraction_of_security_deposit"
+        ]
         self._validate()
 
     def _validate(self) -> None:
@@ -64,6 +68,9 @@ class RentConfig(Config):
         assert (
             self.inflation_adjustment_period >= 1
         ), "Inflation adjustment period must be an integer of at least 1."
+
+    def get_upfront_one_time_cost(self) -> float:
+        return self.security_deposit * self.unrecoverable_fraction_of_security_deposit
 
     def _get_first_monthly_cost(self) -> float:
         """Get monthly cost of renting for the first month"""
