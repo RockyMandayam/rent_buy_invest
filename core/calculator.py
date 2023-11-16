@@ -122,12 +122,12 @@ class Calculator:
             "House: Monthly mortgage total payment": [monthly_mortgage_payment] * self.num_months,
             # fmt: on
             "House: Monthly cost of PMI": pmis,
-            "House: Monthly surplus": housing_monthly_surpluses,
+            "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
             "House: House value": house_values,
             "House: Equity value": equities,
-            "House: Investment value": housing_investment_monthly,
-            "Rent: Monthly cost": rent_monthly_costs,
-            "Rent: Monthly surplus": rent_monthly_surpluses,
+            "House: Investment (excluding house) value": housing_investment_monthly,
+            "Rent: Monthly cost tied to inflation": rent_monthly_costs,
+            "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
             "Rent: Investment": rent_investment_monthly,
         }
         rows = []
