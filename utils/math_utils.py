@@ -56,4 +56,6 @@ def increment_month(date: datetime.date) -> datetime.date:
     if month == 13:
         month = 1
         year += 1
-    return date.replace(year=year, month=month)
+    # just an approximate hacky way of avoiding having to deal with months ending on different dates
+    day = min(date.day, 28)
+    return date.replace(year=year, month=month, day=day)

@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 
 from rent_buy_invest.utils import math_utils
@@ -80,3 +82,20 @@ def test_month_to_year_month() -> None:
         math_utils.month_to_year_month(-1)
     assert math_utils.month_to_year_month(0) == (1, 1)
     assert math_utils.month_to_year_month(13) == (2, 2)
+
+
+def test_increment_month() -> None:
+    date = datetime.datetime.strptime("2020-09-03", "%Y-%m-%d")
+    act = math_utils.increment_month(date)
+    exp = date.replace(month=10)
+    assert act == exp
+
+    date = datetime.datetime.strptime("2020-01-31", "%Y-%m-%d")
+    act = math_utils.increment_month(date)
+    exp = date.replace(month=2, day=28)
+    assert act == exp
+
+    date = datetime.datetime.strptime("2020-12-31", "%Y-%m-%d")
+    act = math_utils.increment_month(date)
+    exp = date.replace(year=2021, month=1, day=28)
+    assert act == exp
