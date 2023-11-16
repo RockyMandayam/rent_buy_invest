@@ -26,6 +26,14 @@
     "inflation_adjustment_period": {
       "description": "How often, in months, to update rent-related expenses for inflation. Twelve is a good number here, as leases are often for 12-month periods and rents change when leases end.",
       "type": "number"
+    },
+    "security_deposit": {
+      "description": "The security deposit (in dollars) which will be returned back to you minus expenses that the landowner charges for cleaning, damages, etc.",
+      "type": "number"
+    },
+    "unrecoverable_fraction_of_security_deposit": {
+      "description": "The fraction of the security deposit that you expect NOT to be returned to you ever.",
+      "type": "number"
     }
   },
   "required": [
@@ -34,6 +42,8 @@
     "monthly_renters_insurance",
     "monthly_parking_fee",
     "annual_rent_inflation_rate",
-    "inflation_adjustment_period"
+    "inflation_adjustment_period",
+    "security_deposit",
+    "unrecoverable_fraction_of_security_deposit"
   ]
 }

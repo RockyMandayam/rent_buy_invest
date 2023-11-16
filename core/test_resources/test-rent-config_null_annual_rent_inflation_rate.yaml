@@ -9,3 +9,7 @@ monthly_parking_fee: !!float 100.
 annual_rent_inflation_rate: null
 
 inflation_adjustment_period: !!int 12
+
+security_deposit: !!float 2000.
+
+unrecoverable_fraction_of_security_deposit: !!float 0.5
