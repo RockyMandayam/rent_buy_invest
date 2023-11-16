@@ -11,6 +11,7 @@ HOUSE_CONFIG = HouseConfig.parse(TEST_CONFIG_PATH)
 
 class TestHouseConfig:
     def test_inputs_with_invalid_schema(self) -> None:
+        # check null fields
         attributes = [
             "sale_price",
             "annual_assessed_value_inflation_rate",
@@ -56,6 +57,12 @@ class TestHouseConfig:
             test_config_filename = f"rent_buy_invest/core/test_resources/test-house-config_null_{attribute}.yaml"
             with pytest.raises(jsonschema.ValidationError):
                 HouseConfig.parse(test_config_filename)
+
+        # check missing field
+        with pytest.raises(jsonschema.ValidationError):
+            HouseConfig.parse(
+                "rent_buy_invest/core/test_resources/test-house-config_missing_annual_management_cost_fraction.yaml"
+            )
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)

@@ -13,6 +13,7 @@ class TestRentConfig:
     # TODO test edge cases
 
     def test_inputs_with_invalid_schema(self) -> None:
+        # check null fields
         attributes = [
             "monthly_rent",
             "monthly_utilities",
@@ -25,6 +26,12 @@ class TestRentConfig:
             test_config_filename = f"rent_buy_invest/core/test_resources/test-rent-config_null_{attribute}.yaml"
             with pytest.raises(jsonschema.ValidationError):
                 RentConfig.parse(test_config_filename)
+
+        # check missing field
+        with pytest.raises(jsonschema.ValidationError):
+            RentConfig.parse(
+                "rent_buy_invest/core/test_resources/test-rent-config_missing_inflation_adjustment_period.yaml"
+            )
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)

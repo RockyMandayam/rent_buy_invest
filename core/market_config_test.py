@@ -16,6 +16,7 @@ class TestMarketConfig:
     # TODO test edge cases
 
     def test_inputs_with_invalid_schema(self) -> None:
+        # check null fields
         attributes = [
             "market_rate_of_return",
             "tax_brackets",
@@ -30,6 +31,12 @@ class TestMarketConfig:
         with pytest.raises(jsonschema.ValidationError):
             MarketConfig.parse(
                 "rent_buy_invest/core/test_resources/test-market-config_empty_tax_brackets.yaml"
+            )
+
+        # check missing field
+        with pytest.raises(jsonschema.ValidationError):
+            MarketConfig.parse(
+                "rent_buy_invest/core/test_resources/test-market-config_missing_last_tax_rate.yaml"
             )
 
     def test_invalid_inputs(self) -> None:
