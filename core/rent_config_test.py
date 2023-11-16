@@ -20,6 +20,8 @@ class TestRentConfig:
             "monthly_parking_fee",
             "annual_rent_inflation_rate",
             "inflation_adjustment_period",
+            "security_deposit",
+            "unrecoverable_fraction_of_security_deposit",
         ]
         for attribute in attributes:
             test_config_filename = f"rent_buy_invest/core/test_resources/test-rent-config_null_{attribute}.yaml"

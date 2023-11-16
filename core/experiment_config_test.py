@@ -26,6 +26,7 @@ EXPERIMENT_CONFIG = ExperimentConfig.parse(TEST_CONFIG_PATH)
 
 class TestExperimentConfig:
     def test_inputs_with_invalid_schema(self) -> None:
+        # TODO for all these for all classes, I shouldn't have to add attributes manually to this list
         attributes = [
             "num_months",
             "market_config_path",
