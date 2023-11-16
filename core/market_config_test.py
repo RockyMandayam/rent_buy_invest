@@ -69,12 +69,10 @@ class TestMarketConfig:
         assert MARKET_CONFIG.get_tax(500000) == pytest.approx(68691.25)
 
     def test_get_pretax_monthly_wealth(self) -> None:
-        actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, 1)
-        expected = [pytest.approx(100)]
-        assert actual == expected
-        num_months = 25
-        actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, num_months)
-        expected = [
-            pytest.approx(round((1.07) ** (i / 12) * 100, 2)) for i in range(num_months)
-        ]
-        assert actual == expected
+        for num_months in [1, 2, 24, 25]:
+            actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, num_months)
+            expected = [
+                pytest.approx(round((1.07) ** (i / 12) * 100, 2))
+                for i in range(num_months)
+            ]
+            assert actual == expected

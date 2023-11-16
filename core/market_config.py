@@ -176,8 +176,9 @@ class MarketConfig(Config):
             AssertionError: If the principal is negative or num_months is not positive
         """
         assert principal >= 0, "Principal invested must be non-negative."
-        # TODO this and all other such assertions maybe could happen only once earlier?
-        assert num_months > 0, "Number of months must be positive."
         return math_utils.project_growth(
-            principal, self.market_rate_of_return, True, num_months
+            principal=principal,
+            annual_growth_rate=self.market_rate_of_return,
+            compound_monthly=True,
+            num_months=num_months,
         )
