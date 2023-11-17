@@ -19,6 +19,7 @@ def test_get_abs_path() -> None:
 
 
 def test_read_yaml() -> None:
+    # simple custom test case
     actual = io_utils.read_yaml(TEST_YAML_PATH)
     expected = {
         "a": 1,
@@ -27,6 +28,14 @@ def test_read_yaml() -> None:
         "d": [True, False],
     }
     assert actual == expected
+
+    # test on example yamls
+    io_utils.read_yaml(
+        "rent_buy_invest/configs/examples/experiment-config-example-1.yaml"
+    )
+    io_utils.read_yaml("rent_buy_invest/configs/examples/house-config-example-1.yaml")
+    io_utils.read_yaml("rent_buy_invest/configs/examples/market-config-example-1.yaml")
+    io_utils.read_yaml("rent_buy_invest/configs/examples/rent-config-example-1.yaml")
 
 
 # TODO test write_yaml
