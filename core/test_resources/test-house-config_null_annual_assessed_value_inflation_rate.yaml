@@ -156,7 +156,8 @@ owners_title_insurance_fraction: !!float 0.01
 # title insurance, e.g., Easements And Encroachments, Zoning.
 # The expected price per-endorsement is about $75. Enter the total amount you
 # expect for all endorsements.
-# TODO not sure if this is for lenders, owners, or both
+# I'm not sure if this is for lender's title insurance, owner's title insurance,
+# or both, but I'll assume the owner pays it regardless
 endorsement_fees: !!float 150.
 
 

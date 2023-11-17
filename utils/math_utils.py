@@ -49,7 +49,6 @@ def month_to_year_month(month: int) -> Tuple[int]:
 
 
 def increment_month(date: datetime.date) -> datetime.date:
-    # TODO test
     # not using dateutils b/c don't want to depend on it just for this one function
     year, month = date.year, date.month
     month += 1
