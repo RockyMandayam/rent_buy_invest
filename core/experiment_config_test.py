@@ -15,14 +15,6 @@ from rent_buy_invest.utils import io_utils
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-experiment-config.yaml"
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TEST_CONFIG_PATH)
 
-# TODO document in dev instructions how to add field:
-# update appropriate config class
-# add to all configs, examples and tests
-# update json schema (add the field and also make it required if required)
-# update tests, both invalid_schema and invalid_inputs
-# make sure all tests pass
-# make sure you can run it
-
 
 class TestExperimentConfig:
     def test_inputs_with_invalid_schema(self) -> None:

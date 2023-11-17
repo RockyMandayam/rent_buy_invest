@@ -3,8 +3,6 @@ from typing import Any, Dict, Iterable, List, Type
 
 import pytest
 
-# TODO test this file
-
 
 def _check_field(
     clz: Type,
