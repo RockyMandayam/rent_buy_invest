@@ -1,8 +1,10 @@
+import datetime
+import os
 from typing import Any, Dict
 
 import yaml
 
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.utils import datetime_utils, io_utils
 
 TEST_YAML_PATH = "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
 TEST_JSON_PATH = "rent_buy_invest/utils/test_resources/simple-json.json"
@@ -39,7 +41,21 @@ def test_read_yaml() -> None:
     io_utils.read_yaml("rent_buy_invest/configs/examples/rent-config-example-1.yaml")
 
 
-# TODO test write_yaml
+def test_write_yaml() -> None:
+    # simple custom test case
+    exp = {
+        "a": 1,
+        "b": 1.1,
+        "c": "1",
+        "d": [True, False],
+    }
+    dir = f"rent_buy_invest/temp/{datetime_utils.get_time()}"
+    project_path = f"{dir}/test_write_yaml.yaml"
+    io_utils.make_dirs(dir)
+    io_utils.write_yaml(project_path, exp)
+    act = io_utils.read_yaml(project_path)
+    assert act == exp
+    io_utils.delete_file(project_path)
 
 
 # TODO test write_csv_df

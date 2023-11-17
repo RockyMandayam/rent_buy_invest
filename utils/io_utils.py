@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 from typing import Any, Dict, List, Union
@@ -46,8 +47,34 @@ class RentBuyInvestFileOpener:
         self.file.close()
 
 
+# class RentBuyInvestTempFileOpener():
+#     """File opener that takes in project path (relative eto rent_buy_invest).
+
+#     The default python open() function requires an absolute path.
+#     """
+
+#     def __init__(self, filename: str) -> None:
+#         project_path = f"rent_buy_invest/{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}/{filename}"
+#         mode = "x"
+#         super().__init__(project_path, mode)
+
+#     # def __enter__(self) -> Any:
+#     #     project_path = f"rent_buy_invest/{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+#     #     abs_path = get_abs_path(self.project_path)
+#     #     self.file = open(abs_path, mode=self.mode)
+#     #     return self.file
+
+#     def __exit__(self, exc_type, exc_val, exc_tb):
+#         self.file.close()
+#         os.remove(self.file)
+
+
 def make_dirs(project_path: str) -> None:
     os.makedirs(get_abs_path(project_path))
+
+
+def delete_file(project_path: str) -> None:
+    os.remove(get_abs_path(project_path))
 
 
 def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
@@ -59,7 +86,7 @@ def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
 
 def write_yaml(project_path: str, obj: Any) -> None:
     """Write objct to given path (from top-level directory) as yaml."""
-    with RentBuyInvestFileOpener(project_path, mode="x") as f:
+    with RentBuyInvestFileOpener(project_path, mode="w") as f:
         yaml.dump(obj, f)
 
 
