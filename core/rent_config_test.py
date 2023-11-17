@@ -76,6 +76,13 @@ class TestRentConfig:
             allow_negative=False,
             allow_zero=False,
         )
+        check_float_field(
+            RentConfig,
+            config_kwargs,
+            ["unrecoverable_fraction_of_security_deposit"],
+            allow_negative=False,
+            allow_greater_than_one=False,
+        )
 
     def test_get_upfront_one_time_cost(self) -> None:
         act = RENT_CONFIG.get_upfront_one_time_cost()
