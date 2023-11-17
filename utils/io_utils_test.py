@@ -9,7 +9,7 @@ TEST_YAML_PATH = "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
 
 def test_get_abs_path() -> None:
     relative_path = "rent_buy_invest/configs"
-    actual = io_utils._get_abs_path(relative_path)
+    actual = io_utils.get_abs_path(relative_path)
     # TODO do not hardcode this - should work on any machine
     expected = "/Users/rocky/Downloads/rent_buy_invest/configs"
     assert actual == expected
