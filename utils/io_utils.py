@@ -19,7 +19,6 @@ def get_abs_path(project_path: str) -> str:
     >>> get_abs_path("rent_buy_invest/configs")
     '/Users/FooBarUser/rent_buy_invest/configs'
     """
-    # TODO is there any way not to hard code this?
     if not project_path.startswith("rent_buy_invest"):
         raise ValueError("Invalid project_path")
     dir_containing_top_level_dir = os.path.join(
@@ -55,7 +54,6 @@ def make_dirs(project_path: str) -> None:
 def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
     """Load yaml given by path (from top-level directory) as dictionary."""
     with RentBuyInvestFileOpener(project_path, mode="r") as f:
-        # TODO load is unsafe apparently! use safe_load!
         general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     return general_config
 
