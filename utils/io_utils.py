@@ -1,4 +1,3 @@
-import datetime
 import json
 import os
 from typing import Any, Dict, List, Union
@@ -47,12 +46,17 @@ class RentBuyInvestFileOpener:
         self.file.close()
 
 
-def make_dirs(project_path: str) -> None:
-    os.makedirs(get_abs_path(project_path))
-
-
 def delete_file(project_path: str) -> None:
     os.remove(get_abs_path(project_path))
+
+
+def make_dirs(project_path: str, exist_ok: bool = True) -> None:
+    os.makedirs(get_abs_path(project_path), exist_ok=exist_ok)
+
+
+def delete_dir(project_path) -> None:
+    # os.remove(get_abs_path(project_path))
+    os.rmdir(get_abs_path(project_path))
 
 
 def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
