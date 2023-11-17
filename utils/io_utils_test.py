@@ -35,4 +35,8 @@ def test_read_yaml() -> None:
 # TODO test write_csv_df
 
 
-# TODO test read_json
+def test_read_json() -> None:
+    io_utils.read_json("rent_buy_invest/configs/schemas/experiment-config-schema.json")
+    io_utils.read_json("rent_buy_invest/configs/schemas/house-config-schema.json")
+    io_utils.read_json("rent_buy_invest/configs/schemas/market-config-schema.json")
+    io_utils.read_json("rent_buy_invest/configs/schemas/rent-config-schema.json")
