@@ -5,6 +5,7 @@ import yaml
 from rent_buy_invest.utils import io_utils
 
 TEST_YAML_PATH = "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
+TEST_JSON_PATH = "rent_buy_invest/utils/test_resources/simple-json.json"
 
 
 def test_get_abs_path() -> None:
@@ -29,7 +30,7 @@ def test_read_yaml() -> None:
     }
     assert actual == expected
 
-    # test on example yamls
+    # try reading example yamls
     io_utils.read_yaml(
         "rent_buy_invest/configs/examples/experiment-config-example-1.yaml"
     )
@@ -45,6 +46,17 @@ def test_read_yaml() -> None:
 
 
 def test_read_json() -> None:
+    # simple custom test case
+    actual = io_utils.read_yaml(TEST_JSON_PATH)
+    expected = {
+        "a": 1,
+        "b": 1.1,
+        "c": "1",
+        "d": [True, False],
+    }
+    assert actual == expected
+
+    # try reading example jsons
     io_utils.read_json("rent_buy_invest/configs/schemas/experiment-config-schema.json")
     io_utils.read_json("rent_buy_invest/configs/schemas/house-config-schema.json")
     io_utils.read_json("rent_buy_invest/configs/schemas/market-config-schema.json")
