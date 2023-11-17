@@ -68,6 +68,11 @@ class RentConfig(Config):
         assert (
             self.inflation_adjustment_period >= 1
         ), "Inflation adjustment period must be an integer of at least 1."
+        assert self.security_deposit >= 0, "Security deposit must be non-negative."
+        assert (
+            self.unrecoverable_fraction_of_security_deposit >= 0
+            and self.unrecoverable_fraction_of_security_deposit <= 1
+        ), "Unrecoverable fraction of security deposit must be between 0 and 1 inclusive."
 
     def get_upfront_one_time_cost(self) -> float:
         return self.security_deposit * self.unrecoverable_fraction_of_security_deposit
