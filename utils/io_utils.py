@@ -35,12 +35,11 @@ class RentBuyInvestFileOpener:
     """
 
     def __init__(self, project_path: str, mode: str) -> None:
-        self.project_path = project_path
+        self.abs_path = get_abs_path(project_path)
         self.mode = mode
 
     def __enter__(self) -> Any:
-        abs_path = get_abs_path(self.project_path)
-        self.file = open(abs_path, mode=self.mode)
+        self.file = open(self.abs_path, mode=self.mode)
         return self.file
 
     def __exit__(self, exc_type, exc_val, exc_tb):
