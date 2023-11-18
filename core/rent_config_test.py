@@ -12,7 +12,6 @@ RENT_CONFIG = RentConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestRentConfig:
-
     def test_inputs_with_invalid_schema(self) -> None:
         # check null fields
         attributes = [
