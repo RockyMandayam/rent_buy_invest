@@ -58,7 +58,7 @@ class Calculator:
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
-        for month in range(self.num_months):
+        for month in range(self.num_months + 1):
             mortgage_interest = round(
                 mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12,
                 2,
@@ -120,7 +120,7 @@ class Calculator:
             "House: Monthly mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "House: Monthly mortgage total payment": [monthly_mortgage_payment] * self.num_months,
+            "House: Monthly mortgage total payment": [monthly_mortgage_payment] * (self.num_months + 1),
             # fmt: on
             "House: Monthly cost of PMI": pmis,
             "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
@@ -133,7 +133,7 @@ class Calculator:
         }
         rows = []
         date = self.start_date
-        for _ in range(self.num_months):
+        for _ in range(self.num_months + 1):
             rows.append(date.strftime("%b %d, %Y"))
             date = math_utils.increment_month(date)
         return to_df(cols, rows, multi_col_func=lambda col_name: col_name.split(":")[0])

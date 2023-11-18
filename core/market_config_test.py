@@ -80,12 +80,12 @@ class TestMarketConfig:
         with pytest.raises(AssertionError):
             MARKET_CONFIG.get_pretax_monthly_wealth(100, 0)
 
-        assert MARKET_CONFIG.get_pretax_monthly_wealth(0, 12) == [0] * 12
+        assert MARKET_CONFIG.get_pretax_monthly_wealth(0, 12) == [0] * 13
 
         for num_months in [1, 2, 24, 25]:
             actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, num_months)
             expected = [
                 pytest.approx(round((1.07) ** (i / 12) * 100, 2))
-                for i in range(num_months)
+                for i in range(num_months + 1)
             ]
             assert actual == expected

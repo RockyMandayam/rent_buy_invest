@@ -14,7 +14,8 @@ def project_growth(
     round_to_cent: bool = True,
 ) -> float:
     """Given a principal (starting amount) and an annual growth rate, return
-    the value each month for num_months months.
+    the value at the beginning of each month for num_months months, and a final
+    value representing the value at the end of num_months months.
 
     Returns:
         List[float]: monthly value in dollars
@@ -29,7 +30,7 @@ def project_growth(
             annual_growth_rate
         )
     monthly_values = []
-    for month in range(num_months):
+    for month in range(num_months + 1):
         if compound_monthly:
             monthly_value = principal * (1 + equivalent_monthly_rate) ** month
         else:
