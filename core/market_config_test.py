@@ -13,8 +13,6 @@ MARKET_CONFIG = MarketConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestMarketConfig:
-    # TODO test edge cases
-
     def test_inputs_with_invalid_schema(self) -> None:
         # check null fields
         attributes = [
@@ -64,11 +62,15 @@ class TestMarketConfig:
             MarketConfig(**invalid_kwargs)
 
     def test_get_tax(self) -> None:
+        with pytest.raises(AssertionError):
+            MARKET_CONFIG.get_tax(-1)
         assert MARKET_CONFIG.get_tax(0) == pytest.approx(0)
         assert MARKET_CONFIG.get_tax(44625) == pytest.approx(0)
         assert MARKET_CONFIG.get_tax(500000) == pytest.approx(68691.25)
 
     def test_get_pretax_monthly_wealth(self) -> None:
+        with pytest.raises(AssertionError):
+            MARKET_CONFIG.get_pretax_monthly_wealth(100, 0)
         for num_months in [1, 2, 24, 25]:
             actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, num_months)
             expected = [
