@@ -57,6 +57,7 @@ class Calculator:
         housing_investment_monthly = [0]
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
+        remaining_mortgage_amounts = [mortgage_amount]
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
         for month in range(self.num_months):
             mortgage_interest = round(
@@ -64,6 +65,9 @@ class Calculator:
                 2,
             )
             mortgage_interests.append(mortgage_interest)
+            remaining_mortgage_amounts.append(
+                remaining_mortgage_amounts[-1] - mortgage_interest
+            )
             toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
             if mortgage_amount < 0.8 * self.house_config.sale_price:
@@ -111,6 +115,7 @@ class Calculator:
         rent_investment_monthly.pop()
         housing_investment_monthly.pop()
         equities.pop()
+        remaining_mortgage_amounts.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
@@ -126,6 +131,7 @@ class Calculator:
             "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
             "House: House value": house_values,
             "House: Equity value": equities,
+            "House: Remaining mortgage amount": remaining_mortgage_amounts,
             "House: Investment (excluding house) value": housing_investment_monthly,
             "Rent: Monthly cost tied to inflation": rent_monthly_costs,
             "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
