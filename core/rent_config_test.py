@@ -93,6 +93,9 @@ class TestRentConfig:
         assert act == exp
 
     def test_get_monthly_costs_of_renting(self) -> None:
+        with pytest.raises(AssertionError):
+            RENT_CONFIG.get_monthly_costs_of_renting(0)
+
         for num_months in [1, 2, 24, 25]:
             actual = RENT_CONFIG.get_monthly_costs_of_renting(num_months)
 
