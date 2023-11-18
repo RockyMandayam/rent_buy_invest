@@ -12,8 +12,6 @@ RENT_CONFIG = RentConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestRentConfig:
-    # TODO test edge cases
-
     def test_inputs_with_invalid_schema(self) -> None:
         # check null fields
         attributes = [
@@ -93,6 +91,9 @@ class TestRentConfig:
         assert act == exp
 
     def test_get_monthly_costs_of_renting(self) -> None:
+        with pytest.raises(AssertionError):
+            RENT_CONFIG.get_monthly_costs_of_renting(0)
+
         for num_months in [1, 2, 24, 25]:
             actual = RENT_CONFIG.get_monthly_costs_of_renting(num_months)
 

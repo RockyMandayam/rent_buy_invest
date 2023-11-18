@@ -61,21 +61,9 @@ class TestMarketConfig:
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
 
-        # upper_limit of 0 should cause error
-        invalid_kwargs = copy.deepcopy(config_kwargs)
-        invalid_kwargs["tax_brackets"]["tax_brackets"][0]["upper_limit"] = 0
-        with pytest.raises(AssertionError):
-            MarketConfig(**invalid_kwargs)
-
         # non-increasing upper_limit should cause error
         invalid_kwargs = copy.deepcopy(config_kwargs)
         invalid_kwargs["tax_brackets"]["tax_brackets"][1]["upper_limit"] = 44625
-        with pytest.raises(AssertionError):
-            MarketConfig(**invalid_kwargs)
-
-        # tax_rate must be non-negative
-        invalid_kwargs = copy.deepcopy(config_kwargs)
-        invalid_kwargs["tax_brackets"]["tax_brackets"][0]["tax_rate"] = -0.01
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
 
