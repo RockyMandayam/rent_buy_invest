@@ -16,7 +16,7 @@
       "type": "number"
     },
     "monthly_parking_fee": {
-      "description": "Monthly parking fee",
+      "description": "Monthly parking fee for the first month",
       "type": "number"
     },
     "annual_rent_inflation_rate": {

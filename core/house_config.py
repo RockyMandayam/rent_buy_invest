@@ -8,9 +8,12 @@ from rent_buy_invest.utils import math_utils
 class HouseConfig(Config):
     """Stores house config.
 
-    Documentation of the instance variable types:
-    # TODO add documentation
-    # TODO maybe just point to the yaml file
+    Class Attributes:
+        schema_path (str): House config schema path
+
+    Instance Attributes:
+        See rent_buy_invest/configs/schemas/house-config-schema for documentation
+            instance attributes.
     """
 
     @classmethod

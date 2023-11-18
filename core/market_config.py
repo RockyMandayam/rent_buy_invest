@@ -9,7 +9,7 @@ class MarketConfig(Config):
     """Stores market config.
 
     Class attributes:
-        market_config_schema_path: Market config schema path
+        schema_path (str): Market config schema path
 
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the

@@ -9,9 +9,15 @@ from rent_buy_invest.core.rent_config import RentConfig
 class ExperimentConfig(Config):
     """Stores experiment config.
 
-    Documentation of the instance variable types:
-    # TODO add documentation
-    # TODO maybe just point to the yaml file
+    Class Attributes:
+        schema_path (str): Experiment config schema path
+
+    Instance Attributes:
+        num_months (int): Number of months to run the projection for
+        market_config (MarketConfig): MarketConfig
+        rent_config (RentConfig): RentConfig.
+        house_config: (HouseConfig): HouseConfig
+        start_date: (datetime.datetime): Start date of the projection
     """
 
     @classmethod
