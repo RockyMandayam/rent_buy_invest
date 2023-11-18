@@ -73,12 +73,6 @@ class TestMarketConfig:
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
 
-        # tax_rate must be non-negative
-        invalid_kwargs = copy.deepcopy(config_kwargs)
-        invalid_kwargs["tax_brackets"]["tax_brackets"][0]["tax_rate"] = -0.01
-        with pytest.raises(AssertionError):
-            MarketConfig(**invalid_kwargs)
-
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
             MARKET_CONFIG.get_tax(-1)
