@@ -35,20 +35,28 @@ class RentBuyInvestFileOpener:
     """
 
     def __init__(self, project_path: str, mode: str) -> None:
-        self.project_path = project_path
+        self.abs_path = get_abs_path(project_path)
         self.mode = mode
 
     def __enter__(self) -> Any:
-        abs_path = get_abs_path(self.project_path)
-        self.file = open(abs_path, mode=self.mode)
+        self.file = open(self.abs_path, mode=self.mode)
         return self.file
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.file.close()
 
 
-def make_dirs(project_path: str) -> None:
-    os.makedirs(get_abs_path(project_path))
+def delete_file(project_path: str) -> None:
+    os.remove(get_abs_path(project_path))
+
+
+def make_dirs(project_path: str, exist_ok: bool = True) -> None:
+    os.makedirs(get_abs_path(project_path), exist_ok=exist_ok)
+
+
+def delete_dir(project_path) -> None:
+    # os.remove(get_abs_path(project_path))
+    os.rmdir(get_abs_path(project_path))
 
 
 def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
@@ -60,7 +68,7 @@ def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
 
 def write_yaml(project_path: str, obj: Any) -> None:
     """Write objct to given path (from top-level directory) as yaml."""
-    with RentBuyInvestFileOpener(project_path, mode="x") as f:
+    with RentBuyInvestFileOpener(project_path, mode="w") as f:
         yaml.dump(obj, f)
 
 
