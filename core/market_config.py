@@ -135,6 +135,7 @@ class MarketConfig(Config):
         Returns:
             tax: non-negative tax owed
         """
+        assert income >= 0, "Income must be non-negative"
         return self.tax_brackets._get_tax(income)
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
