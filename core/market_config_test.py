@@ -55,9 +55,27 @@ class TestMarketConfig:
             allow_negative=False,
         )
 
-        # check that there is a final upper limit of infinity
+        # final upper_limit must be infinity
         invalid_kwargs = copy.deepcopy(config_kwargs)
         invalid_kwargs["tax_brackets"]["tax_brackets"].pop()
+        with pytest.raises(AssertionError):
+            MarketConfig(**invalid_kwargs)
+
+        # upper_limit of 0 should cause error
+        invalid_kwargs = copy.deepcopy(config_kwargs)
+        invalid_kwargs["tax_brackets"]["tax_brackets"][0]["upper_limit"] = 0
+        with pytest.raises(AssertionError):
+            MarketConfig(**invalid_kwargs)
+
+        # non-increasing upper_limit should cause error
+        invalid_kwargs = copy.deepcopy(config_kwargs)
+        invalid_kwargs["tax_brackets"]["tax_brackets"][1]["upper_limit"] = 44625
+        with pytest.raises(AssertionError):
+            MarketConfig(**invalid_kwargs)
+
+        # tax_rate must be non-negative
+        invalid_kwargs = copy.deepcopy(config_kwargs)
+        invalid_kwargs["tax_brackets"]["tax_brackets"][0]["tax_rate"] = -0.01
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
 
@@ -70,7 +88,12 @@ class TestMarketConfig:
 
     def test_get_pretax_monthly_wealth(self) -> None:
         with pytest.raises(AssertionError):
+            MARKET_CONFIG.get_pretax_monthly_wealth(-1, 12)
+        with pytest.raises(AssertionError):
             MARKET_CONFIG.get_pretax_monthly_wealth(100, 0)
+
+        assert MARKET_CONFIG.get_pretax_monthly_wealth(0, 12) == [0] * 12
+
         for num_months in [1, 2, 24, 25]:
             actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, num_months)
             expected = [
