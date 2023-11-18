@@ -1,38 +1,26 @@
-import csv
-import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import pandas as pd
-import yaml
 
 
-# TODO test this
 def to_df(
     cols: Dict[str, List[Any]],
     rows: Optional[List[str]] = None,
-    multi_col: bool = False,
+    multi_col_func: Optional[Callable[[str], str]] = None,
 ) -> pd.DataFrame:
     """
     Args:
         cols: Map from column name to col (list of values)
+        rows: Optional list of row names
+        multi_col_func: Optional function that takes in the col name and outputs the col category.
 
     Returns:
         pd.DataFrame: DataFrame constructed from given cols
     """
     index = index = pd.Index(rows) if rows else None
     df = pd.DataFrame(data=cols, index=index)
-    if multi_col:
-        tuples = []
-        for col in cols.keys():
-            if col.startswith("Rent"):
-                category = "Rent"
-            elif col.startswith("House"):
-                category = "House"
-            else:
-                raise ValueError(
-                    "All columns in projection table must start with 'Rent' or 'House'"
-                )
-            tuples.append((category, col))
+    if multi_col_func:
+        tuples = [(multi_col_func(col_name), col_name) for col_name in cols]
         columns = pd.MultiIndex.from_tuples(tuples)
         df.columns = columns
     return df

@@ -15,6 +15,15 @@ class TestInitialState:
         initial_state = InitialState(HOUSE_CONFIG, RENT_CONFIG)
         act = initial_state.get_df()
 
+        # total money put in initially must be same in both cases
+        assert (
+            act.loc["One-time costs", "Rent"]
+            + act.loc["Invested (in market or house)", "Rent"]
+            == act.loc["One-time costs", "House"]
+            + act.loc["Invested (in market or house)", "House"]
+        )
+
+        # now for a more specific test
         exp_rows = ["One-time costs", "Invested (in market or house)"]
         exp_cols = {
             "Rent": [

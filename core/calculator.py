@@ -136,4 +136,4 @@ class Calculator:
         for _ in range(self.num_months):
             rows.append(date.strftime("%b %d, %Y"))
             date = math_utils.increment_month(date)
-        return to_df(cols, rows, multi_col=True)
+        return to_df(cols, rows, multi_col_func=lambda col_name: col_name.split(":")[0])
