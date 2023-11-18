@@ -21,6 +21,6 @@ Steps:
 - Update json schema (add the field and also make it required if required)
 - Add the field to all configs, both examples and tests
 - Update appropriate config class
-- Update tests, both invalid_schema and invalid_inputs
+- Update tests, both invalid_schema and invalid_inputs methods in the relevant test file
 - Make sure all tests pass
 - Make sure you can run the code
