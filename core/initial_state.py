@@ -16,7 +16,6 @@ class InitialState:
     def __init__(self, house_config: HouseConfig, rent_config: RentConfig) -> None:
         self.rent_one_time_cost = rent_config.get_upfront_one_time_cost()
         self.house_one_time_cost = house_config.get_upfront_one_time_cost()
-        # TODO test this assert
         assert (
             self.rent_one_time_cost < self.house_one_time_cost
         ), "Renting should have a smaller upfront one-time cost than buying a house."
