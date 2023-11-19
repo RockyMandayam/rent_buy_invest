@@ -111,6 +111,6 @@ class TestRentConfig:
                 2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** num_full_years,
                 2,
             )
-            exp.extend([monthly_rent] * (num_months % 12))
+            exp.extend([monthly_rent] * ((num_months % 12) + 1))
 
             assert actual == exp

@@ -46,7 +46,7 @@ def test_project_growth() -> None:
     expected = (
         [principal] * 12
         + [round(principal * 1.03, 2)] * 12
-        + [round(principal * 1.03**2, 2)]
+        + [round(principal * 1.03**2, 2)] * 2
     )
     assert actual == expected
 
@@ -60,7 +60,7 @@ def test_project_growth() -> None:
     )
     expected = [
         round(principal * (1 + equivalent_monthly_rate) ** m, 2)
-        for m in range(num_months)
+        for m in range(num_months + 1)
     ]
     assert actual == expected
 
@@ -72,7 +72,7 @@ def test_project_growth() -> None:
         annual_growth_rate
     )
     expected = [
-        principal * (1 + equivalent_monthly_rate) ** m for m in range(num_months)
+        principal * (1 + equivalent_monthly_rate) ** m for m in range(num_months + 1)
     ]
     assert actual == pytest.approx(expected)
 

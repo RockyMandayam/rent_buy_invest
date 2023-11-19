@@ -49,31 +49,53 @@ class Calculator:
         # which projects forward month by month
         mortgage_interests = []
         paid_toward_equity = []
-        equities = [self.house_config.get_down_payment()]
+        equities = []
         pmis = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
-        rent_investment_monthly = [self.initial_state.rent_invested]
-        housing_investment_monthly = [0]
+        rent_investment_values = [
+            self.initial_state.rent_invested
+        ]  # NOTE: first value filed in
+        housing_investment_values = [0]  # NOTE: first value filed in
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
-        for month in range(self.num_months):
+        for month in range(self.num_months + 1):
+            # mortgage interest cost
             mortgage_interest = round(
                 mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12,
                 2,
             )
             mortgage_interests.append(mortgage_interest)
-            toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
+
+            # mortgage equity payment and equity value
+            if mortgage_amount == 0:
+                # mortage already paid off
+                # no mortgage amount, so mortgage_interest is zero also
+                toward_equity = 0
+            elif mortgage_amount + mortgage_interest <= monthly_mortgage_payment:
+                # final mortgage payment
+                # paying interest on prev month and the remaining little mortgage amount
+                toward_equity = mortgage_amount
+            else:
+                # regular mortgage payment
+                toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
+            equities.append(round(house_values[month] - mortgage_amount, 2))
+
+            # TODO this and other edge cases where maybe it's rounding or something
+            # like rn the table has PMI for just the first row..
+            # pmi
             if mortgage_amount < 0.8 * self.house_config.sale_price:
                 pmi = 0
             else:
                 pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
             pmis.append(pmi)
-            mortgage_amount -= toward_equity
-            equities.append(round(house_values[month] - mortgage_amount, 2))
-            assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
+
+            # monthly surplus from one option vs the other
+            # rent_investment_values and housing_investment_values have their
+            # start-of-the-month value already filled in, so this calculates the value
+            # at the end of the month.
             housing_monthly_payment = (
                 house_monthly_costs_related_to_house_value[month]
                 + house_monthly_costs_related_to_inflation[month]
@@ -81,36 +103,38 @@ class Calculator:
                 + toward_equity
                 + pmi
             )
-            rent_grown_investment = self.market_config.get_pretax_monthly_wealth(
-                rent_investment_monthly[-1], 1
-            )[0]
-            housing_grown_investment = self.market_config.get_pretax_monthly_wealth(
-                housing_investment_monthly[-1], 1
-            )[0]
             rent_monthly_payment = rent_monthly_costs[month]
+            rent_investment_gains = self.market_config.get_pretax_monthly_wealth(
+                rent_investment_values[-1], 1
+            )[1]
+            housing_investment_gains = self.market_config.get_pretax_monthly_wealth(
+                housing_investment_values[-1], 1
+            )[1]
             # Surplus from the perspective of renting
             surplus = round(housing_monthly_payment - rent_monthly_payment, 2)
             if surplus > 0:
+                # if rent option has a relative surplus
                 rent_monthly_surpluses.append(surplus)
-                rent_investment_monthly.append(
-                    round(rent_grown_investment + surplus, 2)
-                )
+                rent_investment_values.append(round(rent_investment_gains + surplus, 2))
                 housing_monthly_surpluses.append(0)
-                housing_investment_monthly.append(housing_grown_investment)
+                housing_investment_values.append(housing_investment_gains)
             elif surplus < 0:
-                # Now surplus is from the perspective of housing
+                # if house option has a relative surplus
+                # negate surplus to make it a positive from the perspective of housing
                 surplus = -surplus
                 rent_monthly_surpluses.append(0)
-                rent_investment_monthly.append(rent_grown_investment)
+                rent_investment_values.append(rent_investment_gains)
                 housing_monthly_surpluses.append(surplus)
-                housing_investment_monthly.append(
-                    round(housing_grown_investment + surplus, 2)
+                housing_investment_values.append(
+                    round(housing_investment_gains + surplus, 2)
                 )
-        # TODO fix this - for now removing last element to make all cols have same num of rows
-        # equities.pop()
-        rent_investment_monthly.pop()
-        housing_investment_monthly.pop()
-        equities.pop()
+
+            # update mortgage_amount for next iteration
+            mortgage_amount -= toward_equity
+            assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
+        # Pop last element from lists which have an extra item (starting value)
+        rent_investment_values.pop()
+        housing_investment_values.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
@@ -120,20 +144,20 @@ class Calculator:
             "House: Monthly mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "House: Monthly mortgage total payment": [monthly_mortgage_payment] * self.num_months,
+            "House: Monthly mortgage total payment": [monthly_mortgage_payment] * (self.num_months + 1),
             # fmt: on
             "House: Monthly cost of PMI": pmis,
             "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
             "House: House value": house_values,
             "House: Equity value": equities,
-            "House: Investment (excluding house) value": housing_investment_monthly,
+            "House: Investment (excluding house) value": housing_investment_values,
             "Rent: Monthly cost tied to inflation": rent_monthly_costs,
             "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
-            "Rent: Investment": rent_investment_monthly,
+            "Rent: Investment": rent_investment_values,
         }
         rows = []
         date = self.start_date
-        for _ in range(self.num_months):
+        for _ in range(self.num_months + 1):
             rows.append(date.strftime("%b %d, %Y"))
             date = math_utils.increment_month(date)
         return to_df(cols, rows, multi_col_func=lambda col_name: col_name.split(":")[0])

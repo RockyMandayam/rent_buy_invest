@@ -1,7 +1,6 @@
-from dataclasses import dataclass
-from typing import Any, List, Optional
+import copy
 
-import pandas as pd
+import pytest
 
 # from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.house_config_test import HOUSE_CONFIG
@@ -39,3 +38,8 @@ class TestInitialState:
         }
         exp = to_df(exp_cols, exp_rows)
         assert act.equals(exp)
+
+        rent_config_bad = copy.deepcopy(RENT_CONFIG)
+        rent_config_bad.security_deposit = 1000000
+        with pytest.raises(AssertionError):
+            initial_state = InitialState(HOUSE_CONFIG, rent_config_bad)
