@@ -54,8 +54,8 @@ class Calculator:
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
         rent_investment_values = [
-            self.initial_state.rent_invested
-        ]  # NOTE: first value filed in
+            self.initial_state.invested_in_market_if_renting
+        ]  # NOTE: first value filled in
         housing_investment_values = [0]  # NOTE: first value filed in
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
@@ -147,6 +147,7 @@ class Calculator:
             "House: Monthly mortgage total payment": [monthly_mortgage_payment] * (self.num_months + 1),
             # fmt: on
             "House: Monthly cost of PMI": pmis,
+            # "House: Monthly cost (total minus mortgage equity component)"
             "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
             "House: House value": house_values,
             "House: Equity value": equities,
