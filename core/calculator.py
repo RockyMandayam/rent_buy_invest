@@ -148,7 +148,7 @@ class Calculator:
             "House: Monthly mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "House: Monthly mortgage total payment": [monthly_mortgage_payment] * (self.num_months + 1),
+            "House: Monthly mortgage total payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
             "House: Monthly cost of PMI": pmis,
             # "House: Monthly cost (total minus mortgage equity component)"
