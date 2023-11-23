@@ -53,10 +53,10 @@ class Calculator:
         pmis = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
-        rent_investment_values = [
+        investment_values_if_renting = [
             self.initial_state.invested_in_market_if_renting
         ]  # NOTE: first value filled in
-        housing_investment_values = [0]  # NOTE: first value filed in
+        investment_values_if_house = [0]  # NOTE: first value filed in
 
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
@@ -93,7 +93,7 @@ class Calculator:
             pmis.append(pmi)
 
             # monthly surplus from one option vs the other
-            # rent_investment_values and housing_investment_values have their
+            # investment_values_if_renting and investment_values_if_house have their
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
             housing_monthly_payment = (
@@ -105,27 +105,29 @@ class Calculator:
             )
             rent_monthly_payment = rent_monthly_costs[month]
             rent_investment_gains = self.market_config.get_pretax_monthly_wealth(
-                rent_investment_values[-1], 1
+                investment_values_if_renting[-1], 1
             )[1]
             housing_investment_gains = self.market_config.get_pretax_monthly_wealth(
-                housing_investment_values[-1], 1
+                investment_values_if_house[-1], 1
             )[1]
             # Surplus from the perspective of renting
             surplus = round(housing_monthly_payment - rent_monthly_payment, 2)
             if surplus > 0:
                 # if rent option has a relative surplus
                 rent_monthly_surpluses.append(surplus)
-                rent_investment_values.append(round(rent_investment_gains + surplus, 2))
+                investment_values_if_renting.append(
+                    round(rent_investment_gains + surplus, 2)
+                )
                 housing_monthly_surpluses.append(0)
-                housing_investment_values.append(housing_investment_gains)
+                investment_values_if_house.append(housing_investment_gains)
             elif surplus < 0:
                 # if house option has a relative surplus
                 # negate surplus to make it a positive from the perspective of housing
                 surplus = -surplus
                 rent_monthly_surpluses.append(0)
-                rent_investment_values.append(rent_investment_gains)
+                investment_values_if_renting.append(rent_investment_gains)
                 housing_monthly_surpluses.append(surplus)
-                housing_investment_values.append(
+                investment_values_if_house.append(
                     round(housing_investment_gains + surplus, 2)
                 )
 
@@ -133,8 +135,8 @@ class Calculator:
             mortgage_amount -= toward_equity
             assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
         # Pop last element from lists which have an extra item (starting value)
-        rent_investment_values.pop()
-        housing_investment_values.pop()
+        investment_values_if_renting.pop()
+        investment_values_if_house.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
@@ -151,10 +153,10 @@ class Calculator:
             "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
             "House: House value": house_values,
             "House: Equity value": equities,
-            "House: Investment (excluding house) value": housing_investment_values,
+            "House: Investment (excluding house) value": investment_values_if_house,
             "Rent: Monthly cost tied to inflation": rent_monthly_costs,
             "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
-            "Rent: Investment": rent_investment_values,
+            "Rent: Investment": investment_values_if_renting,
         }
         rows = []
         date = self.start_date
