@@ -104,10 +104,12 @@ class Calculator:
                 + pmi
             )
             rent_monthly_payment = rent_monthly_costs[month]
-            rent_investment_gains = self.market_config.get_pretax_monthly_wealth(
-                investment_values_if_renting[-1], 1
-            )[1]
-            housing_investment_gains = self.market_config.get_pretax_monthly_wealth(
+            gains_in_investment_if_renting = (
+                self.market_config.get_pretax_monthly_wealth(
+                    investment_values_if_renting[-1], 1
+                )[1]
+            )
+            gains_in_investment_if_house = self.market_config.get_pretax_monthly_wealth(
                 investment_values_if_house[-1], 1
             )[1]
             # Surplus from the perspective of renting
@@ -116,19 +118,19 @@ class Calculator:
                 # if rent option has a relative surplus
                 rent_monthly_surpluses.append(surplus)
                 investment_values_if_renting.append(
-                    round(rent_investment_gains + surplus, 2)
+                    round(gains_in_investment_if_renting + surplus, 2)
                 )
                 housing_monthly_surpluses.append(0)
-                investment_values_if_house.append(housing_investment_gains)
+                investment_values_if_house.append(gains_in_investment_if_house)
             elif surplus < 0:
                 # if house option has a relative surplus
                 # negate surplus to make it a positive from the perspective of housing
                 surplus = -surplus
                 rent_monthly_surpluses.append(0)
-                investment_values_if_renting.append(rent_investment_gains)
+                investment_values_if_renting.append(gains_in_investment_if_renting)
                 housing_monthly_surpluses.append(surplus)
                 investment_values_if_house.append(
-                    round(housing_investment_gains + surplus, 2)
+                    round(gains_in_investment_if_house + surplus, 2)
                 )
 
             # update mortgage_amount for next iteration
