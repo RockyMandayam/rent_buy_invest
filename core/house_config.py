@@ -280,6 +280,6 @@ class HouseConfig(Config):
         return math_utils.project_growth(
             principal=self._get_first_inflation_related_monthly_cost(),
             annual_growth_rate=annual_inflation_rate,
-            compound_monthly=True,
+            compound_monthly=False,
             num_months=num_months,
         )
