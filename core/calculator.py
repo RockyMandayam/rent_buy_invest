@@ -9,6 +9,13 @@ from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils import math_utils
 from rent_buy_invest.utils.data_utils import to_df
 
+# This is the maximum mortgage amount as a fraction of the ORIGINAL home price
+# for which the borrower does not have to pay PMI. When the mortgage amount falls
+# to this amount, the borrower can request that the PMI be removed. As of today,
+# Jan 25, 2024, this amount is 80%, and the lender is supposed to automatically
+# remove the PMI at 78%.
+MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI = 0.8
+
 
 class Calculator:
     def __init__(
@@ -82,10 +89,11 @@ class Calculator:
             paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
 
-            # pmi - this assumes pmi is dropped when mortagage amount falls to
-            # 80% of the original home value. The lender should automatically remove
-            # pmi at 78%, but the borrower should be able to request removal at 80%
-            if mortgage_amount <= 0.8 * self.house_config.sale_price:
+            if (
+                mortgage_amount
+                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI
+                * self.house_config.sale_price
+            ):
                 pmi = 0
             else:
                 pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
