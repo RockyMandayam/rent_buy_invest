@@ -56,18 +56,31 @@ def test_write_yaml() -> None:
 
 
 def test_write_xlsx_df() -> None:
-    # TODO: test multi column
     dir = f"rent_buy_invest/temp/test_write_xlsx_df"
     project_path = f"{dir}/test_write_xlsx_df.xlsx"
     io_utils.make_dirs(dir, exist_ok=True)
+
+    # test basic DataFrame
     exp = pd.DataFrame(
         {
             "col1": [1, 2],
-            "column 2": [3, 4],
+            "col2": [3, 4],
         }
     )
     io_utils.write_xlsx_df(project_path, exp)
     act = pd.read_excel(io_utils.get_abs_path(project_path), index_col=0)
+    assert act.equals(exp)
+    io_utils.delete_file(project_path)
+
+    # test multi-index column
+    exp = pd.DataFrame(
+        {
+            ("category 1", "col1"): [1, 2],
+            ("category 2", "col2"): [3, 4],
+        }
+    )
+    io_utils.write_xlsx_df(project_path, exp)
+    act = pd.read_excel(io_utils.get_abs_path(project_path), index_col=0, header=[0, 1])
     assert act.equals(exp)
     io_utils.delete_file(project_path)
 
