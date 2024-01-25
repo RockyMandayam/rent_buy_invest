@@ -55,6 +55,7 @@ class Calculator:
         # which projects forward month by month
         mortgage_interests = []
         paid_toward_equity = []
+        mortgage_amounts = []
         equities = []
         pmis = []
         housing_monthly_surpluses = []
@@ -67,6 +68,8 @@ class Calculator:
         mortgage_amount = self.house_config.get_initial_mortgage_amount()
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
         for month in range(self.num_months + 1):
+            mortgage_amounts.append(mortgage_amount)
+
             # mortgage interest cost
             mortgage_interest = round(
                 mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12,
@@ -149,6 +152,12 @@ class Calculator:
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
+            # House: state
+            "House: House value": house_values,
+            "House: Equity value": equities,
+            "House: Mortgage amount": mortgage_amounts,
+            "House: Investment (excluding house) value": investment_values_if_house,
+            # House: costs
             "House: Monthly cost tied to house value": house_monthly_costs_related_to_house_value,
             "House: Monthly cost tied to inflation": house_monthly_costs_related_to_inflation,
             "House: Monthly mortgage interest payment": mortgage_interests,
@@ -158,14 +167,14 @@ class Calculator:
             "House: Monthly mortgage total payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
             "House: Monthly cost of PMI": pmis,
-            # "House: Monthly cost (total minus mortgage equity component)"
+            # House: relative surplus
             "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
-            "House: House value": house_values,
-            "House: Equity value": equities,
-            "House: Investment (excluding house) value": investment_values_if_house,
-            "Rent: Monthly cost tied to inflation": rent_monthly_costs,
-            "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
+            # Rent: state
             "Rent: Investment": investment_values_if_renting,
+            # Rent: costs
+            "Rent: Monthly cost tied to inflation": rent_monthly_costs,
+            # Rent: relative surplus
+            "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
         }
         rows = []
         date = self.start_date
