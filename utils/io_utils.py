@@ -67,14 +67,21 @@ def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
 
 
 def write_yaml(project_path: str, obj: Any) -> None:
-    """Write objct to given path (from top-level directory) as yaml."""
+    """Write object to given path (from top-level directory) as yaml.
+
+    project_path should end in '.yaml'
+    """
     with RentBuyInvestFileOpener(project_path, mode="w") as f:
         yaml.dump(obj, f)
 
 
-def write_csv_df(project_path: str, df: pd.DataFrame) -> None:
+def write_xlsx_df(project_path: str, df: pd.DataFrame) -> None:
+    """Write DataFrame to given path (from top-level directory) as an excel-readable file.
+
+    project_path must end in '.xlsx'
+    """
     abs_path = get_abs_path(project_path)
-    abs_path = abs_path[:-3] + "xlsx"
+    abs_path = abs_path
     df.to_excel(abs_path)
 
 

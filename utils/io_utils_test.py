@@ -1,10 +1,17 @@
 import os
-from typing import Any, Dict
+
+import pandas as pd
 
 from rent_buy_invest.utils import io_utils
 
 TEST_YAML_PATH = "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
 TEST_JSON_PATH = "rent_buy_invest/utils/test_resources/simple-json.json"
+EXPECTED_TEST_VALUE = {
+    "a": 1,
+    "b": 1.1,
+    "c": "1",
+    "d": [True, False],
+}
 
 
 def test_get_abs_path() -> None:
@@ -26,13 +33,7 @@ def test_make_dirs() -> None:
 def test_read_yaml() -> None:
     # simple custom test case
     actual = io_utils.read_yaml(TEST_YAML_PATH)
-    expected = {
-        "a": 1,
-        "b": 1.1,
-        "c": "1",
-        "d": [True, False],
-    }
-    assert actual == expected
+    assert actual == EXPECTED_TEST_VALUE
 
     # try reading example yamls
     io_utils.read_yaml(
@@ -45,22 +46,30 @@ def test_read_yaml() -> None:
 
 def test_write_yaml() -> None:
     # simple custom test case
-    exp = {
-        "a": 1,
-        "b": 1.1,
-        "c": "1",
-        "d": [True, False],
-    }
-    dir = f"rent_buy_invest/temp/test_write_yaml/"
+    dir = f"rent_buy_invest/temp/test_write_yaml"
     project_path = f"{dir}/test_write_yaml.yaml"
     io_utils.make_dirs(dir, exist_ok=True)
-    io_utils.write_yaml(project_path, exp)
+    io_utils.write_yaml(project_path, EXPECTED_TEST_VALUE)
     act = io_utils.read_yaml(project_path)
-    assert act == exp
+    assert act == EXPECTED_TEST_VALUE
     io_utils.delete_file(project_path)
 
 
-# TODO test write_csv_df
+def test_write_xlsx_df() -> None:
+    # TODO: test multi column
+    dir = f"rent_buy_invest/temp/test_write_xlsx_df"
+    project_path = f"{dir}/test_write_xlsx_df.xlsx"
+    io_utils.make_dirs(dir, exist_ok=True)
+    exp = pd.DataFrame(
+        {
+            "col1": [1, 2],
+            "column 2": [3, 4],
+        }
+    )
+    io_utils.write_xlsx_df(project_path, exp)
+    act = pd.read_excel(io_utils.get_abs_path(project_path), index_col=0)
+    assert act.equals(exp)
+    io_utils.delete_file(project_path)
 
 
 def test_read_json() -> None:

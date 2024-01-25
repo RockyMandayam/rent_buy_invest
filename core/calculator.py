@@ -34,7 +34,6 @@ class Calculator:
             self.house_config.get_house_value_related_monthly_costs(self.num_months)
         )
         house_monthly_costs_related_to_inflation = (
-            # TODO don't use rent inflation maybe? Use something else for utilities for rent and house?
             self.house_config.get_inflation_related_monthly_costs(
                 self.rent_config.annual_rent_inflation_rate, self.num_months
             )

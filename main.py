@@ -42,9 +42,9 @@ def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
     io_utils.write_yaml(path, obj)
 
 
-def _write_output_csv_df(output_dir: str, filename: str, df: pd.DataFrame) -> None:
+def _write_output_xlsx_df(output_dir: str, filename: str, df: pd.DataFrame) -> None:
     path = os.path.join(output_dir, filename)
-    io_utils.write_csv_df(path, df)
+    io_utils.write_xlsx_df(path, df)
 
 
 def main() -> None:
@@ -69,14 +69,14 @@ def main() -> None:
 
     # calculate initial state
     initial_state = InitialState(house_config, rent_config)
-    _write_output_csv_df(output_dir, "initial_state.csv", initial_state.get_df())
+    _write_output_xlsx_df(output_dir, "initial_state.xlsx", initial_state.get_df())
 
     # project forward in time
     calculator = Calculator(
         house_config, rent_config, market_config, num_months, start_date, initial_state
     )
     projection = calculator.calculate()
-    _write_output_csv_df(output_dir, "projection.csv", projection)
+    _write_output_xlsx_df(output_dir, "projection.xlsx", projection)
 
 
 if __name__ == "__main__":
