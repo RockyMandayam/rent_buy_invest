@@ -82,8 +82,6 @@ class Calculator:
             paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
 
-            # TODO this and other edge cases where maybe it's rounding or something
-            # like rn the table has PMI for just the first row..
             # pmi
             if mortgage_amount < 0.8 * self.house_config.sale_price:
                 pmi = 0
