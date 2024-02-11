@@ -17,9 +17,11 @@ EXPECTED_TEST_VALUE = {
 def test_get_abs_path() -> None:
     relative_path = "rent_buy_invest/configs"
     actual = io_utils.get_abs_path(relative_path)
-    # TODO do not hardcode this - should work on any machine
-    expected = "/Users/rocky/Downloads/rent_buy_invest/configs"
-    assert actual == expected
+    expected = [
+        "/Users/rocky/Downloads/rent_buy_invest/configs",  # local dev machine for Rocky
+        "/home/runner/work/rent_buy_invest/rent_buy_invest/configs",  # github action machine
+    ]
+    assert actual in expected
 
 
 def test_make_dirs() -> None:
