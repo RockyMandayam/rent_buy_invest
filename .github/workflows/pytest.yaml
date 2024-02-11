@@ -13,9 +13,9 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.11.4
-          requirementsFiles: "requirements.txt"
+          # requirementsFiles: "requirements.txt"
       - name: Run pytest
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install -r "requirements.txt"
           pytest .
