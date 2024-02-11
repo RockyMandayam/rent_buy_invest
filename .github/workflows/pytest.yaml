@@ -14,7 +14,12 @@ jobs:
         with:
           python-version: 3.11.4
           requirementsFiles: "requirements.txt"
-      # - name: Install pytest
+      - name: Install pip
+      - run: |
+          python -m pip install --upgrade pip
+      - name: Install pytest
+        run: |
+          pip install pytest
       - name: Run pytest
         run: |
           pytest .
