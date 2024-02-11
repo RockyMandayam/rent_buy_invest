@@ -1,9 +1,12 @@
 import pytest
 
+# isort: off
 from rent_buy_invest.core.calculator import (
     MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI,
     Calculator,
 )
+
+# isort: on
 from rent_buy_invest.core.experiment_config_test import EXPERIMENT_CONFIG
 from rent_buy_invest.core.initial_state import InitialState
 
