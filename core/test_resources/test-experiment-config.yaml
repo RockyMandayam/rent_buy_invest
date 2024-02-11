@@ -1,4 +1,4 @@
-num_months: !!int 40
+num_months: !!int 480
 
 market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-config.yaml"
 

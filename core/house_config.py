@@ -209,17 +209,23 @@ class HouseConfig(Config):
 
     def get_upfront_one_time_cost(self):
         return (
+            # fmt: off
             self.mortgage_origination_points_fee_fraction
-            * self.get_initial_mortgage_amount()
+                * self.get_initial_mortgage_amount()
+            # fmt: on
             + self.mortgage_processing_fee
             + self.mortgage_underwriting_fee
+            # fmt: off
             + self.mortgage_discount_points_fee_fraction
-            * self.get_initial_mortgage_amount()
+                * self.get_initial_mortgage_amount()
+            # fmt: on
             + self.house_appraisal_cost
             + self.credit_report_fee
+            # fmt: off
             + (1 - self.seller_burden_of_transfer_tax_fraction)
-            * self.transfer_tax_fraction
-            * self.sale_price
+                * self.transfer_tax_fraction
+                * self.sale_price
+            # fmt: on
             + (self.recording_fee_fraction * self.sale_price)
             + (self.realtor_commission_fraction * self.sale_price)
             + (1 - self.seller_burden_of_hoa_transfer_fee) * self.hoa_transfer_fee
@@ -227,8 +233,10 @@ class HouseConfig(Config):
             + self.pest_inspection_cost
             + self.escrow_fixed_fee
             + self.flood_certification_fee
+            # fmt: off
             + (1 - self.seller_burden_of_title_search_fee_fraction)
-            * self.title_search_fee
+                * self.title_search_fee
+            # fmt: on
             + self.attorney_fee
             + self.closing_protection_letter_fee
             + self.search_abstract_fee
