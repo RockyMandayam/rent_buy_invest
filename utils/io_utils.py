@@ -82,6 +82,8 @@ def write_xlsx_df(project_path: str, df: pd.DataFrame) -> None:
     """
     abs_path = get_abs_path(project_path)
     abs_path = abs_path
+    df.style.set_sticky(axis="columns")
+    df.style.set_sticky(axis="index")
     df.to_excel(abs_path)
 
 

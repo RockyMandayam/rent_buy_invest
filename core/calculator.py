@@ -153,32 +153,32 @@ class Calculator:
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
             # House: state
-            "House: House value": house_values,
-            "House: Equity value": equities,
+            "House: Market value": house_values,
+            "House: House equity": equities,
             "House: Mortgage amount": mortgage_amounts,
-            "House: Investment (excluding house) value": investment_values_if_house,
+            "House: Non-house investment": investment_values_if_house,
             # House: costs
-            "House: Monthly cost tied to house value": house_monthly_costs_related_to_house_value,
-            "House: Monthly cost tied to inflation": house_monthly_costs_related_to_inflation,
-            "House: Monthly mortgage interest payment": mortgage_interests,
-            "House: Monthly mortgage equity payment": paid_toward_equity,
+            "House: Cost tied to market value": house_monthly_costs_related_to_house_value,
+            "House: Cost tied to inflation": house_monthly_costs_related_to_inflation,
+            "House: Mortgage interest payment": mortgage_interests,
+            "House: Mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "House: Monthly mortgage total payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
+            "House: Mortgage payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
-            "House: Monthly cost of PMI": pmis,
+            "House: PMI": pmis,
             # House: relative surplus
-            "House: Monthly surplus (relative to renting)": housing_monthly_surpluses,
+            "House: Surplus (vs renting)": housing_monthly_surpluses,
             # Rent: state
             "Rent: Investment": investment_values_if_renting,
             # Rent: costs
-            "Rent: Monthly cost tied to inflation": rent_monthly_costs,
+            "Rent: Cost tied to inflation": rent_monthly_costs,
             # Rent: relative surplus
-            "Rent: Monthly surplus (relative to buying a house)": rent_monthly_surpluses,
+            "Rent: Surplus (vs buying house)": rent_monthly_surpluses,
         }
         rows = []
         date = self.start_date
         for _ in range(self.num_months + 1):
             rows.append(date.strftime("%b %d, %Y"))
             date = math_utils.increment_month(date)
-        return to_df(cols, rows, multi_col_func=lambda col_name: col_name.split(":")[0])
+        return to_df(cols, rows, multi_col=True)
