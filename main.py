@@ -55,11 +55,14 @@ def _write_output_xlsx_df(
     max_num_cols_with_data = 13
     for i in range(max_num_cols_with_data):
         col_name = chr(ord("B") + i)
+        # ws.column_dimensions[col_name].number_format = "$#,##0.00"
         ws.column_dimensions[col_name].width = 18
         for header_row in range(1, num_header_rows + 1):
             ws[f"{col_name}{header_row}"].alignment = openpyxl.styles.Alignment(
                 horizontal="left"
             )
+        for cell in ws[col_name]:
+            cell.number_format = "$#,##0.00"
     wb.save(path)
 
 
