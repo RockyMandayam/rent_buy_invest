@@ -3,6 +3,7 @@ import datetime
 import os
 from typing import Any
 
+import openpyxl
 import pandas as pd
 
 from rent_buy_invest.core.calculator import Calculator
@@ -42,9 +43,24 @@ def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
     io_utils.write_yaml(path, obj)
 
 
-def _write_output_xlsx_df(output_dir: str, filename: str, df: pd.DataFrame) -> None:
+def _write_output_xlsx_df(
+    output_dir: str, filename: str, df: pd.DataFrame, num_header_rows=0
+) -> None:
     path = os.path.join(output_dir, filename)
     io_utils.write_xlsx_df(path, df)
+    wb = openpyxl.load_workbook(path)
+    ws = wb["Sheet1"]
+    ws.column_dimensions["A"].width = 15
+    ws.freeze_panes = f"B{num_header_rows+1}"
+    max_num_cols_with_data = 13
+    for i in range(max_num_cols_with_data):
+        col_name = chr(ord("B") + i)
+        ws.column_dimensions[col_name].width = 18
+        for header_row in range(1, num_header_rows + 1):
+            ws[f"{col_name}{header_row}"].alignment = openpyxl.styles.Alignment(
+                horizontal="left"
+            )
+    wb.save(path)
 
 
 def main() -> None:
@@ -69,14 +85,16 @@ def main() -> None:
 
     # calculate initial state
     initial_state = InitialState(house_config, rent_config)
-    _write_output_xlsx_df(output_dir, "initial_state.xlsx", initial_state.get_df())
+    _write_output_xlsx_df(
+        output_dir, "initial_state.xlsx", initial_state.get_df(), num_header_rows=1
+    )
 
     # project forward in time
     calculator = Calculator(
         house_config, rent_config, market_config, num_months, start_date, initial_state
     )
     projection = calculator.calculate()
-    _write_output_xlsx_df(output_dir, "projection.xlsx", projection)
+    _write_output_xlsx_df(output_dir, "projection.xlsx", projection, num_header_rows=2)
 
 
 if __name__ == "__main__":
