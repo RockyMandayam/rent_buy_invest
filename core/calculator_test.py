@@ -29,28 +29,28 @@ class TestCalculator:
 
         first_row = projection.iloc[0, :]
         first_month_house_value_related_cost_fraction = (
-            first_row["House"]["House: Monthly cost tied to house value"]
-            / first_row["House"]["House: House value"]
+            first_row["House"]["Monthly cost tied to house value"]
+            / first_row["House"]["House value"]
         )
         first_month_monthly_mortgage_total_payment = first_row["House"][
-            "House: Monthly mortgage total payment"
+            "Monthly mortgage total payment"
         ]
 
         for row_index in range(projection.shape[0]):
             row = projection.iloc[row_index, :]
 
-            assert row["House"]["House: Monthly cost tied to house value"] / row[
-                "House"
-            ]["House: House value"] == pytest.approx(
+            assert row["House"]["Monthly cost tied to house value"] / row["House"][
+                "House value"
+            ] == pytest.approx(
                 first_month_house_value_related_cost_fraction, rel=0.0001
             )
 
             monthly_mortgage_total_payment = row["House"][
-                "House: Monthly mortgage total payment"
+                "Monthly mortgage total payment"
             ]
             assert (
-                row["House"]["House: Monthly mortgage interest payment"]
-                + row["House"]["House: Monthly mortgage equity payment"]
+                row["House"]["Monthly mortgage interest payment"]
+                + row["House"]["Monthly mortgage equity payment"]
                 == monthly_mortgage_total_payment
             )
             assert (
@@ -61,8 +61,8 @@ class TestCalculator:
                 <= EXPERIMENT_CONFIG.num_months * 0.005
             )
 
-            mortgage_amount = row["House"]["House: Mortgage amount"]
-            pmi = row["House"]["House: Monthly cost of PMI"]
+            mortgage_amount = row["House"]["Mortgage amount"]
+            pmi = row["House"]["Monthly cost of PMI"]
             if (
                 mortgage_amount
                 <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI
@@ -75,22 +75,19 @@ class TestCalculator:
                 )
 
             house_monthly_cost = (
-                row["House"]["House: Monthly cost tied to house value"]
-                + row["House"]["House: Monthly cost tied to inflation"]
+                row["House"]["Monthly cost tied to house value"]
+                + row["House"]["Monthly cost tied to inflation"]
                 + monthly_mortgage_total_payment
                 + pmi
             )
-            rent_monthly_cost = row["Rent"]["Rent: Monthly cost tied to inflation"]
+            rent_monthly_cost = row["Rent"]["Monthly cost tied to inflation"]
             if house_monthly_cost >= rent_monthly_cost:
-                assert row["House"]["House: Monthly surplus (relative to renting)"] == 0
+                assert row["House"]["Monthly surplus (relative to renting)"] == 0
                 assert row["Rent"][
-                    "Rent: Monthly surplus (relative to buying a house)"
+                    "Monthly surplus (relative to buying a house)"
                 ] == pytest.approx(house_monthly_cost - rent_monthly_cost, abs=0.0001)
             else:
-                assert (
-                    row["Rent"]["Rent: Monthly surplus (relative to buying a house)"]
-                    == 0
-                )
+                assert row["Rent"]["Monthly surplus (relative to buying a house)"] == 0
                 assert row["House"][
-                    "House: Monthly surplus (relative to renting)"
+                    "Monthly surplus (relative to renting)"
                 ] == pytest.approx(rent_monthly_cost - house_monthly_cost, abs=0.0001)
