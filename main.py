@@ -52,7 +52,7 @@ def _write_output_xlsx_df(
     ws = wb["Sheet1"]
     ws.column_dimensions["A"].width = 15
     ws.freeze_panes = f"B{num_header_rows+1}"
-    max_num_cols_with_data = 13
+    max_num_cols_with_data = 14
     for i in range(max_num_cols_with_data):
         col_name = chr(ord("B") + i)
         # ws.column_dimensions[col_name].number_format = "$#,##0.00"
