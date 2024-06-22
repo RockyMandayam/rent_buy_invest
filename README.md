@@ -8,7 +8,7 @@ Calculates the long-term financial pros and cons of decisions related to renting
 - Clone this repo
 - Make sure you have python 3.11.4+ (anything 3.8+ should probably work) and pip3 installed
 - Navigate to the top-level directory of this repo and run `pip3 install -r requirements.txt`
-- To your `PYTHONPATH` environment variable, add the directory containing this repo
+- To your `PYTHONPATH` environment variable, add the path to this repo
 
 ### Run the Code
 Navigate to the directory containing `rent_buy_invest` and run:
