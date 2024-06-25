@@ -19,7 +19,9 @@ class TestCalculator:
             EXPERIMENT_CONFIG.market_config,
             EXPERIMENT_CONFIG.num_months,
             EXPERIMENT_CONFIG.start_date,
-            InitialState(EXPERIMENT_CONFIG.house_config, EXPERIMENT_CONFIG.rent_config),
+            InitialState.from_configs(
+                EXPERIMENT_CONFIG.house_config, EXPERIMENT_CONFIG.rent_config
+            ),
         )
 
         # initial state tested separately

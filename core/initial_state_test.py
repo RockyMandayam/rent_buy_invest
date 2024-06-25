@@ -11,7 +11,7 @@ from rent_buy_invest.utils.data_utils import to_df
 
 class TestInitialState:
     def test_get_df(self) -> None:
-        initial_state = InitialState(HOUSE_CONFIG, RENT_CONFIG)
+        initial_state = InitialState.from_configs(HOUSE_CONFIG, RENT_CONFIG)
         act = initial_state.get_df()
 
         # total money put in initially must be same in both cases
@@ -46,4 +46,4 @@ class TestInitialState:
         rent_config_bad = copy.deepcopy(RENT_CONFIG)
         rent_config_bad.security_deposit = 1000000
         with pytest.raises(AssertionError):
-            initial_state = InitialState(HOUSE_CONFIG, rent_config_bad)
+            initial_state = InitialState.from_configs(HOUSE_CONFIG, rent_config_bad)
