@@ -87,7 +87,7 @@ def main() -> None:
     _write_output_yaml(output_dir, "configs.yaml", experiment_config)
 
     # calculate initial state
-    initial_state = InitialState(house_config, rent_config)
+    initial_state = InitialState.from_configs(house_config, rent_config)
     _write_output_xlsx_df(
         output_dir, "initial_state.xlsx", initial_state.get_df(), num_header_rows=1
     )
