@@ -18,6 +18,7 @@ class RentConfig(Config):
 
     MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT = 0.25
     MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT = 0.5
+    MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
 
     # TODO class properties are deprecated in python 3.11 and won't be supported in python 3.13
     @classmethod
@@ -78,6 +79,9 @@ class RentConfig(Config):
             <= RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT
             * self.monthly_rent
         ), f"Please set the monthly parking fee to something reasonable (at most {RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT} of monthly rent)"
+        assert (
+            self.annual_rent_inflation_rate <= RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE
+        ), f"Please set the annual rent inflation rent to something reasonable (at most {RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE})"
         assert (
             self.security_deposit <= 12 * self.monthly_rent
         ), "Please set the security deposit to something reasonable (at most 1 year of rent)"
