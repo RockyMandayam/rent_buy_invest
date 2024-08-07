@@ -16,6 +16,7 @@ class RentConfig(Config):
             instance attributes.
     """
 
+    # TODO class properties are deprecated in python 3.11 and won't be supported in python 3.13
     @classmethod
     @property
     def schema_path(cls) -> str:
