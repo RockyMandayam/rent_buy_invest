@@ -4,6 +4,8 @@ from typing import Dict, List
 from rent_buy_invest.core.config import Config
 from rent_buy_invest.utils import math_utils
 
+DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS = True
+
 
 class MarketConfig(Config):
     """Stores market config.
@@ -37,13 +39,20 @@ class MarketConfig(Config):
                 an upper limit of infinity.
         """
 
-        def __init__(self, tax_brackets: List[Dict[str, float]]) -> None:
+        def __init__(
+            self,
+            tax_brackets: List[Dict[str, float]],
+            validate_non_regressive_tax_brackets: bool,
+        ) -> None:
             """Initializes the class.
 
             To see why I don't use yaml tags, see the docstring for __init__
             in GeneralConfig.
             """
             self.tax_brackets: List[Dict[str, float]] = tax_brackets
+            self.validate_non_regressive_tax_brackets = (
+                validate_non_regressive_tax_brackets
+            )
             self._validate()
 
         def _validate(self) -> None:
@@ -54,7 +63,7 @@ class MarketConfig(Config):
             """
             assert self.tax_brackets, "Tax brackets must not be null or empty"
             upper_limit = 0
-            # tax_rate = -1
+            prev_tax_rate = 0
             for i, bracket in enumerate(self.tax_brackets):
                 if i == len(self.tax_brackets) - 1:
                     assert bracket["upper_limit"] == float(
@@ -67,16 +76,16 @@ class MarketConfig(Config):
                     ), "All tax brackets except the last one must have an upper limit that is positive and non-infinite."
                 assert (
                     math.isfinite(bracket["tax_rate"]) and bracket["tax_rate"] >= 0
-                ), "Tax bracket's tax rate must be non-negative and not negative infinity."
+                ), "Tax bracket's tax rate must be finite and non-negative."
                 assert (
                     bracket["upper_limit"] > upper_limit
                 ), "Tax brackets must be listed in order."
-                # # Assumes "progressive" tax brackets
-                # assert (
-                #     math.isfinite(bracket["tax_rate"]) and bracket["tax_rate"] > tax_rate
-                # ), "Tax brackets must be listed in order."
+                if self.validate_non_regressive_tax_brackets:
+                    assert (
+                        bracket["tax_rate"] >= prev_tax_rate
+                    ), "Tax brackets must have non-decreasing tax rates"
+                    prev_tax_rate = bracket["tax_rate"]
                 upper_limit = bracket["upper_limit"]
-                # tax_rate = bracket["tax_rate"]
 
         def _get_tax(self, income: float) -> float:
             """Calculates tax owed given income.
@@ -105,6 +114,7 @@ class MarketConfig(Config):
         self,
         market_rate_of_return: float,
         tax_brackets: List[Dict[str, float]],
+        validate_non_regressive_tax_brackets: bool = DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS,
     ) -> None:
         """Initializes the class.
 
@@ -113,7 +123,7 @@ class MarketConfig(Config):
         """
         self.market_rate_of_return: float = market_rate_of_return
         self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
-            tax_brackets["tax_brackets"]
+            tax_brackets["tax_brackets"], validate_non_regressive_tax_brackets
         )
         self._validate()
 

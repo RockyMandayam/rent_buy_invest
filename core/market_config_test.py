@@ -72,6 +72,12 @@ class TestMarketConfig:
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
 
+        # test regressive tax brackets
+        invalid_kwargs["tax_brackets"]["tax_brackets"][1]["tax_rate"] = 0.0
+        invalid_kwargs["validate_non_regressive_tax_brackets"] = True
+        with pytest.raises(AssertionError):
+            MarketConfig(**invalid_kwargs)
+
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
             MARKET_CONFIG.get_tax(-1)
