@@ -72,15 +72,15 @@ class RentConfig(Config):
         assert (
             self.monthly_utilities
             <= RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT * self.monthly_rent
-        )
+        ), f"Please set monthly utilities to something reasonable (at most {RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT} of monthly rent)"
         assert (
             self.monthly_parking_fee
             <= RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT
             * self.monthly_rent
-        )
+        ), f"Please set the monthly parking fee to something reasonable (at most {RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT} of monthly rent)"
         assert (
             self.security_deposit <= 12 * self.monthly_rent
-        ), "A security deposit of more than 1 year of rent is unreasonably high"
+        ), "Please set the security deposit to something reasonable (at most 1 year of rent)"
 
     def get_upfront_one_time_cost(self) -> float:
         return self.security_deposit * self.unrecoverable_fraction_of_security_deposit
