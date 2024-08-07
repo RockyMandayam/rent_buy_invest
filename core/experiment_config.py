@@ -49,7 +49,6 @@ class ExperimentConfig(Config):
         still be created. Of course, I can implement __init__ to just raise an
         Exception, but this approach seems bad.
         """
-        assert num_months <= ExperimentConfig.MAX_NUM_MONTHS
         self.num_months: int = num_months
         self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
         self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
@@ -65,8 +64,8 @@ class ExperimentConfig(Config):
         """
         # make 150 if parameter and maybe appropriately update the yaml comment
         assert (
-            self.num_months > 0 and self.num_months <= 2400
-        ), "Number of months must be positive and at most 2400."
+            self.num_months > 0 and self.num_months <= ExperimentConfig.MAX_NUM_MONTHS
+        ), f"Number of months must be positive and at most {ExperimentConfig.MAX_NUM_MONTHS}."
         assert isinstance(
             self.start_date, datetime.date
         ), "Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date)."
