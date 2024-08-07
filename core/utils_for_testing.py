@@ -52,6 +52,7 @@ def check_float_field(
     allow_negative: bool = True,
     allow_zero: bool = True,
     allow_greater_than_one: bool = True,
+    max_value: float | None = None,
 ) -> None:
     """Checks that for a given key in config_kwargs with a float value, invalid values
     (defined by the params) cause an exception when instantiating clz from config_kwargs.
@@ -65,6 +66,7 @@ def check_float_field(
         allow_negative: if True, negative numbers are considered invalid
         allow_zero: if True, zero is considered invalid
         allow_greater_than_one: if True, numbers greater than one are considered invalid
+        max_value: If not None, this indicates the max value the field should accept
     """
     # NOTE: this func can also be used for ints. schema at least checks that finite floats are not passed in to an int field
     invalid_values = [float("nan"), float("inf"), float("-inf")]
@@ -74,6 +76,8 @@ def check_float_field(
         invalid_values.append(0)
     if not allow_greater_than_one:
         invalid_values.append(1.1)
+    if max_value is not None:
+        invalid_values.append(max_value + 1)
     _check_field(clz, config_kwargs, field_keys, invalid_values, AssertionError)
 
 

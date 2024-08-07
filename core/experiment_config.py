@@ -20,6 +20,8 @@ class ExperimentConfig(Config):
         start_date: (datetime.datetime): Start date of the projection
     """
 
+    MAX_NUM_MONTHS = 3600
+
     @classmethod
     @property
     def schema_path(cls) -> str:
@@ -47,6 +49,7 @@ class ExperimentConfig(Config):
         still be created. Of course, I can implement __init__ to just raise an
         Exception, but this approach seems bad.
         """
+        assert num_months <= ExperimentConfig.MAX_NUM_MONTHS
         self.num_months: int = num_months
         self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
         self.rent_config: RentConfig = RentConfig.parse(rent_config_path)

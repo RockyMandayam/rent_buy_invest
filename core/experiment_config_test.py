@@ -50,6 +50,7 @@ class TestExperimentConfig:
             ["num_months"],
             allow_negative=False,
             allow_zero=False,
+            max_value=ExperimentConfig.MAX_NUM_MONTHS,
         )
         check_filepath_field(
             ExperimentConfig,
