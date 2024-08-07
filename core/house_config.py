@@ -16,6 +16,8 @@ class HouseConfig(Config):
             instance attributes.
     """
 
+    MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE = 0.5
+
     @classmethod
     @property
     def schema_path(cls) -> str:
@@ -107,9 +109,7 @@ class HouseConfig(Config):
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
-        assert (
-            self.sale_price > 0
-        ), "House sale price must be positive and not infinity."
+        assert self.sale_price > 0, "House sale price must be positive."
         assert (
             self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
         ), "Down payment fraction must be between 0 and 1 inclusive."
@@ -200,6 +200,11 @@ class HouseConfig(Config):
         assert (
             self.annual_management_cost_fraction >= 0
         ), "Annual management cost fraction must be non-negative."
+        assert (
+            self.get_upfront_one_time_cost()
+            <= HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE
+            * self.sale_price
+        ), f"Please check the house config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
 
     def get_down_payment(self):
         return self.down_payment_fraction * self.sale_price

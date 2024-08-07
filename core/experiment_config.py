@@ -20,6 +20,8 @@ class ExperimentConfig(Config):
         start_date: (datetime.datetime): Start date of the projection
     """
 
+    MAX_NUM_MONTHS = 3600
+
     @classmethod
     @property
     def schema_path(cls) -> str:
@@ -62,8 +64,8 @@ class ExperimentConfig(Config):
         """
         # make 150 if parameter and maybe appropriately update the yaml comment
         assert (
-            self.num_months > 0 and self.num_months <= 2400
-        ), "Number of months must be positive and at most 2400."
+            self.num_months > 0 and self.num_months <= ExperimentConfig.MAX_NUM_MONTHS
+        ), f"Number of months must be positive and at most {ExperimentConfig.MAX_NUM_MONTHS}."
         assert isinstance(
             self.start_date, datetime.date
         ), "Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date)."

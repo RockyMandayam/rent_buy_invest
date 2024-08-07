@@ -49,6 +49,8 @@ class TestRentConfig:
             config_kwargs,
             ["monthly_utilities"],
             allow_negative=False,
+            max_value=RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT
+            * config_kwargs["monthly_rent"],
         )
         check_float_field(
             RentConfig,
@@ -61,6 +63,8 @@ class TestRentConfig:
             config_kwargs,
             ["monthly_parking_fee"],
             allow_negative=False,
+            max_value=RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT
+            * config_kwargs["monthly_rent"],
         )
         check_float_field(
             RentConfig,

@@ -16,6 +16,11 @@ class RentConfig(Config):
             instance attributes.
     """
 
+    MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT = 0.25
+    MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT = 0.5
+    MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
+
+    # TODO class properties are deprecated in python 3.11 and won't be supported in python 3.13
     @classmethod
     @property
     def schema_path(cls) -> str:
@@ -65,6 +70,21 @@ class RentConfig(Config):
             self.unrecoverable_fraction_of_security_deposit >= 0
             and self.unrecoverable_fraction_of_security_deposit <= 1
         ), "Unrecoverable fraction of security deposit must be between 0 and 1 inclusive."
+        assert (
+            self.monthly_utilities
+            <= RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT * self.monthly_rent
+        ), f"Please set monthly utilities to something reasonable (at most {RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT} of monthly rent)"
+        assert (
+            self.monthly_parking_fee
+            <= RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT
+            * self.monthly_rent
+        ), f"Please set the monthly parking fee to something reasonable (at most {RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT} of monthly rent)"
+        assert (
+            self.annual_rent_inflation_rate <= RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE
+        ), f"Please set the annual rent inflation rent to something reasonable (at most {RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE})"
+        assert (
+            self.security_deposit <= 12 * self.monthly_rent
+        ), "Please set the security deposit to something reasonable (at most 1 year of rent)"
 
     def get_upfront_one_time_cost(self) -> float:
         return self.security_deposit * self.unrecoverable_fraction_of_security_deposit

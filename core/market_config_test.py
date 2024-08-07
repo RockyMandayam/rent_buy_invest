@@ -40,7 +40,12 @@ class TestMarketConfig:
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
 
-        check_float_field(MarketConfig, config_kwargs, ["market_rate_of_return"])
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["market_rate_of_return"],
+            max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
+        )
         check_float_field(
             MarketConfig,
             config_kwargs,
@@ -64,6 +69,12 @@ class TestMarketConfig:
         # non-increasing upper_limit should cause error
         invalid_kwargs = copy.deepcopy(config_kwargs)
         invalid_kwargs["tax_brackets"]["tax_brackets"][1]["upper_limit"] = 44625
+        with pytest.raises(AssertionError):
+            MarketConfig(**invalid_kwargs)
+
+        # test regressive tax brackets
+        invalid_kwargs["tax_brackets"]["tax_brackets"][1]["tax_rate"] = 0.0
+        invalid_kwargs["validate_non_regressive_tax_brackets"] = True
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
 
