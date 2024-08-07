@@ -40,7 +40,12 @@ class TestMarketConfig:
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
 
-        check_float_field(MarketConfig, config_kwargs, ["market_rate_of_return"])
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["market_rate_of_return"],
+            max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
+        )
         check_float_field(
             MarketConfig,
             config_kwargs,

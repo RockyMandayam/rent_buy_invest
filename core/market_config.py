@@ -17,6 +17,8 @@ class MarketConfig(Config):
         self.tax_brackets: A TaxBrackets object
     """
 
+    MAX_MARKET_RATE_OF_RETURN = 0.5
+
     @classmethod
     @property
     def schema_path(cls) -> str:
@@ -124,6 +126,9 @@ class MarketConfig(Config):
         assert math.isfinite(
             self.market_rate_of_return
         ), "Market rate of return must not be NaN, infinity, or negative infinity."
+        assert (
+            self.market_rate_of_return <= MarketConfig.MAX_MARKET_RATE_OF_RETURN
+        ), "Please set a reasonable market rate of return (at most 0.5)"
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
 
     def get_tax(self, income: float) -> float:
