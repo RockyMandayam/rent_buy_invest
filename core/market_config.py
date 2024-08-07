@@ -37,6 +37,8 @@ class MarketConfig(Config):
                 next tax bracket begins). This list is ordered from lowest tax
                 bracket to highest tax bracket. The highest tax bracket will have
                 an upper limit of infinity.
+            self.validate_non_regressive_tax_brackets: If True, validate that the tax brackets
+                are non-regressive (i.e., the tax rate never decreases as the tax bracket increases)
         """
 
         def __init__(
