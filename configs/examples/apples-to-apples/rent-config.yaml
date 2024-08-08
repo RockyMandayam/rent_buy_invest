@@ -1,10 +1,10 @@
-monthly_rent: !!float 2000.0
+monthly_rent: !!float 3000.0
 
-monthly_utilities: !!float 300.
+monthly_utilities: !!float 200.
 
-monthly_renters_insurance: !!float 20.
+monthly_renters_insurance: !!float 50.
 
-monthly_parking_fee: !!float 100.
+monthly_parking_fee: !!float 150.
 
 annual_rent_inflation_rate: !!float 0.07
 
