@@ -57,6 +57,8 @@ class TestRentConfig:
             config_kwargs,
             ["monthly_renters_insurance"],
             allow_negative=False,
+            max_value=RentConfig.MAX_MONTHLY_RENTERS_INSURANCE_AS_FRACTION_OF_RENT
+            * config_kwargs["monthly_rent"],
         )
         check_float_field(
             RentConfig,
@@ -70,6 +72,7 @@ class TestRentConfig:
             RentConfig,
             config_kwargs,
             ["annual_rent_inflation_rate"],
+            max_value=RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
         )
         check_float_field(
             RentConfig,
@@ -77,6 +80,15 @@ class TestRentConfig:
             ["inflation_adjustment_period"],
             allow_negative=False,
             allow_zero=False,
+            min_value=1,
+        )
+        check_float_field(
+            RentConfig,
+            config_kwargs,
+            ["security_deposit"],
+            allow_negative=False,
+            max_value=RentConfig.MAX_SECURITY_DEPOSIT_AS_FRACTION_OF_RENT
+            * config_kwargs["monthly_rent"],
         )
         check_float_field(
             RentConfig,

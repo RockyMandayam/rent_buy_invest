@@ -52,6 +52,7 @@ def check_float_field(
     allow_negative: bool = True,
     allow_zero: bool = True,
     allow_greater_than_one: bool = True,
+    min_value: float | None = None,
     max_value: float | None = None,
 ) -> None:
     """Checks that for a given key in config_kwargs with a float value, invalid values
@@ -77,7 +78,9 @@ def check_float_field(
     if not allow_greater_than_one:
         invalid_values.append(1.1)
     if max_value is not None:
-        invalid_values.append(max_value + 1)
+        invalid_values.append(max_value + 0.00000001)
+    if min_value is not None:
+        invalid_values.append(min_value - 0.00000001)
     _check_field(clz, config_kwargs, field_keys, invalid_values, AssertionError)
 
 
