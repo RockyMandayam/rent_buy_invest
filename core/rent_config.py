@@ -56,7 +56,7 @@ class RentConfig(Config):
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
-        assert self.monthly_rent >= 0, "Monthly rent must be non-negative."
+        assert self.monthly_rent > 0, "Monthly rent must be positive."
         assert self.monthly_utilities >= 0, "Monthly utilities must be non-negative."
         assert (
             self.monthly_renters_insurance >= 0

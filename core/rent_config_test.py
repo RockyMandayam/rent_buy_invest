@@ -43,6 +43,7 @@ class TestRentConfig:
             config_kwargs,
             ["monthly_rent"],
             allow_negative=False,
+            allow_zero=False,
         )
         check_float_field(
             RentConfig,
