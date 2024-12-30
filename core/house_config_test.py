@@ -66,6 +66,7 @@ class TestHouseConfig:
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
+        test_house_config = HouseConfig(**config_kwargs)
 
         check_float_field(
             HouseConfig,
@@ -78,6 +79,7 @@ class TestHouseConfig:
             HouseConfig,
             config_kwargs,
             ["annual_assessed_value_inflation_rate"],
+            max_value=HouseConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
         )
         check_float_field(
             HouseConfig,
@@ -92,6 +94,7 @@ class TestHouseConfig:
             config_kwargs,
             ["mortgage_annual_interest_rate"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MORTGAGE_ANNUAL_INTEREST_RATE,
         )
         check_float_field(
             HouseConfig,
@@ -99,54 +102,68 @@ class TestHouseConfig:
             ["mortgage_term_months"],
             allow_negative=False,
             allow_zero=False,
+            max_value=HouseConfig.MAX_MORTGAGE_TERM,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["pmi_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_PMI_FRACTION
+            * test_house_config.initial_mortgage_amount,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["mortgage_origination_points_fee_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION
+            * test_house_config.initial_mortgage_amount,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["mortgage_processing_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MORTGAGE_PROCESSING_FEE
+            * test_house_config.initial_mortgage_amount,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["mortgage_underwriting_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MORTGAGE_UNDERWRITING_FEE
+            * test_house_config.initial_mortgage_amount,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["mortgage_discount_points_fee_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION
+            * test_house_config.initial_mortgage_amount,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["house_appraisal_cost"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_HOUSE_APPRAISAL_COST,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["credit_report_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_CREDIT_REPORT_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["transfer_tax_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_TRANSFER_TAX_FRACTION,
         )
         check_float_field(
             HouseConfig,
@@ -160,24 +177,28 @@ class TestHouseConfig:
             config_kwargs,
             ["recording_fee_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_RECORDING_FEE_FRACTION,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["annual_property_tax_rate"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ANNUAL_PROPERTY_TAX_RATE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["realtor_commission_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_REALTOR_COMMISSION_FRACTION,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["hoa_transfer_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_HOA_TRANSFER_FEE,
         )
         check_float_field(
             HouseConfig,
@@ -191,30 +212,35 @@ class TestHouseConfig:
             config_kwargs,
             ["house_inspection_cost"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_HOUSE_INSPECTION_COST,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["pest_inspection_cost"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_PEST_INSPECTION_COST,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["escrow_fixed_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ESCROW_FIXED_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["flood_certification_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_FLOOD_CERTIFICATION_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["title_search_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_TITLE_SEARCH_FEE,
         )
         check_float_field(
             HouseConfig,
@@ -228,36 +254,42 @@ class TestHouseConfig:
             config_kwargs,
             ["attorney_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ATTORNEY_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["closing_protection_letter_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["search_abstract_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_SEARCH_ABSTRACT_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["survey_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_SURVEY_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["notary_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_NOTARY_FEE,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["deed_prep_fee"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_DEED_PREP_FEE,
         )
         check_float_field(
             HouseConfig,
@@ -276,36 +308,42 @@ class TestHouseConfig:
             config_kwargs,
             ["endorsement_fees"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ENDORSEMENT_FEES,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["annual_homeowners_insurance_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["monthly_utilities"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MONTHLY_UTILITIES,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["annual_maintenance_cost_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ANNUAL_MAINTENANCE_COST_FRACTION,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["monthly_hoa_fees"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_MONTHLY_HOA_FEES,
         )
         check_float_field(
             HouseConfig,
             config_kwargs,
             ["annual_management_cost_fraction"],
             allow_negative=False,
+            max_value=HouseConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
         )
 
     def test_get_monthly_mortgage_payment(self) -> None:

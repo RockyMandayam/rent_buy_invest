@@ -65,7 +65,7 @@ class Calculator:
         ]  # NOTE: first value filled in
         investment_values_if_house = [0]  # NOTE: first value filed in
 
-        mortgage_amount = self.house_config.get_initial_mortgage_amount()
+        mortgage_amount = self.house_config.initial_mortgage_amount
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
         for month in range(self.num_months + 1):
             mortgage_amounts.append(mortgage_amount)

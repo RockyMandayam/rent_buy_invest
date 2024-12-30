@@ -16,6 +16,38 @@ class HouseConfig(Config):
             instance attributes.
     """
 
+    MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
+    MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
+    MAX_MORTGAGE_TERM = 60 * 12
+    MAX_PMI_FRACTION = 0.1
+    MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION = 0.1
+    MAX_MORTGAGE_PROCESSING_FEE = 1000.0
+    MAX_MORTGAGE_UNDERWRITING_FEE = 1000.0
+    MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION = 0.05
+    MAX_HOUSE_APPRAISAL_COST = 5000.0
+    MAX_CREDIT_REPORT_FEE = 500.0
+    MAX_TRANSFER_TAX_FRACTION = 0.01
+    MAX_RECORDING_FEE_FRACTION = 0.1
+    MAX_ANNUAL_PROPERTY_TAX_RATE = 0.1
+    MAX_REALTOR_COMMISSION_FRACTION = 0.1
+    MAX_HOA_TRANSFER_FEE = 5000.0
+    MAX_HOUSE_INSPECTION_COST = 5000.0
+    MAX_PEST_INSPECTION_COST = 5000.0
+    MAX_ESCROW_FIXED_FEE = 5000.0
+    MAX_FLOOD_CERTIFICATION_FEE = 1000.0
+    MAX_TITLE_SEARCH_FEE = 1000.0
+    MAX_ATTORNEY_FEE = 10000.0
+    MAX_CLOSING_PROTECTION_LETTER_FEE = 500.0
+    MAX_SEARCH_ABSTRACT_FEE = 5000.0
+    MAX_SURVEY_FEE = 5000.0
+    MAX_NOTARY_FEE = 2000.0
+    MAX_DEED_PREP_FEE = 1000.0
+    MAX_ENDORSEMENT_FEES = 1000
+    MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION = 0.05
+    MAX_MONTHLY_UTILITIES = 1000.0
+    MAX_ANNUAL_MAINTENANCE_COST_FRACTION = 0.05
+    MAX_MONTHLY_HOA_FEES = 1000.0
+    MAX_ANNUAL_MANAGEMENT_COST_FRACTION = 0.05
     MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE = 0.5
 
     @classmethod
@@ -171,7 +203,7 @@ class HouseConfig(Config):
         assert (
             self.seller_burden_of_title_search_fee_fraction >= 0
             and self.seller_burden_of_title_search_fee_fraction <= 1
-        ), "Seller burden fraction of title search fee must be non-negative."
+        ), "Seller burden fraction of title search fee must be between 0 and 1 inclusive"
         assert self.attorney_fee >= 0, "Attorney fee must be non-negative."
         assert (
             self.closing_protection_letter_fee >= 0
@@ -184,10 +216,12 @@ class HouseConfig(Config):
         assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
         assert (
             self.lenders_title_insurance_fraction >= 0
-        ), "Lenders title insurance fraction must be non-negative"
+            and self.lenders_title_insurance_fraction <= 1
+        ), "Lenders title insurance fraction must be between 0 and 1 inclusive."
         assert (
             self.owners_title_insurance_fraction >= 0
-        ), "Owners title insurance fraction must be non-negative."
+            and self.owners_title_insurance_fraction <= 1
+        ), "Owners title insurance fraction must be between 0 and 1 inclusive."
         assert self.endorsement_fees >= 0, "Endorsement fees must be non-negative."
         assert (
             self.annual_homeowners_insurance_fraction >= 0
@@ -200,6 +234,93 @@ class HouseConfig(Config):
         assert (
             self.annual_management_cost_fraction >= 0
         ), "Annual management cost fraction must be non-negative."
+        self._validate_max_value(
+            "annual_assessed_value_inflation_rate",
+            HouseConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
+        )
+        self._validate_max_value(
+            "mortgage_annual_interest_rate",
+            HouseConfig.MAX_MORTGAGE_ANNUAL_INTEREST_RATE,
+        )
+        self._validate_max_value("mortgage_term_months", HouseConfig.MAX_MORTGAGE_TERM)
+        if self.initial_mortgage_amount:
+            self._validate_max_value_as_fraction(
+                "pmi_fraction", "initial_mortgage_amount", HouseConfig.MAX_PMI_FRACTION
+            )
+            self._validate_max_value_as_fraction(
+                "mortgage_origination_points_fee_fraction",
+                "initial_mortgage_amount",
+                HouseConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION,
+            )
+        self._validate_max_value(
+            "mortgage_processing_fee", HouseConfig.MAX_MORTGAGE_PROCESSING_FEE
+        )
+        self._validate_max_value(
+            "mortgage_underwriting_fee", HouseConfig.MAX_MORTGAGE_UNDERWRITING_FEE
+        )
+        if self.initial_mortgage_amount:
+            self._validate_max_value_as_fraction(
+                "mortgage_discount_points_fee_fraction",
+                "initial_mortgage_amount",
+                HouseConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION,
+            )
+        self._validate_max_value(
+            "house_appraisal_cost", HouseConfig.MAX_HOUSE_APPRAISAL_COST
+        )
+        self._validate_max_value("credit_report_fee", HouseConfig.MAX_CREDIT_REPORT_FEE)
+        self._validate_max_value(
+            "transfer_tax_fraction", HouseConfig.MAX_TRANSFER_TAX_FRACTION
+        )
+        self._validate_max_value(
+            "recording_fee_fraction",
+            HouseConfig.MAX_RECORDING_FEE_FRACTION,
+        )
+        self._validate_max_value(
+            "annual_property_tax_rate", HouseConfig.MAX_ANNUAL_PROPERTY_TAX_RATE
+        )
+        self._validate_max_value(
+            "realtor_commission_fraction",
+            HouseConfig.MAX_REALTOR_COMMISSION_FRACTION,
+        )
+        self._validate_max_value("hoa_transfer_fee", HouseConfig.MAX_HOA_TRANSFER_FEE)
+        self._validate_max_value(
+            "house_inspection_cost", HouseConfig.MAX_HOUSE_INSPECTION_COST
+        )
+        self._validate_max_value(
+            "pest_inspection_cost", HouseConfig.MAX_PEST_INSPECTION_COST
+        )
+        self._validate_max_value("escrow_fixed_fee", HouseConfig.MAX_ESCROW_FIXED_FEE)
+        self._validate_max_value(
+            "flood_certification_fee", HouseConfig.MAX_FLOOD_CERTIFICATION_FEE
+        )
+        self._validate_max_value("title_search_fee", HouseConfig.MAX_TITLE_SEARCH_FEE)
+        self._validate_max_value("attorney_fee", HouseConfig.MAX_ATTORNEY_FEE)
+        self._validate_max_value(
+            "closing_protection_letter_fee",
+            HouseConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
+        )
+        self._validate_max_value(
+            "search_abstract_fee", HouseConfig.MAX_SEARCH_ABSTRACT_FEE
+        )
+        self._validate_max_value("survey_fee", HouseConfig.MAX_SURVEY_FEE)
+        self._validate_max_value("notary_fee", HouseConfig.MAX_NOTARY_FEE)
+        self._validate_max_value("deed_prep_fee", HouseConfig.MAX_DEED_PREP_FEE)
+        self._validate_max_value("endorsement_fees", HouseConfig.MAX_ENDORSEMENT_FEES)
+        self._validate_max_value(
+            "annual_homeowners_insurance_fraction",
+            HouseConfig.MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION,
+        )
+        self._validate_max_value("monthly_utilities", HouseConfig.MAX_MONTHLY_UTILITIES)
+        self._validate_max_value(
+            "annual_maintenance_cost_fraction",
+            HouseConfig.MAX_ANNUAL_MAINTENANCE_COST_FRACTION,
+        )
+        self._validate_max_value("monthly_hoa_fees", HouseConfig.MAX_MONTHLY_HOA_FEES)
+        self._validate_max_value(
+            "annual_management_cost_fraction",
+            HouseConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+        )
+
         assert (
             self.get_upfront_one_time_cost()
             <= HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE
@@ -209,20 +330,21 @@ class HouseConfig(Config):
     def get_down_payment(self):
         return self.down_payment_fraction * self.sale_price
 
-    def get_initial_mortgage_amount(self):
+    @property
+    def initial_mortgage_amount(self):
         return (1 - self.down_payment_fraction) * self.sale_price
 
     def get_upfront_one_time_cost(self):
         return (
             # fmt: off
             self.mortgage_origination_points_fee_fraction
-                * self.get_initial_mortgage_amount()
+                * self.initial_mortgage_amount
             # fmt: on
             + self.mortgage_processing_fee
             + self.mortgage_underwriting_fee
             # fmt: off
             + self.mortgage_discount_points_fee_fraction
-                * self.get_initial_mortgage_amount()
+                * self.initial_mortgage_amount
             # fmt: on
             + self.house_appraisal_cost
             + self.credit_report_fee
@@ -248,8 +370,8 @@ class HouseConfig(Config):
             + self.survey_fee
             + self.notary_fee
             + self.deed_prep_fee
-            + self.lenders_title_insurance_fraction * self.get_initial_mortgage_amount()
-            + self.owners_title_insurance_fraction * self.get_initial_mortgage_amount()
+            + self.lenders_title_insurance_fraction * self.initial_mortgage_amount
+            + self.owners_title_insurance_fraction * self.initial_mortgage_amount
             + self.endorsement_fees
         )
 
@@ -259,7 +381,7 @@ class HouseConfig(Config):
         # as opposed to using the "equivalent" monthly compound rate
         i = self.mortgage_annual_interest_rate / 12
         r = 1 / (1 + i)
-        L = self.get_initial_mortgage_amount()
+        L = self.initial_mortgage_amount
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_monthly_house_values(self, num_months: int):
