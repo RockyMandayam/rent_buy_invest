@@ -61,6 +61,7 @@ class TestMarketConfig:
                 config_kwargs,
                 ["tax_brackets", "tax_brackets", bracket_index, "tax_rate"],
                 allow_negative=False,
+                allow_greater_than_one=False,
             )
         # for highest bracket, upper limit is infinity, and check tax rate in the same way
         invalid_kwargs = copy.deepcopy(config_kwargs)
