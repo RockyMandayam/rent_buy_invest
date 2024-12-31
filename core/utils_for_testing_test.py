@@ -1,13 +1,10 @@
 import math
 from typing import Dict
 
-# isort: off
 from rent_buy_invest.core.utils_for_testing import (
     check_filepath_field,
     check_float_field,
 )
-
-# isort: on
 from rent_buy_invest.utils import io_utils
 
 
