@@ -77,10 +77,10 @@ def check_float_field(
         invalid_values.append(0)
     if not allow_greater_than_one:
         invalid_values.append(1.1)
-    if max_value is not None:
-        invalid_values.append(max_value + 0.00000001)
     if min_value is not None:
         invalid_values.append(min_value - 0.00000001)
+    if max_value is not None:
+        invalid_values.append(max_value + 0.00000001)
     _check_field(clz, config_kwargs, field_keys, invalid_values, AssertionError)
 
 
