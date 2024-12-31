@@ -17,6 +17,7 @@ jobs:
             requirements-files: "requirements.txt"
             # version: "5.12.0"
             isort-version: "5.12.0"
-            profile: "black"
-            line-length: 88
+            # profile: "black"
+            # line-length: 88
+            args: "--profile black"
       
