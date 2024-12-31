@@ -13,8 +13,10 @@ jobs:
           python-version: 3.11.4
       - uses: isort/isort-action@master
         with:
-            requirementsFiles: "requirements.txt"
-            version: "5.12.0"
+            # requirementsFiles: "requirements.txt"
+            requirements-files: "requirements.txt"
+            # version: "5.12.0"
+            isort-version: "5.12.0"
             profile: "black"
             line-length: 88
       
