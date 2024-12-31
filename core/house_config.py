@@ -51,7 +51,6 @@ class HouseConfig(Config):
     MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE = 0.5
 
     @classmethod
-    @property
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/house-config-schema.json"
 

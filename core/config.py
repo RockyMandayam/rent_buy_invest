@@ -13,7 +13,6 @@ class Config(ABC):
         pass
 
     @classmethod
-    @property
     @abstractmethod
     def schema_path(cls) -> str:
         pass
@@ -30,7 +29,7 @@ class Config(ABC):
             cls: Object with type equal to the calling class (whicch will be a
                 descendent of this class)
         """
-        config_schema = io_utils.read_json(cls.schema_path)
+        config_schema = io_utils.read_json(cls.schema_path())
         config_kwargs = io_utils.read_yaml(project_path)
         jsonschema.validate(instance=config_kwargs, schema=config_schema)
         return cls(**config_kwargs)
