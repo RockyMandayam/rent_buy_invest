@@ -22,7 +22,6 @@ class MarketConfig(Config):
     MAX_MARKET_RATE_OF_RETURN = 0.5
 
     @classmethod
-    @property
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/market-config-schema.json"
 

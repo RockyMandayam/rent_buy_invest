@@ -22,9 +22,7 @@ class RentConfig(Config):
     MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
     MAX_SECURITY_DEPOSIT_AS_FRACTION_OF_RENT = 6
 
-    # TODO class properties are deprecated in python 3.11 and won't be supported in python 3.13
     @classmethod
-    @property
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/rent-config-schema.json"
 
