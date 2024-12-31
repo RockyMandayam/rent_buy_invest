@@ -16,9 +16,11 @@ class RentConfig(Config):
             instance attributes.
     """
 
-    MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT = 0.25
+    MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT = 0.5
+    MAX_MONTHLY_RENTERS_INSURANCE_AS_FRACTION_OF_RENT = 0.5
     MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT = 0.5
     MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
+    MAX_SECURITY_DEPOSIT_AS_FRACTION_OF_RENT = 6
 
     # TODO class properties are deprecated in python 3.11 and won't be supported in python 3.13
     @classmethod
@@ -54,7 +56,7 @@ class RentConfig(Config):
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
-        assert self.monthly_rent >= 0, "Monthly rent must be non-negative."
+        assert self.monthly_rent > 0, "Monthly rent must be positive."
         assert self.monthly_utilities >= 0, "Monthly utilities must be non-negative."
         assert (
             self.monthly_renters_insurance >= 0
@@ -70,21 +72,30 @@ class RentConfig(Config):
             self.unrecoverable_fraction_of_security_deposit >= 0
             and self.unrecoverable_fraction_of_security_deposit <= 1
         ), "Unrecoverable fraction of security deposit must be between 0 and 1 inclusive."
-        assert (
-            self.monthly_utilities
-            <= RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT * self.monthly_rent
-        ), f"Please set monthly utilities to something reasonable (at most {RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT} of monthly rent)"
-        assert (
-            self.monthly_parking_fee
-            <= RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT
-            * self.monthly_rent
-        ), f"Please set the monthly parking fee to something reasonable (at most {RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT} of monthly rent)"
-        assert (
-            self.annual_rent_inflation_rate <= RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE
-        ), f"Please set the annual rent inflation rent to something reasonable (at most {RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE})"
-        assert (
-            self.security_deposit <= 12 * self.monthly_rent
-        ), "Please set the security deposit to something reasonable (at most 1 year of rent)"
+        self._validate_max_value_as_fraction(
+            "monthly_utilities",
+            "monthly_rent",
+            RentConfig.MAX_MONTHLY_UTILITIES_AS_FRACTION_OF_RENT,
+        )
+
+        self._validate_max_value_as_fraction(
+            "monthly_renters_insurance",
+            "monthly_rent",
+            RentConfig.MAX_MONTHLY_RENTERS_INSURANCE_AS_FRACTION_OF_RENT,
+        )
+        self._validate_max_value_as_fraction(
+            "monthly_parking_fee",
+            "monthly_rent",
+            RentConfig.MAX_MONTHLY_PARKING_FEE_AS_FRACTION_OF_RENT,
+        )
+        self._validate_max_value(
+            "annual_rent_inflation_rate", RentConfig.MAX_ANNUAL_RENT_INFLATION_RATE
+        )
+        self._validate_max_value_as_fraction(
+            "security_deposit",
+            "monthly_rent",
+            RentConfig.MAX_SECURITY_DEPOSIT_AS_FRACTION_OF_RENT,
+        )
 
     def get_upfront_one_time_cost(self) -> float:
         return self.security_deposit * self.unrecoverable_fraction_of_security_deposit

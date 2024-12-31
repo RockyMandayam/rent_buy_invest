@@ -77,8 +77,10 @@ class MarketConfig(Config):
                         and bracket["upper_limit"] > 0
                     ), "All tax brackets except the last one must have an upper limit that is positive and non-infinite."
                 assert (
-                    math.isfinite(bracket["tax_rate"]) and bracket["tax_rate"] >= 0
-                ), "Tax bracket's tax rate must be finite and non-negative."
+                    math.isfinite(bracket["tax_rate"])
+                    and bracket["tax_rate"] >= 0
+                    and bracket["tax_rate"] <= 1
+                ), "Tax bracket's tax rate must be finite and between 0 and 1 inclusive."
                 assert (
                     bracket["upper_limit"] > upper_limit
                 ), "Tax brackets must be listed in order."
