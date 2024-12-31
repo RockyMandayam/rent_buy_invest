@@ -15,4 +15,5 @@ jobs:
         with:
             requirementsFiles: "requirements.txt"
             version: "5.11.5"
+            profile: black
       
