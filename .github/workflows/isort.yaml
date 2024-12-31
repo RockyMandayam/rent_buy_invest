@@ -15,5 +15,6 @@ jobs:
         with:
             requirementsFiles: "requirements.txt"
             version: "5.12.0"
-            # profile: "black"
+            profile: "black"
+            line-length: 88
       
