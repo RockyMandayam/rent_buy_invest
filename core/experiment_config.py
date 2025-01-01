@@ -23,7 +23,6 @@ class ExperimentConfig(Config):
     MAX_NUM_MONTHS = 3600
 
     @classmethod
-    @property
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/experiment-config-schema.json"
 

@@ -65,7 +65,7 @@ mortgage_discount_points_fee_fraction: !!float 0.005
 
 # it is assumed the buyer pays this fee up front, regardless of whether the 
 # house purchase/mortgage are finalized and completed
-# this is often requird by the lender
+# this is often required by the lender
 house_appraisal_cost: !!float 500.
 
 # credit report fee charged by lender to do a credit check

@@ -13,7 +13,6 @@ class Config(ABC):
         pass
 
     @classmethod
-    @property
     @abstractmethod
     def schema_path(cls) -> str:
         pass
@@ -30,7 +29,25 @@ class Config(ABC):
             cls: Object with type equal to the calling class (whicch will be a
                 descendent of this class)
         """
-        config_schema = io_utils.read_json(cls.schema_path)
+        config_schema = io_utils.read_json(cls.schema_path())
         config_kwargs = io_utils.read_yaml(project_path)
         jsonschema.validate(instance=config_kwargs, schema=config_schema)
         return cls(**config_kwargs)
+
+    def _validate_max_value(self, attr_name: str, max_value: float) -> None:
+        attr_val = getattr(self, attr_name)
+        assert (
+            attr_val <= max_value
+        ), f"Please set '{attr_name}' to something reasonable (at most {max_value})"
+
+    def _validate_max_value_as_fraction(
+        self,
+        attr_name: str,
+        reference_attr_name: str,
+        max_value_as_fraction_of_reference_value: float,
+    ) -> None:
+        attr_val = getattr(self, attr_name)
+        reference_attr_val = getattr(self, reference_attr_name)
+        assert (
+            attr_val <= max_value_as_fraction_of_reference_value * reference_attr_val
+        ), f"Please set '{attr_name}' to something reasonable (at most {max_value_as_fraction_of_reference_value} times '{reference_attr_name}')"

@@ -46,25 +46,34 @@ class TestMarketConfig:
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
         )
-        check_float_field(
-            MarketConfig,
-            config_kwargs,
-            ["tax_brackets", "tax_brackets", 0, "upper_limit"],
-            allow_negative=False,
-            allow_zero=False,
-        )
-        check_float_field(
-            MarketConfig,
-            config_kwargs,
-            ["tax_brackets", "tax_brackets", 0, "tax_rate"],
-            allow_negative=False,
-        )
-
-        # final upper_limit must be infinity
+        num_brackets = len(config_kwargs["tax_brackets"]["tax_brackets"])
+        # for all non-highest brackets, check upper limit and tax rate
+        for bracket_index in range(num_brackets - 1):
+            check_float_field(
+                MarketConfig,
+                config_kwargs,
+                ["tax_brackets", "tax_brackets", bracket_index, "upper_limit"],
+                allow_negative=False,
+                allow_zero=False,
+            )
+            check_float_field(
+                MarketConfig,
+                config_kwargs,
+                ["tax_brackets", "tax_brackets", bracket_index, "tax_rate"],
+                allow_negative=False,
+                allow_greater_than_one=False,
+            )
+        # for highest bracket, upper limit is infinity, and check tax rate in the same way
         invalid_kwargs = copy.deepcopy(config_kwargs)
         invalid_kwargs["tax_brackets"]["tax_brackets"].pop()
         with pytest.raises(AssertionError):
             MarketConfig(**invalid_kwargs)
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["tax_brackets", "tax_brackets", bracket_index, "tax_rate"],
+            allow_negative=False,
+        )
 
         # non-increasing upper_limit should cause error
         invalid_kwargs = copy.deepcopy(config_kwargs)
