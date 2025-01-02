@@ -6,8 +6,8 @@ from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.core.rent_config import RentConfig
-from rent_buy_invest.utils import math_utils
 from rent_buy_invest.utils.data_utils import to_df
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, increment_month
 
 # For non-FHA loans, this is the maximum mortgage amount (as a fraction of the home value)
 # for which mortgage insurance is not required. When the mortgage amount is below
@@ -24,7 +24,7 @@ NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE = 0.8
 FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
 # If you fall below FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE at the time
 # of the start of the loan, then you need to pay for mortgage insurance for this many months
-FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD = 12 * 11
+FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 
 
 class Calculator:
@@ -80,7 +80,7 @@ class Calculator:
         mortgage_insurance_if_required = round(
             self.house_config.annual_mortgage_insurance_fraction
             * self.house_config.initial_mortgage_amount
-            / 12,
+            / MONTHS_PER_YEAR,
             2,
         )
 
@@ -89,7 +89,9 @@ class Calculator:
 
             # mortgage interest cost
             mortgage_interest = round(
-                mortgage_amount * self.house_config.mortgage_annual_interest_rate / 12,
+                mortgage_amount
+                * self.house_config.mortgage_annual_interest_rate
+                / MONTHS_PER_YEAR,
                 2,
             )
             mortgage_interests.append(mortgage_interest)
@@ -127,7 +129,10 @@ class Calculator:
                 ):
                     mortgage_insurance = mortgage_insurance_if_required
                 else:
-                    if month // 12 < FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD:
+                    if (
+                        month // MONTHS_PER_YEAR
+                        < FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD
+                    ):
                         mortgage_insurance = mortgage_insurance_if_required
                     else:
                         mortgage_insurance = 0
@@ -211,5 +216,5 @@ class Calculator:
         date = self.start_date
         for _ in range(self.num_months + 1):
             rows.append(date.strftime("%b %d, %Y"))
-            date = math_utils.increment_month(date)
+            date = increment_month(date)
         return to_df(cols, rows, multi_col=True)

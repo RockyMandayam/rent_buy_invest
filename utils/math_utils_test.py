@@ -44,8 +44,8 @@ def test_project_growth() -> None:
         principal, annual_growth_rate, compound_monthly, num_months
     )
     expected = (
-        [principal] * 12
-        + [round(principal * 1.03, 2)] * 12
+        [principal] * math_utils.MONTHS_PER_YEAR
+        + [round(principal * 1.03, 2)] * math_utils.MONTHS_PER_YEAR
         + [round(principal * 1.03**2, 2)] * 2
     )
     assert actual == expected

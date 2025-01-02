@@ -6,6 +6,7 @@ import pytest
 from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.core.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
 RENT_CONFIG = RentConfig.parse(TEST_CONFIG_PATH)
@@ -114,7 +115,7 @@ class TestRentConfig:
         for num_months in [1, 2, 24, 25]:
             actual = RENT_CONFIG.get_monthly_costs_of_renting(num_months)
 
-            num_full_years = num_months // 12
+            num_full_years = num_months // MONTHS_PER_YEAR
             exp = []
             # calculate for all but last year
             for year in range(num_full_years):
@@ -122,12 +123,12 @@ class TestRentConfig:
                     2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** year,
                     2,
                 )
-                exp.extend([monthly_rent] * 12)
+                exp.extend([monthly_rent] * MONTHS_PER_YEAR)
             # calculate for last year
             monthly_rent = round(
                 2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** num_full_years,
                 2,
             )
-            exp.extend([monthly_rent] * ((num_months % 12) + 1))
+            exp.extend([monthly_rent] * ((num_months % MONTHS_PER_YEAR) + 1))
 
             assert actual == exp
