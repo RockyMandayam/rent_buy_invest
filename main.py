@@ -13,8 +13,6 @@ from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
-# TODO test this file
-
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
