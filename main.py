@@ -13,8 +13,6 @@ from rent_buy_invest.utils import io_utils
 
 OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
-# TODO test this file
-
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -25,7 +23,7 @@ def _get_args() -> argparse.Namespace:
     parser.add_argument(
         "experiment_config",
         type=str,
-        help="Path (from top-level directory) to experiment config file.",
+        help="Path (from 'rent_buy_invest' directory) to experiment config file.",
     )
     parser.add_argument(
         "--experiment-name",

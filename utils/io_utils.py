@@ -10,7 +10,7 @@ def get_abs_path(project_path: str) -> str:
     """Returns the absolute path given relative path.
 
     Args:
-        project_path (str): path starting with top-level directory.
+        project_path (str): path starting with 'rent_buy_invest' directory.
 
     Returns:
         str: absolute path
@@ -55,19 +55,18 @@ def make_dirs(project_path: str, exist_ok: bool = True) -> None:
 
 
 def delete_dir(project_path) -> None:
-    # os.remove(get_abs_path(project_path))
     os.rmdir(get_abs_path(project_path))
 
 
 def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
-    """Load yaml given by path (from top-level directory) as dictionary."""
+    """Load yaml given by path (from 'rent_buy_invest' directory) as dictionary."""
     with RentBuyInvestFileOpener(project_path, mode="r") as f:
         general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     return general_config
 
 
 def write_yaml(project_path: str, obj: Any) -> None:
-    """Write object to given path (from top-level directory) as yaml.
+    """Write object to given path (from 'rent_buy_invest' directory) as yaml.
 
     project_path should end in '.yaml'
     """
@@ -76,7 +75,7 @@ def write_yaml(project_path: str, obj: Any) -> None:
 
 
 def write_xlsx_df(project_path: str, df: pd.DataFrame) -> None:
-    """Write DataFrame to given path (from top-level directory) as an excel-readable file.
+    """Write DataFrame to given path (from the 'rent_buy_invest' directory) as an excel-readable file.
 
     project_path must end in '.xlsx'
     """
