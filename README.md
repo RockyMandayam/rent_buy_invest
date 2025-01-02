@@ -7,6 +7,7 @@ Calculates the long-term financial pros and cons of decisions related to renting
 This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
 
 Some additional notes about the configs:
+- Property tax: Property taxes are billed annually based on the assessed value of the home. For convenience / to make the math easy, `rent_buy_invest` assumes this annual billing cycle start coincides with the start of the mortgage term.
 - Depending on your situation, you may be required (by the lender, as a condition to getting a loan).
     - There are a few ways to pay mortgage insurance.
         - Monthly premium: You pay every month.
