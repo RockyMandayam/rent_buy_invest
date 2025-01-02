@@ -1,191 +1,89 @@
-# Config file relating to assumptions about buying, owning, and selling real estate
-
-
 ##### BASICS AND GENERAL CONFIGS
 
-# sale price of the house
 sale_price: null
 
-# ANNUAL inflation rate of house assessed value as a fraction
 annual_assessed_value_inflation_rate: !!float 0.05
-
-# NOTE: I don't fully understand prepaid expenses
-# NOTE: These configs do not account for prepaid interest, for a few reasons:
-# 1) It seems some of the prepaid expenses are just paying things maybe a month
-#     or year early (that you would have had to pay later anyways) - this will
-#     not significantly affect financial planning, especially if you don't sell
-#     the newly bought house within a year
-# 2) It seems some of the prepaid expenses (like prepaid mortgage interest) is
-#     mainly to "prorate" for the time in between closure and the official start
-#     of a monthly billing cycle or something. In this case, you pay this up
-#     front, but all future payments are "delayed" so it cancels out. I.e., you
-#     can treat it as if there is no interim period, and in fact, the whole
-#     point of the prepaid expense is to compensate for any interim period to
-#     make it even out anyways!
-
 
 ##### MORTGAGE RELATED CONFIGS
 
-# fraction of the house price put down as the down payment
-# the remaining fraction is assumed to be the mortgage principal
 down_payment_fraction: !!float 0.2
 
-# mortgage ANNUAL interest rate
-# an "equivalent" monthly interest rate can be calculated from this. Note that
-# the equivalent monthly interest rate is not just 1/12 of the annual rate, due
-# to the fact that the monthly rate is compounded monthly (i.e., it is a
-# compound interst rate not a simple interest rate)
 mortgage_annual_interest_rate: !!float 0.06
 
-# mortgage term (length) in months
 mortgage_term_months: !!int 360
 
-# private mortgage insurance cost as fraction of mortgage principal
 pmi_fraction: !!float 0.005
 
-# mortgage origination points are basically just a fee the lender charges for
-# originating (creating), reviewing, processing, etc. the loan.
-# Also called loan origination fee?
-# Expressed as a fraction of the mortgage amount
 mortgage_origination_points_fee_fraction: !!float 0.015
 
-# processing fee. Maybe included in the origination fee
 mortgage_processing_fee: !!float 300.
 
-# underwriting fee. Maybe included in the origination fee.
 mortgage_underwriting_fee: !!float 500.
 
-# mortgage discount points (a.k.a. mortgage points) are a fee you can pay up
-# front to lower your mortgage interest rate. In this config, it is assumed that
-# the FINAL interest rate is set correctly above in the
-# mortgage_annual_interest_rate field. If you use discount points to achieve
-# that rate, it should be noted here.
-# Expressed as a fraction of the mortgage amount
 mortgage_discount_points_fee_fraction: !!float 0.005
 
-# it is assumed the buyer pays this fee up front, regardless of whether the 
-# house purchase/mortgage are finalized and completed
-# this is often requird by the lender
 house_appraisal_cost: !!float 500.
 
-# credit report fee charged by lender to do a credit check
 credit_report_fee: !!float 50.
 
 ##### TAXES
 
-# transfer tax as a fraction of the sale price
-# note there are often multiple transfer taxes (e.g., state and county)
-# this parameter represents the sum of all such transfer taxes
-# transfer tax is a one-time tax
 transfer_tax_fraction: !!float 0.0011
 
-# what fraction of the transfer tax burden is borne by the seller
-# the rest is borne by the buyer
 seller_burden_of_transfer_tax_fraction: !!float 0.9
 
-# often considered part of title fees and therefore part of closing costs.
-# tax charged by the county (state?) to legally record the property's deed
-# and mortgage information. Expressed as fraction of sale price
 recording_fee_fraction: !!float 0.03
 
-# ANNUAL property tax rate (fraction of house's assessed value)
 annual_property_tax_rate: !!float 0.01
-
 
 ##### MISCELLANEOUS CLOSING COSTS
 
-# buyer's realtor's commission as a fraction of sale price 
 realtor_commission_fraction: !!float 0.025
 
-# fee to sell home in HOA (Homee Owners Association)
 hoa_transfer_fee: !!float 300.
 
-# sellre's burdene of HOA transfer fee as a fraction of the fee
 seller_burden_of_hoa_transfer_fee: !!float 1.0
 
-# house inspection should include at least the following types: general,
-# foundation, plumbing, septic tank, termite, mold, chimney
-# typically a house inspection does NOT include a pest inspection
 house_inspection_cost: !!float 500.
 
-# pest inspection cost
-# house inspection probably does not include pest inspection
 pest_inspection_cost: !!float 500.
 
-# fixed fee
-# I don't think there is a basic price-based fee except for specific
-# line items, e.g., flood certification fee
 escrow_fixed_fee: !!float 500.
 
-# flood certification fee
 flood_certification_fee: !!float 20.
 
-# title search fee
 title_search_fee: !!float 100. 
 
-# seller burden of the title search fee as a fraction
 seller_burden_of_title_search_fee_fraction: !!float 1.
 
-# attorney fee
 attorney_fee: !!float 800.
 
-# closing protection letter (CPL) fee
 closing_protection_letter_fee: !!float 35.
 
-# part of loosely defined "settlement fees"
 search_abstract_fee: !!float 300.
 
-# part of loosely defined "settlement fees"
 survey_fee: !!float 500.
 
-# part of loosely defined "settlement fees"
 notary_fee: !!float 100.
 
-# part of loosely defined "settlement fees"
 deed_prep_fee: !!float 50.
 
-# lender's title insurance (protects the lender) as a fraction of the mortgage
-# amount. Apparently there is a wide range of typical values here.
 lenders_title_insurance_fraction: !!float 0.02
 
-# owner's title insurance (protects the owner (you)) as a fraction of the
-# mortgage amount. Apparently there is a wide range of typical values here.
 owners_title_insurance_fraction: !!float 0.01 
 
-# these are for add-ons ("endorsements") that are not included in a standard
-# title insurance, e.g., Easements And Encroachments, Zoning.
-# The expected price per-endorsement is about $75. Enter the total amount you
-# expect for all endorsements.
-# I'm not sure if this is for lender's title insurance, owner's title insurance,
-# or both, but I'll assume the owner pays it regardless
 endorsement_fees: !!float 150.
-
 
 ##### MISCELLANEOUS MONTHLY COSTS
 
-# ANNUAL as fraction of assessed house value
-# depends a lot on how much you insure, house, conditions, coverage, etc.
 annual_homeowners_insurance_fraction: !!float 0.005
 
-# monthly utilities for the first month
 monthly_utilities: !!float 300.
 
-# ANNUAL maintenance cost as a fraction of the assessed house value (not 
-# sale price)
 annual_maintenance_cost_fraction: !!float 0.02
 
-# monthly HOA (Home Owners Association) fees
 monthly_hoa_fees: !!float 250.
 
 ##### MANAGEMENT COSTS
 
-# total ANNUAL cost of managing the house without living in it (being a
-# landlord) EXCEPT for maintenance costs that you'd expect to pay even if you
-# lived in the house. Note that this means if you expect maintenance costs to be
-# higher when you do not live in the house vs when you live in it (because you
-# think tenants will take worse care of the house than you would if you lived in
-# it), that difference in cost should contribute to this parameter. Note this
-# parameter can include paying a management company, advertising the house, any
-# trips you may have to make, anything associated with managing / landlord
-# Expressed as fraction of assessed house price
 annual_management_cost_fraction: !!float 0.02
