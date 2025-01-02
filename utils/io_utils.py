@@ -55,7 +55,6 @@ def make_dirs(project_path: str, exist_ok: bool = True) -> None:
 
 
 def delete_dir(project_path) -> None:
-    # os.remove(get_abs_path(project_path))
     os.rmdir(get_abs_path(project_path))
 
 
