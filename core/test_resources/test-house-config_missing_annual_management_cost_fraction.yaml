@@ -85,5 +85,3 @@ annual_maintenance_cost_fraction: !!float 0.02
 monthly_hoa_fees: !!float 250.
 
 ##### MANAGEMENT COSTS
-
-annual_management_cost_fraction: !!float 0.02
