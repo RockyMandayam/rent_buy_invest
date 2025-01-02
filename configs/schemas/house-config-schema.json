@@ -31,6 +31,10 @@
       "description": "ANNUAL mortgage insurance cost as fraction of mortgage principal.",
       "type": "number"
     },
+    "is_fha_loan": {
+      "description": "True if the loan is a Federal Housing Administration (FHA) loan; false otherwise.",
+      "type": "boolean"
+    },
     "mortgage_origination_points_fee_fraction": {
       "description": "Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the mortgage amount",
       "type": "number"
@@ -172,6 +176,7 @@
     "mortgage_term_months",
     "upfront_mortgage_insurance_fraction",
     "annual_mortgage_insurance_fraction",
+    "is_fha_loan",
     "mortgage_origination_points_fee_fraction",
     "mortgage_processing_fee",
     "mortgage_underwriting_fee",

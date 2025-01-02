@@ -79,6 +79,7 @@ class HouseConfig(Config):
         self.annual_mortgage_insurance_fraction: float = kwargs[
             "annual_mortgage_insurance_fraction"
         ]
+        self.is_fha_loan: bool = kwargs["is_fha_loan"]
         self.mortgage_origination_points_fee_fraction: float = kwargs[
             "mortgage_origination_points_fee_fraction"
         ]

@@ -11,6 +11,7 @@
 - **`mortgage_term_months`** *(number, required)*: Mortgage term (length) in months.
 - **`upfront_mortgage_insurance_fraction`** *(number, required)*: Upfront mortgage insurance cost as a fraction of initial mortgage principal.
 - **`annual_mortgage_insurance_fraction`** *(number, required)*: ANNUAL mortgage insurance cost as fraction of mortgage principal.
+- **`is_fha_loan`** *(boolean, required)*: True if the loan is a Federal Housing Administration (FHA) loan; false otherwise.
 - **`mortgage_origination_points_fee_fraction`** *(number, required)*: Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the mortgage amount.
 - **`mortgage_processing_fee`** *(number, required)*: Mortgage processing fee. Some lenders include this in the origination fee. Do NOT include that amount here. Only include here any amount not covered under other fees.
 - **`mortgage_underwriting_fee`** *(number, required)*: Mortgage underwriting fee. Some lenders include this in the origination fee. Do NOT include that amount here. Only include here any amount not covered under other fees.

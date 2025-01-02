@@ -16,6 +16,8 @@ upfront_mortgage_insurance_fraction: !!float 0.0
 
 annual_mortgage_insurance_fraction: !!float 0.005
 
+is_fha_loan: false
+
 mortgage_origination_points_fee_fraction: null
 
 mortgage_processing_fee: !!float 300.

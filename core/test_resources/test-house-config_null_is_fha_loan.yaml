@@ -16,7 +16,7 @@ upfront_mortgage_insurance_fraction: !!float 0.0
 
 annual_mortgage_insurance_fraction: !!float 0.005
 
-is_fha_loan: false
+is_fha_loan: null
 
 mortgage_origination_points_fee_fraction: !!float 0.015
 
@@ -46,7 +46,7 @@ realtor_commission_fraction: !!float 0.025
 
 hoa_transfer_fee: !!float 300.
 
-seller_burden_of_hoa_transfer_fee: null
+seller_burden_of_hoa_transfer_fee: !!float 1.0
 
 house_inspection_cost: !!float 500.
 
