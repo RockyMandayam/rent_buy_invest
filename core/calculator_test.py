@@ -2,7 +2,7 @@ import pytest
 
 # isort: off
 from rent_buy_invest.core.calculator import (
-    MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI,
+    MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE,
     Calculator,
 )
 
@@ -61,16 +61,16 @@ class TestCalculator:
             )
 
             mortgage_amount = row["House"]["Mortgage amount"]
-            pmi = row["House"]["PMI"]
+            mortgage_insurance = row["House"]["Mortgage Insurance"]
             if (
                 mortgage_amount
-                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI
+                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
                 * EXPERIMENT_CONFIG.house_config.sale_price
             ):
-                assert pmi == 0
+                assert mortgage_insurance == 0
             else:
-                assert pmi == round(
-                    EXPERIMENT_CONFIG.house_config.annual_pmi_fraction
+                assert mortgage_insurance == round(
+                    EXPERIMENT_CONFIG.house_config.annual_mortgage_insurance_fraction
                     * mortgage_amount,
                     2,
                 )
@@ -79,7 +79,7 @@ class TestCalculator:
                 row["House"]["Cost tied to market value"]
                 + row["House"]["Cost tied to inflation"]
                 + monthly_mortgage_total_payment
-                + pmi
+                + mortgage_insurance
             )
             rent_monthly_cost = row["Rent"]["Cost tied to inflation"]
             if house_monthly_cost >= rent_monthly_cost:
