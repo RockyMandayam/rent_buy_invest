@@ -8,11 +8,11 @@ This is a tool for helping determine whether to rent vs buy a home. The main fin
 
 Some additional notes about the configs:
 - Depending on your situation, you may be required (by the lender, as a condition to getting a loan).
-    - There are a few ways to pay PMI.
+    - There are a few ways to pay mortgage insurance.
         - Monthly premium: You pay every month.
         - Upfront premium: You pay once upfront.
         - Split premium: You pay some portion upfront and some portion premium
-        - Lender-paid premium: The lender pays the PMI. In exchange, they'll likely charge you a higher interest rate than otherwise.
+        - Lender-paid premium: The lender pays the mortgage insurance. In exchange, they'll likely charge you a higher interest rate than otherwise.
     - `rent_buy_invest` does not yet include all these options. Ideally, it would include these options in the future. Currently, it is expected that the premium is paid monthly.
     - I think the monthly premium is the way to go, due to the fact that if you pay upfront, then you may not get a refund if you sell or refinance the house before the mortgage ends.
 - "Prepaid expenses" is a category of expenses paid by a home buyer around the time of closing that are payments for upcoming expenses. These are not closing costs, though they are paid at the same/similar time. Prepaid expenses include a variety of different expenses. This tool does not handle prepaid expenses, and below is a description of each of the major types of prepaid expenses and why `rent_buy_invest` does NOT handle them:
@@ -24,7 +24,7 @@ Some additional notes about the configs:
 - House cost inflation: There are a few different categories of costs associated with buying a house:
     - House value related costs: property tax, homeowners insurance, maintenance, and management. These change according to `annual_assessed_value_inflation_rate`
     - Inflation related costs: utilities and HOA fees. These increase change according to `annual_inflation_rate`
-    - PMI: this changes based on the mortgage loan amount remaining and is recalculated periodically
+    - Mortgage insurance: Mortgage insurance is calculated based on the initial loan amount
     - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the principal decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
 
 ## Installation & How to Run
