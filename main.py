@@ -31,10 +31,14 @@ def _get_args() -> argparse.Namespace:
         help="Name of the experiment. Output folder will be 'out/<experiment_name>/<timestamp>'; defaults to 'experiment'",
     )
     args = parser.parse_args()
-    # TODO be more lenient with filenames
+    assert args.experiment_config.endswith(".yaml") or args.experiment.config_endswith(
+        ".yml"
+    ), "Experiment config file must end in '.yaml' or '.yml'"
+    if not args.experiment_name:
+        args.experiment_name = "unnamed_experiment"
     assert all(
-        c.isalpha() or c.isdigit() or c in ["_-"] for c in args.experiment_name
-    ), "Provide a filename which only contains characters, digits, underscores, and/or dashes"
+        c.isalpha() or c.isdigit() or c in "_-" for c in args.experiment_name
+    ), f"Provide an experiment name which only contains characters, digits, underscores, and/or dashes; received '{args.experiment_name}'"
     return args
 
 
