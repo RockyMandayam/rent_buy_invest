@@ -153,20 +153,20 @@ class Calculator:
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
             # House: state
-            "House: Market value": house_values,
-            "House: House equity": equities,
-            "House: Mortgage amount": mortgage_amounts,
             "House: Non-house investment": investment_values_if_house,
+            "House: House equity": equities,
+            "House: Market value": house_values,
+            "House: Mortgage amount": mortgage_amounts,
             # House: costs
             "House: Cost tied to market value": house_monthly_costs_related_to_house_value,
             "House: Cost tied to inflation": house_monthly_costs_related_to_inflation,
+            "House: PMI": pmis,
             "House: Mortgage interest payment": mortgage_interests,
             "House: Mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
             # fmt: off
             "House: Mortgage payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
-            "House: PMI": pmis,
             # House: relative surplus
             "House: Surplus (vs renting)": housing_monthly_surpluses,
             # Rent: state
