@@ -12,7 +12,7 @@ mortgage_annual_interest_rate: null
 
 mortgage_term_months: !!int 360
 
-pmi_fraction: !!float 0.005
+annual_pmi_fraction: !!float 0.005
 
 mortgage_origination_points_fee_fraction: !!float 0.015
 

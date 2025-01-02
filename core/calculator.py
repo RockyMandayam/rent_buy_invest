@@ -99,7 +99,12 @@ class Calculator:
             ):
                 pmi = 0
             else:
-                pmi = round(self.house_config.pmi_fraction * mortgage_amount, 2)
+                pmi = round(
+                    self.house_config.annual_pmi_fraction
+                    * self.house_config.initial_mortgage_amount
+                    / 12,
+                    2,
+                )
             pmis.append(pmi)
 
             # monthly surplus from one option vs the other

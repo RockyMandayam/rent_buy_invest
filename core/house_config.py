@@ -19,7 +19,7 @@ class HouseConfig(Config):
     MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
     MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
     MAX_MORTGAGE_TERM = 60 * 12
-    MAX_PMI_FRACTION = 0.1
+    MAX_ANNUAL_PMI_FRACTION = 0.1
     MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION = 0.1
     MAX_MORTGAGE_PROCESSING_FEE = 1000.0
     MAX_MORTGAGE_UNDERWRITING_FEE = 1000.0
@@ -72,7 +72,7 @@ class HouseConfig(Config):
             "mortgage_annual_interest_rate"
         ]
         self.mortgage_term_months: int = kwargs["mortgage_term_months"]
-        self.pmi_fraction: float = kwargs["pmi_fraction"]
+        self.annual_pmi_fraction: float = kwargs["annual_pmi_fraction"]
         self.mortgage_origination_points_fee_fraction: float = kwargs[
             "mortgage_origination_points_fee_fraction"
         ]
@@ -150,7 +150,7 @@ class HouseConfig(Config):
         assert (
             self.mortgage_term_months > 0
         ), "Mortgage term in months must be positive."
-        assert self.pmi_fraction >= 0, "PMI fraction must be non-negative."
+        assert self.annual_pmi_fraction >= 0, "PMI fraction must be non-negative."
         assert (
             self.mortgage_origination_points_fee_fraction >= 0
         ), "Mortgage original points fee fraction must be non-negative."
@@ -244,7 +244,9 @@ class HouseConfig(Config):
         self._validate_max_value("mortgage_term_months", HouseConfig.MAX_MORTGAGE_TERM)
         if self.initial_mortgage_amount:
             self._validate_max_value_as_fraction(
-                "pmi_fraction", "initial_mortgage_amount", HouseConfig.MAX_PMI_FRACTION
+                "annual_pmi_fraction",
+                "initial_mortgage_amount",
+                HouseConfig.MAX_ANNUAL_PMI_FRACTION,
             )
             self._validate_max_value_as_fraction(
                 "mortgage_origination_points_fee_fraction",

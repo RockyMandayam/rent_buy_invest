@@ -41,7 +41,7 @@ mortgage_annual_interest_rate: !!float 0.07
 mortgage_term_months: !!int 360
 
 # private mortgage insurance cost as fraction of mortgage principal
-pmi_fraction: !!float 0.005
+annual_pmi_fraction: !!float 0.005
 
 # mortgage origination points are basically just a fee the lender charges for
 # originating (creating), reviewing, processing, etc. the loan.
