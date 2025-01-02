@@ -18,6 +18,7 @@ class TestHouseConfig:
             "down_payment_fraction",
             "mortgage_annual_interest_rate",
             "mortgage_term_months",
+            "upfront_mortgage_insurance_fraction",
             "annual_mortgage_insurance_fraction",
             "mortgage_origination_points_fee_fraction",
             "mortgage_processing_fee",
@@ -104,6 +105,14 @@ class TestHouseConfig:
             allow_zero=False,
             max_value=HouseConfig.MAX_MORTGAGE_TERM,
         )
+        check_float_field(
+            HouseConfig,
+            config_kwargs,
+            ["upfront_mortgage_insurance_fraction"],
+            allow_negative=False,
+            max_value=HouseConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION
+            * test_house_config.initial_mortgage_amount,
+        ),
         check_float_field(
             HouseConfig,
             config_kwargs,

@@ -12,7 +12,7 @@ mortgage_annual_interest_rate: !!float 0.06
 
 mortgage_term_months: !!int 360
 
-upfront_mortgage_insurance_fraction: !!float 0.0
+upfront_mortgage_insurance_fraction: null
 
 annual_mortgage_insurance_fraction: !!float 0.005
 
@@ -64,7 +64,7 @@ closing_protection_letter_fee: !!float 35.
 
 search_abstract_fee: !!float 300.
 
-survey_fee: null
+survey_fee: !!float 500.
 
 notary_fee: !!float 100.
 

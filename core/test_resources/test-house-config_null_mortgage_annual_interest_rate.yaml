@@ -12,6 +12,8 @@ mortgage_annual_interest_rate: null
 
 mortgage_term_months: !!int 360
 
+upfront_mortgage_insurance_fraction: !!float 0.0
+
 annual_mortgage_insurance_fraction: !!float 0.005
 
 mortgage_origination_points_fee_fraction: !!float 0.015
