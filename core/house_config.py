@@ -403,7 +403,7 @@ class HouseConfig(Config):
         return math_utils.project_growth(
             principal=first_month_cost,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
-            compound_monthly=True,
+            compound_monthly=False,
             num_months=num_months,
         )
 

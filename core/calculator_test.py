@@ -39,9 +39,10 @@ class TestCalculator:
         for row_index in range(projection.shape[0]):
             row = projection.iloc[row_index, :]
 
-            assert row["House"]["Cost tied to market value"] / row["House"][
-                "Market value"
-            ] == pytest.approx(
+            first_row_of_year = projection.iloc[(row_index // 12) * 12, :]
+            assert row["House"]["Cost tied to market value"] / first_row_of_year[
+                "House"
+            ]["Market value"] == pytest.approx(
                 first_month_house_value_related_cost_fraction, rel=0.0001
             )
 
