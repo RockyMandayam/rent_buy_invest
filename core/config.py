@@ -23,7 +23,7 @@ class Config(ABC):
         provided in the yaml file with the given path.
 
         Args:
-            project_path (str): Path (from top-level directory) to yaml file
+            project_path (str): Path (from the 'rent_buy_invest' directory) to yaml file
 
         Returns:
             cls: Object with type equal to the calling class (whicch will be a

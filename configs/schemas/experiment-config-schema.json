@@ -8,15 +8,15 @@
       "type": "integer"
     },
     "market_config_path": {
-      "description": "Market config file path from top-level directory",
+      "description": "Market config file path from the 'rent_buy_invest' directory",
       "type": "string"
     },
     "rent_config_path": {
-      "description": "Rent config file path from top-level directory.",
+      "description": "Rent config file path from the 'rent_buy_invest' directory.",
       "type": "string"
     },
     "house_config_path": {
-      "description": "House config file path from top-level directory.",
+      "description": "House config file path from the 'rent_buy_invest' directory.",
       "type": "string"
     },
     "start_date": {

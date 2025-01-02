@@ -25,7 +25,7 @@ def _get_args() -> argparse.Namespace:
     parser.add_argument(
         "experiment_config",
         type=str,
-        help="Path (from top-level directory) to experiment config file.",
+        help="Path (from 'rent_buy_invest' directory) to experiment config file.",
     )
     args = parser.parse_args()
     return args
