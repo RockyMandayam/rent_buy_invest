@@ -25,8 +25,6 @@ class TestCalculator:
         )
 
         # initial state tested separately
-
-        # TODO do an exact comparison of the project vs my by-hand calculations.
         projection = calculator.calculate()
 
         first_row = projection.iloc[0, :]
