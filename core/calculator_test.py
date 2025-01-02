@@ -69,7 +69,9 @@ class TestCalculator:
                 assert pmi == 0
             else:
                 assert pmi == round(
-                    EXPERIMENT_CONFIG.house_config.pmi_fraction * mortgage_amount, 2
+                    EXPERIMENT_CONFIG.house_config.annual_pmi_fraction
+                    * mortgage_amount,
+                    2,
                 )
 
             house_monthly_cost = (

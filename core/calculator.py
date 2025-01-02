@@ -100,8 +100,9 @@ class Calculator:
                 pmi = 0
             else:
                 pmi = round(
-                    self.house_config.pmi_fraction
-                    * self.house_config.initial_mortgage_amount,
+                    self.house_config.annual_pmi_fraction
+                    * self.house_config.initial_mortgage_amount
+                    / 12,
                     2,
                 )
             pmis.append(pmi)

@@ -18,7 +18,7 @@ class TestHouseConfig:
             "down_payment_fraction",
             "mortgage_annual_interest_rate",
             "mortgage_term_months",
-            "pmi_fraction",
+            "annual_pmi_fraction",
             "mortgage_origination_points_fee_fraction",
             "mortgage_processing_fee",
             "mortgage_underwriting_fee",
@@ -107,9 +107,9 @@ class TestHouseConfig:
         check_float_field(
             HouseConfig,
             config_kwargs,
-            ["pmi_fraction"],
+            ["annual_pmi_fraction"],
             allow_negative=False,
-            max_value=HouseConfig.MAX_PMI_FRACTION
+            max_value=HouseConfig.MAX_ANNUAL_PMI_FRACTION
             * test_house_config.initial_mortgage_amount,
         )
         check_float_field(
