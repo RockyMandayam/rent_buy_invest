@@ -20,11 +20,11 @@
       "type": "number"
     },
     "annual_rent_inflation_rate": {
-      "description": "ANNUAL rent inflation rate as a fraction. This will be applied to all rent-related expenses (e.g., rent, utilities, parking).",
+      "description": "ANNUAL rent inflation rate as a fraction. This will be applied to all expenses, not just rent (e.g., rent, utilities, renter's insurance, etc.).",
       "type": "number"
     },
     "inflation_adjustment_period": {
-      "description": "How often, in months, to update rent-related expenses for inflation. Twelve is a good number here, as leases are often for 12-month periods and rents change when leases end.",
+      "description": "How often, in months, to update expenses due to inflation. Twelve is a good number here, as leases are often for 12-month periods and rents change when leases end.",
       "type": "number"
     },
     "security_deposit": {
