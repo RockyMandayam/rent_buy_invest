@@ -2,7 +2,7 @@ import math
 from typing import Any, Dict, List
 
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.utils import math_utils
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, project_growth
 
 
 class HouseConfig(Config):
@@ -18,7 +18,7 @@ class HouseConfig(Config):
 
     MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
     MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
-    MAX_MORTGAGE_TERM = 60 * 12
+    MAX_MORTGAGE_TERM = 60 * MONTHS_PER_YEAR
     MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION = 0.1
     MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION = 0.05
     MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION = 0.1
@@ -395,15 +395,15 @@ class HouseConfig(Config):
 
     def get_monthly_mortgage_payment(self):
         # https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:geo-series-notation/v/geometric-series-sum-to-figure-out-mortgage-payments
-        # NOTE mortgages typically use the annual rate divided by 12
+        # NOTE mortgages typically use the annual rate divided by MONTHS_PER_YEAR
         # as opposed to using the "equivalent" monthly compound rate
-        i = self.mortgage_annual_interest_rate / 12
+        i = self.mortgage_annual_interest_rate / MONTHS_PER_YEAR
         r = 1 / (1 + i)
         L = self.initial_mortgage_amount
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_monthly_house_values(self, num_months: int):
-        return math_utils.project_growth(
+        return project_growth(
             principal=self.sale_price,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
             compound_monthly=True,
@@ -411,12 +411,16 @@ class HouseConfig(Config):
         )
 
     def get_house_value_related_monthly_costs(self, num_months: int) -> float:
-        first_month_cost = self.sale_price * (
-            self.annual_property_tax_rate / 12
-            + self.annual_maintenance_cost_fraction / 12
-            + self.annual_management_cost_fraction / 12
+        first_month_cost = (
+            self.sale_price
+            * (
+                self.annual_property_tax_rate
+                + self.annual_maintenance_cost_fraction
+                + self.annual_management_cost_fraction
+            )
+            / MONTHS_PER_YEAR
         )
-        return math_utils.project_growth(
+        return project_growth(
             principal=first_month_cost,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
             compound_monthly=False,
@@ -427,13 +431,15 @@ class HouseConfig(Config):
         return (
             self.monthly_utilities
             + self.monthly_hoa_fees
-            + self.sale_price * self.annual_homeowners_insurance_fraction / 12
+            + self.sale_price
+            * self.annual_homeowners_insurance_fraction
+            / MONTHS_PER_YEAR
         )
 
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
     ) -> List[float]:
-        return math_utils.project_growth(
+        return project_growth(
             principal=self._get_first_inflation_related_monthly_cost(),
             annual_growth_rate=annual_inflation_rate,
             compound_monthly=False,

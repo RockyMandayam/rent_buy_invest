@@ -1,9 +1,11 @@
 import datetime
 from typing import Tuple
 
+MONTHS_PER_YEAR: int = 12
+
 
 def get_equivalent_monthly_compound_rate(annual_compound_rate: float) -> float:
-    return (1 + annual_compound_rate) ** (1 / 12) - 1
+    return (1 + annual_compound_rate) ** (1 / MONTHS_PER_YEAR) - 1
 
 
 def project_growth(
@@ -34,7 +36,9 @@ def project_growth(
         if compound_monthly:
             monthly_value = principal * (1 + equivalent_monthly_rate) ** month
         else:
-            monthly_value = principal * (1 + annual_growth_rate) ** (month // 12)
+            monthly_value = principal * (1 + annual_growth_rate) ** (
+                month // MONTHS_PER_YEAR
+            )
         if round_to_cent:
             monthly_value = round(monthly_value, 2)
         monthly_values.append(monthly_value)
@@ -46,7 +50,7 @@ def month_to_year_month(month: int) -> Tuple[int]:
     E.g., 11 becomes (0,12) and 12 becomes (1, 1).
     """
     assert month >= 0, "Month must be non-negative."
-    return month // 12 + 1, month % 12 + 1
+    return month // MONTHS_PER_YEAR + 1, month % MONTHS_PER_YEAR + 1
 
 
 def increment_month(date: datetime.date) -> datetime.date:

@@ -7,6 +7,7 @@ import pytest
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.core.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-market-config.yaml"
 MARKET_CONFIG = MarketConfig.parse(TEST_CONFIG_PATH)
@@ -105,7 +106,7 @@ class TestMarketConfig:
         for num_months in [1, 2, 24, 25]:
             actual = MARKET_CONFIG.get_pretax_monthly_wealth(100, num_months)
             expected = [
-                pytest.approx(round((1.07) ** (i / 12) * 100, 2))
+                pytest.approx(round((1.07) ** (i / MONTHS_PER_YEAR) * 100, 2))
                 for i in range(num_months + 1)
             ]
             assert actual == expected

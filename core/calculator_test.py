@@ -9,6 +9,7 @@ from rent_buy_invest.core.calculator import (
 # isort: on
 from rent_buy_invest.core.experiment_config_test import EXPERIMENT_CONFIG
 from rent_buy_invest.core.initial_state import InitialState
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 
 class TestCalculator:
@@ -39,7 +40,9 @@ class TestCalculator:
         for row_index in range(projection.shape[0]):
             row = projection.iloc[row_index, :]
 
-            first_row_of_year = projection.iloc[(row_index // 12) * 12, :]
+            first_row_of_year = projection.iloc[
+                (row_index // MONTHS_PER_YEAR) * MONTHS_PER_YEAR, :
+            ]
             assert row["House"]["Cost tied to market value"] / first_row_of_year[
                 "House"
             ]["Market value"] == pytest.approx(
