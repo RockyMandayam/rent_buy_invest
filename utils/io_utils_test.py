@@ -39,12 +39,13 @@ def test_read_yaml() -> None:
     assert actual == EXPECTED_TEST_VALUE
 
     # try reading example yamls
+    # TODO use test files not example files
     io_utils.read_yaml(
-        "rent_buy_invest/configs/examples/experiment-config-example-1.yaml"
+        "rent_buy_invest/configs/examples/example-1/experiment-config.yaml"
     )
-    io_utils.read_yaml("rent_buy_invest/configs/examples/house-config-example-1.yaml")
-    io_utils.read_yaml("rent_buy_invest/configs/examples/market-config-example-1.yaml")
-    io_utils.read_yaml("rent_buy_invest/configs/examples/rent-config-example-1.yaml")
+    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/house-config.yaml")
+    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/market-config.yaml")
+    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/rent-config.yaml")
 
 
 def test_write_yaml() -> None:

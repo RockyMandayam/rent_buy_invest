@@ -19,6 +19,12 @@ Some additional notes about the configs:
     - Prepaid homeowners insurance: You prepay homeowners insurance for some upcoming period of time, likely for the rest of the calendar year, or for the next 365 days, or for some set number of months. Also, it seems that you still pay periodically for homeowners insurance during the time where you're already covered, as forced prepayment for the next period. E.g., you may have a prepaid homeowners insurance for the first year, and during the first year, you pay ahead of time for the second year, and so on. It does seem like if you sell your home, you get the unused part back. To make the calculations simpler, `rent_buy_invest` does not include prepaid homeowners insurance. It should not really affect the rent vs buy comparison anyways - it seems to be a matter of accounting and payment schedule, not a matter of a change in amounts owed.
     - Prepaid property tax: Similarly, you may prepay some amount of future property tax. To make the calculations simpler, `rent_buy_invest` does not include prepaid homeowners insurance. It should not really affect the rent vs buy comparison anyways - it seems to be a matter of accounting and payment schedule, not a matter of a change in amounts owed.
     - Prepaid mortgage insurance: This is the upfront part of the mortgage insurance. This may be 0. Ideally, `rent_buy_invest` would handle this, but as of now it does not.
+- Rental cost inflation: Currently, the `annual_rent_inflation_rate` is applied to all rental expenses, not just rent (e.g., rent, utilities, renter's insruance, etc.). Ideally `rent_buy_invest` would have separate inflation rates for different categories.
+- House cost inflation: There are a few different categories of costs associated with buying a house:
+    - House value related costs: property tax, homeowners insurance, maintenance, and management. These change according to `annual_assessed_value_inflation_rate`
+    - Inflation related costs: utilities and HOA fees. These increase change according to `annual_inflation_rate`
+    - PMI: this changes based on the mortgage loan amount remaining and is recalculated periodically
+    - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the principal decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
 
 ## Installation & How to Run
 

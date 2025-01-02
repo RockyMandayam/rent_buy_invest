@@ -25,13 +25,26 @@ def _get_args() -> argparse.Namespace:
         type=str,
         help="Path (from 'rent_buy_invest' directory) to experiment config file.",
     )
+    parser.add_argument(
+        "--experiment-name",
+        type=str,
+        help="Name of the experiment. Output folder will be 'out/<experiment_name>/<timestamp>'; defaults to 'experiment'",
+    )
     args = parser.parse_args()
+    assert args.experiment_config.endswith(".yaml") or args.experiment.config_endswith(
+        ".yml"
+    ), "Experiment config file must end in '.yaml' or '.yml'"
+    if not args.experiment_name:
+        args.experiment_name = "unnamed_experiment"
+    assert all(
+        c.isalpha() or c.isdigit() or c in "_-" for c in args.experiment_name
+    ), f"Provide an experiment name which only contains characters, digits, underscores, and/or dashes; received '{args.experiment_name}'"
     return args
 
 
-def _make_output_dir() -> str:
+def _make_output_dir(experiment_name: str) -> str:
     timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    output_dir = os.path.join(OVERALL_OUTPUT_DIR, f"experiment_{timestamp_str}")
+    output_dir = os.path.join(OVERALL_OUTPUT_DIR, experiment_name, timestamp_str)
     io_utils.make_dirs(output_dir)
     return output_dir
 
@@ -79,7 +92,7 @@ def main() -> None:
     start_date = experiment_config.start_date
 
     # create output dir
-    output_dir = _make_output_dir()
+    output_dir = _make_output_dir(args.experiment_name)
 
     # dump configs in output dir (to keep record of configs)
     _write_output_yaml(output_dir, "configs.yaml", experiment_config)

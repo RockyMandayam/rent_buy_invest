@@ -1,0 +1,9 @@
+num_months: !!int 960
+
+market_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/market-config.yaml"
+
+rent_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/rent-config.yaml"
+
+house_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/house-config.yaml"
+
+start_date: !!timestamp "2030-01-01"
