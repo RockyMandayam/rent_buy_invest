@@ -2,7 +2,7 @@ import pytest
 
 # isort: off
 from rent_buy_invest.core.calculator import (
-    MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE,
+    NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE,
     Calculator,
 )
 
@@ -64,7 +64,7 @@ class TestCalculator:
             mortgage_insurance = row["House"]["Mortgage Insurance"]
             if (
                 mortgage_amount
-                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
+                <= NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
                 * EXPERIMENT_CONFIG.house_config.sale_price
             ):
                 assert mortgage_insurance == 0

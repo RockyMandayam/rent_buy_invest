@@ -20,6 +20,7 @@ class TestHouseConfig:
             "mortgage_term_months",
             "upfront_mortgage_insurance_fraction",
             "annual_mortgage_insurance_fraction",
+            "is_fha_loan",
             "mortgage_origination_points_fee_fraction",
             "mortgage_processing_fee",
             "mortgage_underwriting_fee",

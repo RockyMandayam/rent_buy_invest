@@ -9,12 +9,22 @@ from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils import math_utils
 from rent_buy_invest.utils.data_utils import to_df
 
-# This is the maximum mortgage amount as a fraction of the ORIGINAL home price
-# for which the borrower does not have to pay mortgage_insurance. When the mortgage amount falls
-# to this amount, the borrower can request that the mortgage_insurance be removed. As of today,
+# For non-FHA loans, this is the maximum mortgage amount (as a fraction of the home value)
+# for which mortgage insurance is not required. When the mortgage amount is below
+# this fraction of the home value, the borrower can request that the mortgage insurance be removed. As of
 # Jan 25, 2024, this amount is 80%, and the lender is supposed to automatically
 # remove the mortgage_insurance at 78%.
-MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE = 0.8
+# The mortgage insurance is based on the initial value of the home. So when you feel that your home has
+# appreciated and/or enough principal has been paid that you now owe less than 80%, you can ask for a
+# re-appraisal of the home (which you have to pay for), and assuming you're right and you owe less than 80%,
+# the mortgage insurance will be removed
+NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE = 0.8
+# For FHA loans, at the moment of the start of the loan, if you owe more than this fraction of the home
+# value in principal, you must pay FHA mortgage insurance for the ENTIRETY of the loan.
+FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
+# If you fall below FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE at the time
+# of the start of the loan, then you need to pay for mortgage insurance for this many months
+FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD = 12 * 11
 
 
 class Calculator:
@@ -67,6 +77,13 @@ class Calculator:
 
         mortgage_amount = self.house_config.initial_mortgage_amount
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
+        mortgage_insurance_if_required = round(
+            self.house_config.annual_mortgage_insurance_fraction
+            * self.house_config.initial_mortgage_amount
+            / 12,
+            2,
+        )
+
         for month in range(self.num_months + 1):
             mortgage_amounts.append(mortgage_amount)
 
@@ -92,19 +109,28 @@ class Calculator:
             paid_toward_equity.append(toward_equity)
             equities.append(round(house_values[month] - mortgage_amount, 2))
 
-            if (
-                mortgage_amount
-                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
-                * self.house_config.sale_price
-            ):
+            if not mortgage_interest:
                 mortgage_insurance = 0
+            elif not self.house_config.is_fha_loan:
+                if (
+                    mortgage_amount
+                    <= NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
+                    * self.house_config.sale_price
+                ):
+                    mortgage_insurance = 0
+                else:
+                    mortgage_insurance = mortgage_insurance_if_required
             else:
-                mortgage_insurance = round(
-                    self.house_config.annual_mortgage_insurance_fraction
-                    * self.house_config.initial_mortgage_amount
-                    / 12,
-                    2,
-                )
+                if (
+                    (1 - self.house_config.down_payment_fraction)
+                    > FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE
+                ):
+                    mortgage_insurance = mortgage_insurance_if_required
+                else:
+                    if month // 12 < FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD:
+                        mortgage_insurance = mortgage_insurance_if_required
+                    else:
+                        mortgage_insurance = 0
             mortgage_insurances.append(mortgage_insurance)
 
             # monthly surplus from one option vs the other
