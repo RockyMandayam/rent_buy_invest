@@ -9,6 +9,7 @@
 - **`down_payment_fraction`** *(number, required)*: The fraction of the house price put down as the down payment (the remaining is assumed to be the mortgage principal).
 - **`mortgage_annual_interest_rate`** *(number, required)*: Mortgage ANNUAL interest rate. An 'equivalent' monthly interest rate can be calculated from this. Note that the equivalent monthly interest rate is not just 1/12 of the annual rate, due to the fact that the monthly rate is compounded monthly (i.e., it is a compound interst rate not a simple interest rate).
 - **`mortgage_term_months`** *(number, required)*: Mortgage term (length) in months.
+- **`upfront_mortgage_insurance_fraction`** *(number, required)*: Upfront mortgage insurance cost as a fraction of initial mortgage principal.
 - **`annual_mortgage_insurance_fraction`** *(number, required)*: ANNUAL mortgage insurance cost as fraction of mortgage principal.
 - **`mortgage_origination_points_fee_fraction`** *(number, required)*: Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the mortgage amount.
 - **`mortgage_processing_fee`** *(number, required)*: Mortgage processing fee. Some lenders include this in the origination fee. Do NOT include that amount here. Only include here any amount not covered under other fees.

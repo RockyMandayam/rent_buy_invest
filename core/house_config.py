@@ -19,7 +19,8 @@ class HouseConfig(Config):
     MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
     MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
     MAX_MORTGAGE_TERM = 60 * 12
-    MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION = 0.1
+    MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION = 0.1
+    MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION = 0.05
     MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION = 0.1
     MAX_MORTGAGE_PROCESSING_FEE = 1000.0
     MAX_MORTGAGE_UNDERWRITING_FEE = 1000.0
@@ -72,6 +73,9 @@ class HouseConfig(Config):
             "mortgage_annual_interest_rate"
         ]
         self.mortgage_term_months: int = kwargs["mortgage_term_months"]
+        self.upfront_mortgage_insurance_fraction: float = kwargs[
+            "upfront_mortgage_insurance_fraction"
+        ]
         self.annual_mortgage_insurance_fraction: float = kwargs[
             "annual_mortgage_insurance_fraction"
         ]
@@ -152,6 +156,9 @@ class HouseConfig(Config):
         assert (
             self.mortgage_term_months > 0
         ), "Mortgage term in months must be positive."
+        assert (
+            self.upfront_mortgage_insurance_fraction >= 0
+        ), "Upfront mortgage insurance fraction must be non-negative."
         assert (
             self.annual_mortgage_insurance_fraction >= 0
         ), "Annual mortgage insurance fraction must be non-negative."
@@ -247,6 +254,11 @@ class HouseConfig(Config):
         )
         self._validate_max_value("mortgage_term_months", HouseConfig.MAX_MORTGAGE_TERM)
         if self.initial_mortgage_amount:
+            self._validate_max_value_as_fraction(
+                "upfront_mortgage_insurance_fraction",
+                "initial_mortgage_amount",
+                HouseConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION,
+            )
             self._validate_max_value_as_fraction(
                 "annual_mortgage_insurance_fraction",
                 "initial_mortgage_amount",
