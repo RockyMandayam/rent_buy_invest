@@ -24,12 +24,13 @@ def test_get_abs_path() -> None:
     assert actual in expected
 
 
-def test_make_dirs() -> None:
+def test_make_dirs_and_remove_dirs() -> None:
     project_path_dir = "rent_buy_invest/test_dir/"
     io_utils.make_dirs(project_path_dir)
     abs_path_dir = io_utils.get_abs_path(project_path_dir)
     assert os.path.isdir(abs_path_dir)
-    io_utils.delete_dir
+    io_utils.delete_dir(project_path_dir)
+    assert not os.path.isdir(abs_path_dir)
 
 
 def test_read_yaml() -> None:
