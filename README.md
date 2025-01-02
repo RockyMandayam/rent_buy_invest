@@ -1,4 +1,4 @@
-# rent-buy-invest
+# rent_buy_invest
 Calculates the long-term financial pros and cons of decisions related to renting a home, buying a house, and investing in the stock market.
 
 This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
