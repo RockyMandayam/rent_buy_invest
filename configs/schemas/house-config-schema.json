@@ -23,8 +23,8 @@
       "description": "Mortgage term (length) in months.",
       "type": "number"
     },
-    "annual_pmi_fraction": {
-      "description": "ANNUAL private mortgage insurance (PMI) cost as fraction of mortgage principal.",
+    "annual_mortgage_insurance_fraction": {
+      "description": "ANNUAL mortgage insurance cost as fraction of mortgage principal.",
       "type": "number"
     },
     "mortgage_origination_points_fee_fraction": {
@@ -166,7 +166,7 @@
     "down_payment_fraction",
     "mortgage_annual_interest_rate",
     "mortgage_term_months",
-    "annual_pmi_fraction",
+    "annual_mortgage_insurance_fraction",
     "mortgage_origination_points_fee_fraction",
     "mortgage_processing_fee",
     "mortgage_underwriting_fee",

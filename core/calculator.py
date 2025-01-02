@@ -10,11 +10,11 @@ from rent_buy_invest.utils import math_utils
 from rent_buy_invest.utils.data_utils import to_df
 
 # This is the maximum mortgage amount as a fraction of the ORIGINAL home price
-# for which the borrower does not have to pay PMI. When the mortgage amount falls
-# to this amount, the borrower can request that the PMI be removed. As of today,
+# for which the borrower does not have to pay mortgage_insurance. When the mortgage amount falls
+# to this amount, the borrower can request that the mortgage_insurance be removed. As of today,
 # Jan 25, 2024, this amount is 80%, and the lender is supposed to automatically
-# remove the PMI at 78%.
-MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI = 0.8
+# remove the mortgage_insurance at 78%.
+MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE = 0.8
 
 
 class Calculator:
@@ -57,7 +57,7 @@ class Calculator:
         paid_toward_equity = []
         mortgage_amounts = []
         equities = []
-        pmis = []
+        mortgage_insurances = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
         investment_values_if_renting = [
@@ -94,18 +94,18 @@ class Calculator:
 
             if (
                 mortgage_amount
-                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_PMI
+                <= MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
                 * self.house_config.sale_price
             ):
-                pmi = 0
+                mortgage_insurance = 0
             else:
-                pmi = round(
-                    self.house_config.annual_pmi_fraction
+                mortgage_insurance = round(
+                    self.house_config.annual_mortgage_insurance_fraction
                     * self.house_config.initial_mortgage_amount
                     / 12,
                     2,
                 )
-            pmis.append(pmi)
+            mortgage_insurances.append(mortgage_insurance)
 
             # monthly surplus from one option vs the other
             # investment_values_if_renting and investment_values_if_house have their
@@ -116,7 +116,7 @@ class Calculator:
                 + house_monthly_costs_related_to_inflation[month]
                 + mortgage_interest
                 + toward_equity
-                + pmi
+                + mortgage_insurance
             )
             rent_monthly_payment = rent_monthly_costs[month]
             gain_in_investment_if_renting = (
@@ -165,7 +165,7 @@ class Calculator:
             # House: costs
             "House: Cost tied to market value": house_monthly_costs_related_to_house_value,
             "House: Cost tied to inflation": house_monthly_costs_related_to_inflation,
-            "House: PMI": pmis,
+            "House: Mortgage Insurance": mortgage_insurances,
             "House: Mortgage interest payment": mortgage_interests,
             "House: Mortgage equity payment": paid_toward_equity,
             # black formats the following line in an easy-to-misread way
