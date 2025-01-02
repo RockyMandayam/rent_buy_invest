@@ -400,7 +400,6 @@ class HouseConfig(Config):
     def get_house_value_related_monthly_costs(self, num_months: int) -> float:
         first_month_cost = self.sale_price * (
             self.annual_property_tax_rate / 12
-            + self.annual_homeowners_insurance_fraction / 12
             + self.annual_maintenance_cost_fraction / 12
             + self.annual_management_cost_fraction / 12
         )
@@ -412,7 +411,11 @@ class HouseConfig(Config):
         )
 
     def _get_first_inflation_related_monthly_cost(self) -> float:
-        return self.monthly_utilities + self.monthly_hoa_fees
+        return (
+            self.monthly_utilities
+            + self.monthly_hoa_fees
+            + self.sale_price * self.annual_homeowners_insurance_fraction / 12
+        )
 
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
