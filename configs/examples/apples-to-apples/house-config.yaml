@@ -106,11 +106,11 @@ seller_burden_of_hoa_transfer_fee: !!float 1.0
 # house inspection should include at least the following types: general,
 # foundation, plumbing, septic tank, termite, mold, chimney
 # typically a house inspection does NOT include a pest inspection
-house_inspection_cost: !!float 100.
+house_inspection_cost: !!float 500.0
 
 # pest inspection cost
 # house inspection probably does not include pest inspection
-pest_inspection_cost: !!float 100.
+pest_inspection_cost: !!float 0.0
 
 # fixed fee
 # I don't think there is a basic price-based fee except for specific
@@ -118,10 +118,10 @@ pest_inspection_cost: !!float 100.
 escrow_fixed_fee: !!float 0.0
 
 # flood certification fee
-flood_certification_fee: !!float 100.
+flood_certification_fee: !!float 0.0
 
 # title search fee
-title_search_fee: !!float 100.
+title_search_fee: !!float 0.0
 
 # seller burden of the title search fee as a fraction
 seller_burden_of_title_search_fee_fraction: !!float 1.
@@ -130,7 +130,7 @@ seller_burden_of_title_search_fee_fraction: !!float 1.
 attorney_fee: !!float 0.0
 
 # closing protection letter (CPL) fee
-closing_protection_letter_fee: !!float 100.
+closing_protection_letter_fee: !!float 0.0
 
 # part of loosely defined "settlement fees"
 search_abstract_fee: !!float 0.0
@@ -139,7 +139,7 @@ search_abstract_fee: !!float 0.0
 survey_fee: !!float 0.0
 
 # part of loosely defined "settlement fees"
-notary_fee: !!float 100.0
+notary_fee: !!float 0.0
 
 # part of loosely defined "settlement fees"
 deed_prep_fee: !!float 0.0
