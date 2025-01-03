@@ -408,7 +408,7 @@ class HouseConfig(Config):
         L = self.initial_loan_amount
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
-    def get_monthly_house_values(self, num_months: int):
+    def get_monthly_home_values(self, num_months: int):
         return project_growth(
             principal=self.sale_price,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
@@ -416,7 +416,7 @@ class HouseConfig(Config):
             num_months=num_months,
         )
 
-    def get_house_value_related_monthly_costs(self, num_months: int) -> float:
+    def get_home_value_related_monthly_costs(self, num_months: int) -> float:
         first_month_cost = (
             self.sale_price
             * (

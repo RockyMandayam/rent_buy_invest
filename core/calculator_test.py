@@ -29,7 +29,7 @@ class TestCalculator:
         projection = calculator.calculate()
 
         first_row = projection.iloc[0, :]
-        first_month_house_value_related_cost_fraction = (
+        first_month_home_value_related_cost_fraction = (
             first_row["House"]["Cost tied to market value"]
             / first_row["House"]["Market value"]
         )
@@ -46,7 +46,7 @@ class TestCalculator:
             assert row["House"]["Cost tied to market value"] / first_row_of_year[
                 "House"
             ]["Market value"] == pytest.approx(
-                first_month_house_value_related_cost_fraction, rel=0.0001
+                first_month_home_value_related_cost_fraction, rel=0.0001
             )
 
             monthly_mortgage_total_payment = row["House"]["Mortgage payment"]

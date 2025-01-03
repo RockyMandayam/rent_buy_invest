@@ -51,9 +51,9 @@ class Calculator:
 
     def calculate(self) -> pd.DataFrame:
         # Some housing costs/gains can be calculated independently at once
-        house_values = self.house_config.get_monthly_house_values(self.num_months)
-        house_monthly_costs_related_to_house_value = (
-            self.house_config.get_house_value_related_monthly_costs(self.num_months)
+        home_values = self.house_config.get_monthly_home_values(self.num_months)
+        house_monthly_costs_related_to_home_value = (
+            self.house_config.get_home_value_related_monthly_costs(self.num_months)
         )
         house_monthly_costs_related_to_inflation = (
             self.house_config.get_inflation_related_monthly_costs(
@@ -117,7 +117,7 @@ class Calculator:
                 # regular mortgage payment
                 toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
-            equities.append(round(house_values[month] - loan_amount, 2))
+            equities.append(round(home_values[month] - loan_amount, 2))
 
             if not mortgage_interest:
                 mortgage_insurance = 0
@@ -148,7 +148,7 @@ class Calculator:
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
             housing_monthly_payment = (
-                house_monthly_costs_related_to_house_value[month]
+                house_monthly_costs_related_to_home_value[month]
                 + house_monthly_costs_related_to_inflation[month]
                 + mortgage_interest
                 + toward_equity
@@ -197,10 +197,10 @@ class Calculator:
             # House: state
             "House: Non-house investment": investment_values_if_house,
             "House: House equity": equities,
-            "House: Market value": house_values,
+            "House: Market value": home_values,
             "House: Loan amount": loan_amounts,
             # House: costs
-            "House: Cost tied to market value": house_monthly_costs_related_to_house_value,
+            "House: Cost tied to market value": house_monthly_costs_related_to_home_value,
             "House: Cost tied to inflation": house_monthly_costs_related_to_inflation,
             "House: Mortgage Insurance": mortgage_insurances,
             "House: Mortgage interest payment": mortgage_interests,
