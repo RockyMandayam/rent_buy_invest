@@ -85,11 +85,11 @@ class TestCalculator:
             # TODO improve this whole test and more easily test this, including with FHA loans and for PMI being removed with a home appraisal
             # if home_monthly_cost >= rent_monthly_cost:
             #     assert row["Buy"]["Surplus (vs renting)"] == 0
-            #     assert row["Rent"]["Surplus (vs buying house)"] == pytest.approx(
+            #     assert row["Rent"]["Surplus (vs buying home)"] == pytest.approx(
             #         home_monthly_cost - rent_monthly_cost, abs=0.0001
             #     )
             # else:
-            #     assert row["Rent"]["Surplus (vs buying house)"] == 0
+            #     assert row["Rent"]["Surplus (vs buying home)"] == 0
             #     assert row["Buy"]["Surplus (vs renting)"] == pytest.approx(
             #         rent_monthly_cost - home_monthly_cost, abs=0.0001
             #     )
