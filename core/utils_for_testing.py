@@ -1,13 +1,14 @@
 import copy
-from typing import Any, Dict, Iterable, List, Type
+from collections.abc import Iterable
+from typing import Any, Type
 
 import pytest
 
 
 def _check_field(
     clz: Type,
-    config_kwargs: Dict[str, Any],
-    field_keys: List,
+    config_kwargs: dict[str, Any],
+    field_keys: list,
     invalid_values: Iterable,
     exception_to_raise: Exception,
 ) -> None:
@@ -22,7 +23,7 @@ def _check_field(
     The given key is specified by field_keys, which is an ordered list of keys leading to the
     final key. E.g., if we want to replace the value associated 'key2' in the following dict:
     {'key1': {'key2': 'value'}}, field_keys would be ['key1', 'key2'].
-    Sometimes insteada of a Dict we deal with a List, in which case instead of a string as a
+    Sometimes insteada of a dict we deal with a list, in which case instead of a string as a
     key, a field_keys element can be an int representing the index in the list.
 
 
@@ -47,8 +48,8 @@ def _check_field(
 
 def check_float_field(
     clz: Type,
-    config_kwargs: Dict[str, Any],
-    field_keys: List,
+    config_kwargs: dict[str, Any],
+    field_keys: list,
     allow_negative: bool = True,
     allow_zero: bool = True,
     allow_greater_than_one: bool = True,
@@ -86,8 +87,8 @@ def check_float_field(
 
 def check_filepath_field(
     clz: Type,
-    config_kwargs: Dict[str, Any],
-    field_keys: List,
+    config_kwargs: dict[str, Any],
+    field_keys: list,
 ) -> None:
     """Checks that for a given key in config_kwargs with a filepath value, invalid values
     cause an exception when instantiating clz from config_kwargs.

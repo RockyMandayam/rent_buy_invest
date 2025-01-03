@@ -1,5 +1,4 @@
 import math
-from typing import Dict, List
 
 from rent_buy_invest.core.config import Config
 from rent_buy_invest.utils import math_utils
@@ -29,7 +28,7 @@ class MarketConfig(Config):
         """Stores tax bracket config.
 
         Attributes:
-            self.tax_brackets (List[Dict[str, float]]): A list of tax brackets,
+            self.tax_brackets (list[dict[str, float]]): A list of tax brackets,
                 where each bracket contains two keys, "upper_limit" and "tax_rate".
                 "tax_rate" is the marginal tax rate of that bracket. "upper_limit"
                 is the upper income limit of that bracket (beyond that limit, the
@@ -42,7 +41,7 @@ class MarketConfig(Config):
 
         def __init__(
             self,
-            tax_brackets: List[Dict[str, float]],
+            tax_brackets: list[dict[str, float]],
             validate_non_regressive_tax_brackets: bool,
         ) -> None:
             """Initializes the class.
@@ -50,7 +49,7 @@ class MarketConfig(Config):
             To see why I don't use yaml tags, see the docstring for __init__
             in GeneralConfig.
             """
-            self.tax_brackets: List[Dict[str, float]] = tax_brackets
+            self.tax_brackets: list[dict[str, float]] = tax_brackets
             self.validate_non_regressive_tax_brackets = (
                 validate_non_regressive_tax_brackets
             )
@@ -116,7 +115,7 @@ class MarketConfig(Config):
     def __init__(
         self,
         market_rate_of_return: float,
-        tax_brackets: List[Dict[str, float]],
+        tax_brackets: list[dict[str, float]],
         validate_non_regressive_tax_brackets: bool = DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS,
     ) -> None:
         """Initializes the class.
@@ -188,7 +187,7 @@ class MarketConfig(Config):
             0.00948879293.
 
         Returns:
-            List[float]: monthly wealth in dollars at th beginning of each month
+            list[float]: monthly wealth in dollars at th beginning of each month
                 rounded to two decimal points.
 
         Raises:

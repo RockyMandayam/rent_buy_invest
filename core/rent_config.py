@@ -1,5 +1,5 @@
 import math
-from typing import Any, Dict
+from typing import Any
 
 from rent_buy_invest.core.config import Config
 from rent_buy_invest.utils import math_utils
@@ -26,7 +26,7 @@ class RentConfig(Config):
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/rent-config-schema.json"
 
-    def __init__(self, **kwargs: Dict[str, Any]) -> None:  # too many to type
+    def __init__(self, **kwargs: dict[str, Any]) -> None:  # too many to type
         """Initializes the class.
 
         To see why I don't use yaml tags, see the docstring for __init__

@@ -1,5 +1,5 @@
 import math
-from typing import Any, Dict, List
+from typing import Any
 
 from rent_buy_invest.core.config import Config
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, project_growth
@@ -57,7 +57,7 @@ class HouseConfig(Config):
 
     def __init__(
         self,
-        **kwargs: Dict[str, Any],  # lots of parameters, see body of this method
+        **kwargs: dict[str, Any],  # lots of parameters, see body of this method
     ) -> None:
         """Initializes the class.
 
@@ -438,7 +438,7 @@ class HouseConfig(Config):
 
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
-    ) -> List[float]:
+    ) -> list[float]:
         return project_growth(
             principal=self._get_first_inflation_related_monthly_cost(),
             annual_growth_rate=annual_inflation_rate,

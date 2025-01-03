@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import Any
 
 from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.rent_config import RentConfig
@@ -31,7 +31,7 @@ class InitialState:
             invested_in_house,
         )
 
-    def get_df(self) -> List[List[Optional[Any]]]:
+    def get_df(self) -> list[list[Any | None]]:
         rows = ["One-time costs", "Invested in market", "Invested in house"]
         cols = {
             "Rent": [self.rent_one_time_cost, self.invested_in_market_if_renting, 0],

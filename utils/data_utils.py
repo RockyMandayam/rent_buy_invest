@@ -1,11 +1,12 @@
-from typing import Any, Callable, Dict, List, Optional
+from collections.abc import Callable
+from typing import Any
 
 import pandas as pd
 
 
 def to_df(
-    cols: Dict[str, List[Any]],
-    rows: Optional[List[str]] = None,
+    cols: dict[str, list[Any]],
+    rows: list[str] | None = None,
     multi_col: bool = False,
 ) -> pd.DataFrame:
     """

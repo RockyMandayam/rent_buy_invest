@@ -1,5 +1,4 @@
 import datetime
-from typing import Tuple
 
 MONTHS_PER_YEAR: int = 12
 
@@ -45,7 +44,7 @@ def project_growth(
     return monthly_values
 
 
-def month_to_year_month(month: int) -> Tuple[int]:
+def month_to_year_month(month: int) -> tuple[int]:
     """Convert 0-indexed month to (1-indexed year, 1-indexed month).
     E.g., 11 becomes (0,12) and 12 becomes (1, 1).
     """
