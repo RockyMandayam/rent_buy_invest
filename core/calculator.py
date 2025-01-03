@@ -76,7 +76,7 @@ class Calculator:
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
         investment_values_if_renting = [
-            self.initial_state.invested_in_market_if_renting
+            self.initial_state.invested_if_renting
         ]  # NOTE: first value filled in
         investment_values_if_buying = [0]  # NOTE: first value filed in
 
@@ -195,29 +195,29 @@ class Calculator:
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
             # Buy: state
-            "Buy: Non-home investment": investment_values_if_buying,
-            "Buy: Home equity": equities,
-            "Buy: Market value": home_values,
-            "Buy: Loan amount": loan_amounts,
+            "Buy: Invested": investment_values_if_buying,
+            "Buy: Home Equity": equities,
+            "Buy: Home Value": home_values,
+            "Buy: Loan Amount": loan_amounts,
             # Buy: costs
-            "Buy: Cost tied to market value": home_monthly_costs_related_to_home_value,
-            "Buy: Cost tied to inflation": home_monthly_costs_related_to_inflation,
+            "Buy: Costs Tied to Home Value": home_monthly_costs_related_to_home_value,
+            "Buy: Costs Tied to Inflation": home_monthly_costs_related_to_inflation,
             "Buy: Mortgage Insurance": mortgage_insurances,
-            "Buy: Mortgage interest payment": mortgage_interests,
-            "Buy: Mortgage equity payment": paid_toward_equity,
-            "Buy: One-off costs": buy_one_off_costs,
+            "Buy: Mortgage Interest Payment": mortgage_interests,
+            "Buy: Mortgage Equity Payment": paid_toward_equity,
+            "Buy: One-Off Costs": buy_one_off_costs,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "Buy: Mortgage payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
+            "Buy: Mortgage Payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
             # Buy: relative surplus
-            "Buy: Surplus (vs renting)": housing_monthly_surpluses,
+            "Buy: Surplus": housing_monthly_surpluses,
             # Rent: state
-            "Rent: Investment": investment_values_if_renting,
+            "Rent: Invested": investment_values_if_renting,
             # Rent: costs
-            "Rent: Cost tied to inflation": rent_monthly_costs,
+            "Rent: Costs Tied to Inflation": rent_monthly_costs,
             # Rent: relative surplus
-            "Rent: Surplus (vs buying home)": rent_monthly_surpluses,
+            "Rent: Surplus": rent_monthly_surpluses,
         }
         rows = []
         date = self.start_date

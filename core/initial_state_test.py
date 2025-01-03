@@ -15,28 +15,28 @@ class TestInitialState:
 
         # total money put in initially must be same in both cases
         assert (
-            act.loc["One-time costs", "Rent"]
-            + act.loc["Invested in market", "Rent"]
-            + act.loc["Invested in home", "Rent"]
-            == act.loc["One-time costs", "Buy"]
-            + act.loc["Invested in market", "Buy"]
-            + act.loc["Invested in home", "Buy"]
+            act.loc["Upfront one-time costs", "Rent"]
+            + act.loc["Invested", "Rent"]
+            + act.loc["Home equity", "Rent"]
+            == act.loc["Upfront one-time costs", "Buy"]
+            + act.loc["Invested", "Buy"]
+            + act.loc["Home equity", "Buy"]
         )
 
         # now for a more specific test
-        exp_rows = ["One-time costs", "Invested in market", "Invested in home"]
+        exp_rows = ["Upfront one-time costs", "Home equity", "Invested"]
         exp_cols = {
             "Rent": [
                 RENT_CONFIG.get_upfront_one_time_cost(),
+                0,
                 BUY_CONFIG.get_upfront_one_time_cost()
                 + BUY_CONFIG.down_payment
                 - RENT_CONFIG.get_upfront_one_time_cost(),
-                0,
             ],
             "Buy": [
                 BUY_CONFIG.get_upfront_one_time_cost(),
-                0,
                 BUY_CONFIG.down_payment,
+                0,
             ],
         }
         exp = to_df(exp_cols, exp_rows)

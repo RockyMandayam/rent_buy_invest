@@ -30,11 +30,11 @@ class TestCalculator:
 
         first_row = projection.iloc[0, :]
         first_month_home_value_related_cost_fraction = (
-            first_row["Buy"]["Cost tied to market value"]
-            / first_row["Buy"]["Market value"]
+            first_row["Buy"]["Costs Tied to Home Value"]
+            / first_row["Buy"]["Home Value"]
         )
         first_month_monthly_mortgage_total_payment = first_row["Buy"][
-            "Mortgage payment"
+            "Mortgage Payment"
         ]
 
         for row_index in range(projection.shape[0]):
@@ -43,14 +43,14 @@ class TestCalculator:
             first_row_of_year = projection.iloc[
                 (row_index // MONTHS_PER_YEAR) * MONTHS_PER_YEAR, :
             ]
-            assert row["Buy"]["Cost tied to market value"] / first_row_of_year["Buy"][
-                "Market value"
+            assert row["Buy"]["Costs Tied to Home Value"] / first_row_of_year["Buy"][
+                "Home Value"
             ] == pytest.approx(first_month_home_value_related_cost_fraction, rel=0.0001)
 
-            monthly_mortgage_total_payment = row["Buy"]["Mortgage payment"]
+            monthly_mortgage_total_payment = row["Buy"]["Mortgage Payment"]
             assert (
-                row["Buy"]["Mortgage interest payment"]
-                + row["Buy"]["Mortgage equity payment"]
+                row["Buy"]["Mortgage Interest Payment"]
+                + row["Buy"]["Mortgage Equity Payment"]
                 == monthly_mortgage_total_payment
             )
             assert (
@@ -61,7 +61,7 @@ class TestCalculator:
                 <= EXPERIMENT_CONFIG.num_months * 0.005
             )
 
-            loan_amount = row["Buy"]["Loan amount"]
+            loan_amount = row["Buy"]["Loan Amount"]
             mortgage_insurance = row["Buy"]["Mortgage Insurance"]
             if (
                 loan_amount
@@ -76,12 +76,12 @@ class TestCalculator:
                 )
 
             home_monthly_cost = (
-                row["Buy"]["Cost tied to market value"]
-                + row["Buy"]["Cost tied to inflation"]
+                row["Buy"]["Costs Tied to Home Value"]
+                + row["Buy"]["Costs Tied to Inflation"]
                 + monthly_mortgage_total_payment
                 + mortgage_insurance
             )
-            rent_monthly_cost = row["Rent"]["Cost tied to inflation"]
+            rent_monthly_cost = row["Rent"]["Costs Tied to Inflation"]
             # TODO improve this whole test and more easily test this, including with FHA loans and for PMI being removed with a home appraisal
             # if home_monthly_cost >= rent_monthly_cost:
             #     assert row["Buy"]["Surplus (vs renting)"] == 0
