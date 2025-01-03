@@ -88,11 +88,11 @@
       "type": "number"
     },
     "home_inspection_cost": {
-      "description": "The house inspection cost. The house inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a house inspection does NOT include a pest inspection.",
+      "description": "The home inspection cost. The home inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a home inspection does NOT include a pest inspection.",
       "type": "number"
     },
     "pest_inspection_cost": {
-      "description": "The pest inspection cost (note that the house inspection probably does not include pest inspection).",
+      "description": "The pest inspection cost (note that the home inspection probably does not include pest inspection).",
       "type": "number"
     },
     "escrow_fixed_fee": {

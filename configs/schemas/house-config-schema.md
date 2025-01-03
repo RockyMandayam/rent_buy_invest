@@ -25,8 +25,8 @@
 - **`realtor_commission_fraction`** *(number, required)*: The buyer's realtor's commission as a fraction of sale price.
 - **`hoa_transfer_fee`** *(number, required)*: The fee to sell a home that is part of an HOA (Home Owners Association).
 - **`seller_burden_of_hoa_transfer_fee`** *(number, required)*: The seller's burden of the HOA transfer fee as a fraction of the fee.
-- **`home_inspection_cost`** *(number, required)*: The house inspection cost. The house inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a house inspection does NOT include a pest inspection.
-- **`pest_inspection_cost`** *(number, required)*: The pest inspection cost (note that the house inspection probably does not include pest inspection).
+- **`home_inspection_cost`** *(number, required)*: The home inspection cost. The home inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a home inspection does NOT include a pest inspection.
+- **`pest_inspection_cost`** *(number, required)*: The pest inspection cost (note that the home inspection probably does not include pest inspection).
 - **`escrow_fixed_fee`** *(number, required)*: Escrow fixed fee. I don't think there is a basic price-based fee except for specific line items, e.g., flood certification fee.
 - **`flood_certification_fee`** *(number, required)*: Flood certification fee.
 - **`title_search_fee`** *(number, required)*: Title search fee.
