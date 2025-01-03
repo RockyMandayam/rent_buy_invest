@@ -48,7 +48,7 @@ hoa_transfer_fee: !!float 300.
 
 seller_burden_of_hoa_transfer_fee: !!float 1.0
 
-house_inspection_cost: !!float 500.
+home_inspection_cost: !!float 500.
 
 pest_inspection_cost: !!float 500.
 

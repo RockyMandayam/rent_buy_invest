@@ -34,7 +34,7 @@ class TestHouseConfig:
             "realtor_commission_fraction",
             "hoa_transfer_fee",
             "seller_burden_of_hoa_transfer_fee",
-            "house_inspection_cost",
+            "home_inspection_cost",
             "pest_inspection_cost",
             "escrow_fixed_fee",
             "flood_certification_fee",
@@ -220,9 +220,9 @@ class TestHouseConfig:
         check_float_field(
             HouseConfig,
             config_kwargs,
-            ["house_inspection_cost"],
+            ["home_inspection_cost"],
             allow_negative=False,
-            max_value=HouseConfig.MAX_HOUSE_INSPECTION_COST,
+            max_value=HouseConfig.MAX_HOME_INSPECTION_COST,
         )
         check_float_field(
             HouseConfig,

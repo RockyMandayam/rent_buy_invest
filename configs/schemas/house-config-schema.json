@@ -87,7 +87,7 @@
       "description": "The seller's burden of the HOA transfer fee as a fraction of the fee.",
       "type": "number"
     },
-    "house_inspection_cost": {
+    "home_inspection_cost": {
       "description": "The house inspection cost. The house inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a house inspection does NOT include a pest inspection.",
       "type": "number"
     },
@@ -190,7 +190,7 @@
     "realtor_commission_fraction",
     "hoa_transfer_fee",
     "seller_burden_of_hoa_transfer_fee",
-    "house_inspection_cost",
+    "home_inspection_cost",
     "pest_inspection_cost",
     "escrow_fixed_fee",
     "flood_certification_fee",

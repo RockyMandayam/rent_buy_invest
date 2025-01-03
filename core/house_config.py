@@ -32,7 +32,7 @@ class HouseConfig(Config):
     MAX_ANNUAL_PROPERTY_TAX_RATE = 0.1
     MAX_REALTOR_COMMISSION_FRACTION = 0.1
     MAX_HOA_TRANSFER_FEE = 5000.0
-    MAX_HOUSE_INSPECTION_COST = 5000.0
+    MAX_HOME_INSPECTION_COST = 5000.0
     MAX_PEST_INSPECTION_COST = 5000.0
     MAX_ESCROW_FIXED_FEE = 5000.0
     MAX_FLOOD_CERTIFICATION_FEE = 1000.0
@@ -101,7 +101,7 @@ class HouseConfig(Config):
         self.seller_burden_of_hoa_transfer_fee: float = kwargs[
             "seller_burden_of_hoa_transfer_fee"
         ]
-        self.house_inspection_cost: float = kwargs["house_inspection_cost"]
+        self.home_inspection_cost: float = kwargs["home_inspection_cost"]
         self.pest_inspection_cost: float = kwargs["pest_inspection_cost"]
         self.escrow_fixed_fee: float = kwargs["escrow_fixed_fee"]
         self.flood_certification_fee: float = kwargs["flood_certification_fee"]
@@ -201,7 +201,7 @@ class HouseConfig(Config):
             and self.seller_burden_of_hoa_transfer_fee <= 1
         ), "Seller burden fraction of HOA fee must be between 0 and 1 inclusive."
         assert (
-            self.house_inspection_cost >= 0
+            self.home_inspection_cost >= 0
         ), "House inspection cost must be non-negative."
         assert (
             self.pest_inspection_cost >= 0
@@ -302,7 +302,7 @@ class HouseConfig(Config):
         )
         self._validate_max_value("hoa_transfer_fee", HouseConfig.MAX_HOA_TRANSFER_FEE)
         self._validate_max_value(
-            "house_inspection_cost", HouseConfig.MAX_HOUSE_INSPECTION_COST
+            "home_inspection_cost", HouseConfig.MAX_HOME_INSPECTION_COST
         )
         self._validate_max_value(
             "pest_inspection_cost", HouseConfig.MAX_PEST_INSPECTION_COST
@@ -380,7 +380,7 @@ class HouseConfig(Config):
             + (self.recording_fee_fraction * self.sale_price)
             + (self.realtor_commission_fraction * self.sale_price)
             + (1 - self.seller_burden_of_hoa_transfer_fee) * self.hoa_transfer_fee
-            + self.house_inspection_cost
+            + self.home_inspection_cost
             + self.pest_inspection_cost
             + self.escrow_fixed_fee
             + self.flood_certification_fee
