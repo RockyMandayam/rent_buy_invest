@@ -89,9 +89,9 @@ class Calculator:
             2,
         )
 
-        house_one_off_costs = []
+        buy_one_off_costs = []
         for month in range(self.num_months + 1):
-            house_one_off_cost = 0
+            buy_one_off_cost = 0
 
             loan_amounts.append(loan_amount)
 
@@ -124,7 +124,7 @@ class Calculator:
             elif not self.house_config.is_fha_loan:
                 if loan_amount <= PMI_LTV_THRESHOLD * self.house_config.sale_price:
                     if mortgage_insurances and mortgage_insurances[-1] != 0:
-                        house_one_off_cost += self.house_config.home_appraisal_cost
+                        buy_one_off_cost += self.house_config.home_appraisal_cost
                     mortgage_insurance = 0
                 else:
                     mortgage_insurance = mortgage_insurance_if_required
@@ -141,7 +141,7 @@ class Calculator:
                         mortgage_insurance = 0
             mortgage_insurances.append(mortgage_insurance)
 
-            house_one_off_costs.append(house_one_off_cost)
+            buy_one_off_costs.append(buy_one_off_cost)
 
             # monthly surplus from one option vs the other
             # investment_values_if_renting and investment_values_if_buying have their
@@ -153,7 +153,7 @@ class Calculator:
                 + mortgage_interest
                 + toward_equity
                 + mortgage_insurance
-                + house_one_off_cost
+                + buy_one_off_cost
             )
             rent_monthly_payment = rent_monthly_costs[month]
             gain_in_investment_if_renting = (
@@ -205,7 +205,7 @@ class Calculator:
             "House: Mortgage Insurance": mortgage_insurances,
             "House: Mortgage interest payment": mortgage_interests,
             "House: Mortgage equity payment": paid_toward_equity,
-            "House: One-off costs": house_one_off_costs,
+            "House: One-off costs": buy_one_off_costs,
             # black formats the following line in an easy-to-misread way
             # fmt: off
             "House: Mortgage payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
