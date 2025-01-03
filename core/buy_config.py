@@ -52,7 +52,7 @@ class BuyConfig(Config):
 
     @classmethod
     def schema_path(cls) -> str:
-        return "rent_buy_invest/configs/schemas/house-config-schema.json"
+        return "rent_buy_invest/configs/schemas/buy-config-schema.json"
 
     def __init__(
         self,
