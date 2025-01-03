@@ -161,7 +161,7 @@ class Calculator:
                     investment_values_if_renting[-1], 1
                 )[1]
             )
-            gain_in_investment_if_house = self.market_config.get_pretax_monthly_wealth(
+            gain_in_investment_if_buying = self.market_config.get_pretax_monthly_wealth(
                 investment_values_if_buying[-1], 1
             )[1]
             # Surplus from the perspective of renting
@@ -173,7 +173,7 @@ class Calculator:
                     round(gain_in_investment_if_renting + surplus, 2)
                 )
                 housing_monthly_surpluses.append(0)
-                investment_values_if_buying.append(gain_in_investment_if_house)
+                investment_values_if_buying.append(gain_in_investment_if_buying)
             elif surplus < 0:
                 # if buy option has a relative surplus
                 # negate surplus to make it a positive from the perspective of housing
@@ -182,7 +182,7 @@ class Calculator:
                 investment_values_if_renting.append(gain_in_investment_if_renting)
                 housing_monthly_surpluses.append(surplus)
                 investment_values_if_buying.append(
-                    round(gain_in_investment_if_house + surplus, 2)
+                    round(gain_in_investment_if_buying + surplus, 2)
                 )
 
             # update loan_amount for next iteration
