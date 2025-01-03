@@ -14,13 +14,13 @@ class InitialState:
     invested_in_home: float
 
     @staticmethod
-    def from_configs(house_config: BuyConfig, rent_config: RentConfig) -> None:
+    def from_configs(buy_config: BuyConfig, rent_config: RentConfig) -> None:
         rent_one_time_cost = rent_config.get_upfront_one_time_cost()
-        home_one_time_cost = house_config.get_upfront_one_time_cost()
+        home_one_time_cost = buy_config.get_upfront_one_time_cost()
         assert (
             rent_one_time_cost <= home_one_time_cost
         ), "Renting should not have a larger upfront one-time cost than buying a house."
-        invested_in_home = house_config.down_payment
+        invested_in_home = buy_config.down_payment
         invested_in_market_if_renting = (
             home_one_time_cost + invested_in_home - rent_one_time_cost
         )

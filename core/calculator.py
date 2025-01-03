@@ -35,14 +35,14 @@ FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 class Calculator:
     def __init__(
         self,
-        house_config: BuyConfig,
+        buy_config: BuyConfig,
         rent_config: RentConfig,
         market_config: MarketConfig,
         num_months: int,
         start_date: datetime.date,
         initial_state: InitialState,
     ) -> None:
-        self.house_config: BuyConfig = house_config
+        self.buy_config: BuyConfig = buy_config
         self.rent_config: RentConfig = rent_config
         self.market_config: MarketConfig = market_config
         self.num_months: int = num_months
@@ -51,12 +51,12 @@ class Calculator:
 
     def calculate(self) -> pd.DataFrame:
         # Some housing costs/gains can be calculated independently at once
-        home_values = self.house_config.get_monthly_home_values(self.num_months)
+        home_values = self.buy_config.get_monthly_home_values(self.num_months)
         home_monthly_costs_related_to_home_value = (
-            self.house_config.get_home_value_related_monthly_costs(self.num_months)
+            self.buy_config.get_home_value_related_monthly_costs(self.num_months)
         )
         home_monthly_costs_related_to_inflation = (
-            self.house_config.get_inflation_related_monthly_costs(
+            self.buy_config.get_inflation_related_monthly_costs(
                 self.rent_config.annual_rent_inflation_rate, self.num_months
             )
         )
@@ -80,11 +80,11 @@ class Calculator:
         ]  # NOTE: first value filled in
         investment_values_if_buying = [0]  # NOTE: first value filed in
 
-        loan_amount = self.house_config.initial_loan_amount
-        monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
+        loan_amount = self.buy_config.initial_loan_amount
+        monthly_mortgage_payment = self.buy_config.get_monthly_mortgage_payment()
         mortgage_insurance_if_required = round(
-            self.house_config.annual_mortgage_insurance_fraction
-            * self.house_config.initial_loan_amount
+            self.buy_config.annual_mortgage_insurance_fraction
+            * self.buy_config.initial_loan_amount
             / MONTHS_PER_YEAR,
             2,
         )
@@ -98,7 +98,7 @@ class Calculator:
             # mortgage interest cost
             mortgage_interest = round(
                 loan_amount
-                * self.house_config.mortgage_annual_interest_rate
+                * self.buy_config.mortgage_annual_interest_rate
                 / MONTHS_PER_YEAR,
                 2,
             )
@@ -121,16 +121,16 @@ class Calculator:
 
             if not mortgage_interest:
                 mortgage_insurance = 0
-            elif not self.house_config.is_fha_loan:
-                if loan_amount <= PMI_LTV_THRESHOLD * self.house_config.sale_price:
+            elif not self.buy_config.is_fha_loan:
+                if loan_amount <= PMI_LTV_THRESHOLD * self.buy_config.sale_price:
                     if mortgage_insurances and mortgage_insurances[-1] != 0:
-                        buy_one_off_cost += self.house_config.home_appraisal_cost
+                        buy_one_off_cost += self.buy_config.home_appraisal_cost
                     mortgage_insurance = 0
                 else:
                     mortgage_insurance = mortgage_insurance_if_required
             else:
                 if (
-                    self.house_config.initial_loan_fraction
+                    self.buy_config.initial_loan_fraction
                     > FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE
                 ):
                     mortgage_insurance = mortgage_insurance_if_required

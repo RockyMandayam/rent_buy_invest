@@ -15,13 +15,13 @@ from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 class TestCalculator:
     def test_calculate(self) -> None:
         calculator = Calculator(
-            EXPERIMENT_CONFIG.house_config,
+            EXPERIMENT_CONFIG.buy_config,
             EXPERIMENT_CONFIG.rent_config,
             EXPERIMENT_CONFIG.market_config,
             EXPERIMENT_CONFIG.num_months,
             EXPERIMENT_CONFIG.start_date,
             InitialState.from_configs(
-                EXPERIMENT_CONFIG.house_config, EXPERIMENT_CONFIG.rent_config
+                EXPERIMENT_CONFIG.buy_config, EXPERIMENT_CONFIG.rent_config
             ),
         )
 
@@ -65,12 +65,12 @@ class TestCalculator:
             mortgage_insurance = row["Buy"]["Mortgage Insurance"]
             if (
                 loan_amount
-                <= PMI_LTV_THRESHOLD * EXPERIMENT_CONFIG.house_config.sale_price
+                <= PMI_LTV_THRESHOLD * EXPERIMENT_CONFIG.buy_config.sale_price
             ):
                 assert mortgage_insurance == 0
             else:
                 assert mortgage_insurance == round(
-                    EXPERIMENT_CONFIG.house_config.annual_mortgage_insurance_fraction
+                    EXPERIMENT_CONFIG.buy_config.annual_mortgage_insurance_fraction
                     * loan_amount,
                     2,
                 )
