@@ -177,7 +177,7 @@ class HouseConfig(Config):
         ), "Mortgage discount points fee fraction must be non-negative."
         assert (
             self.home_appraisal_cost >= 0
-        ), "House appraisal cost must be non-negative."
+        ), "Home appraisal cost must be non-negative."
         assert self.credit_report_fee >= 0, "Credit report fee must be non-negative."
         assert (
             self.transfer_tax_fraction >= 0

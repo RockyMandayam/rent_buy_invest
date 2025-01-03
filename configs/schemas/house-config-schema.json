@@ -52,7 +52,7 @@
       "type": "number"
     },
     "home_appraisal_cost": {
-      "description": "House appraisal cost. Lenders often require a house appraisal. The buyer often pays for this up-front, regardless of whether the sale actually goes through.",
+      "description": "Home appraisal cost. Lenders often require a home appraisal. The buyer often pays for this up-front, regardless of whether the sale actually goes through.",
       "type": "number"
     },
     "credit_report_fee": {
