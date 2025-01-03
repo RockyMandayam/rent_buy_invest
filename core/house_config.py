@@ -345,7 +345,8 @@ class HouseConfig(Config):
             * self.sale_price
         ), f"Please check the house config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
 
-    def get_down_payment(self):
+    @property
+    def down_payment(self):
         return self.down_payment_fraction * self.sale_price
 
     @property
