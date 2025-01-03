@@ -2,8 +2,7 @@ import copy
 
 import pytest
 
-# from rent_buy_invest.core.house_config import HouseConfig
-from rent_buy_invest.core.house_config_test import HOUSE_CONFIG
+from rent_buy_invest.core.buy_config_test import HOUSE_CONFIG
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.rent_config_test import RENT_CONFIG
 from rent_buy_invest.utils.data_utils import to_df

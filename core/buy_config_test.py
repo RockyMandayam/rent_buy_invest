@@ -1,7 +1,7 @@
 import jsonschema
 import pytest
 
-from rent_buy_invest.core.house_config import HouseConfig
+from rent_buy_invest.core.buy_config import HouseConfig
 from rent_buy_invest.core.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 

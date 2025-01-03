@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from rent_buy_invest.core.house_config import HouseConfig
+from rent_buy_invest.core.buy_config import HouseConfig
 from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils.data_utils import to_df
 

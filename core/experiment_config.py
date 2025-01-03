@@ -1,7 +1,7 @@
 import datetime
 
+from rent_buy_invest.core.buy_config import HouseConfig
 from rent_buy_invest.core.config import Config
-from rent_buy_invest.core.house_config import HouseConfig
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.core.rent_config import RentConfig
 
