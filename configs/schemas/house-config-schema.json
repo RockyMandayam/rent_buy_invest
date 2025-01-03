@@ -148,7 +148,7 @@
       "type": "number"
     },
     "annual_homeowners_insurance_fraction": {
-      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed house value. This field depends a lot on the house, conditions, coverage, insurance, etc.",
+      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed home value. This field depends a lot on the house, conditions, coverage, insurance, etc.",
       "type": "number"
     },
     "monthly_utilities": {
@@ -156,7 +156,7 @@
       "type": "number"
     },
     "annual_maintenance_cost_fraction": {
-      "description": "ANNUAL maintenance cost as a fraction of the assessed house value (not sale price).",
+      "description": "ANNUAL maintenance cost as a fraction of the assessed home value (not sale price).",
       "type": "number"
     },
     "monthly_hoa_fees": {
