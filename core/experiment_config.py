@@ -31,7 +31,7 @@ class ExperimentConfig(Config):
         num_months: int,
         market_config_path: str,
         rent_config_path: str,
-        house_config_path: str,
+        buy_config_path: str,
         start_date: datetime.datetime,
     ) -> None:
         """Initializes the class.
@@ -51,7 +51,7 @@ class ExperimentConfig(Config):
         self.num_months: int = num_months
         self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
         self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
-        self.house_config: HouseConfig = HouseConfig.parse(house_config_path)
+        self.house_config: HouseConfig = HouseConfig.parse(buy_config_path)
         self.start_date: datetime.datetime = start_date
         self._validate()
 

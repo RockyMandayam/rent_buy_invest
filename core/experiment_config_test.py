@@ -23,7 +23,7 @@ class TestExperimentConfig:
             "num_months",
             "market_config_path",
             "rent_config_path",
-            "house_config_path",
+            "buy_config_path",
         ]
         for attribute in attributes:
             test_config_filename = f"rent_buy_invest/core/test_resources/test-experiment-config_null_{attribute}.yaml"
@@ -65,5 +65,5 @@ class TestExperimentConfig:
         check_filepath_field(
             ExperimentConfig,
             config_kwargs,
-            ["house_config_path"],
+            ["buy_config_path"],
         )

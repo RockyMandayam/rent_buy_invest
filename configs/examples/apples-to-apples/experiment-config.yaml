@@ -4,6 +4,6 @@ market_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/mar
 
 rent_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/rent-config.yaml"
 
-house_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/house-config.yaml"
+buy_config_path: !!str "rent_buy_invest/configs/examples/apples-to-apples/house-config.yaml"
 
 start_date: !!timestamp "2030-01-01"
