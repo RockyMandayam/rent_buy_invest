@@ -77,7 +77,7 @@ class TestCalculator:
                     2,
                 )
 
-            house_monthly_cost = (
+            home_monthly_cost = (
                 row["House"]["Cost tied to market value"]
                 + row["House"]["Cost tied to inflation"]
                 + monthly_mortgage_total_payment
@@ -85,13 +85,13 @@ class TestCalculator:
             )
             rent_monthly_cost = row["Rent"]["Cost tied to inflation"]
             # TODO improve this whole test and more easily test this, including with FHA loans and for PMI being removed with a home appraisal
-            # if house_monthly_cost >= rent_monthly_cost:
+            # if home_monthly_cost >= rent_monthly_cost:
             #     assert row["House"]["Surplus (vs renting)"] == 0
             #     assert row["Rent"]["Surplus (vs buying house)"] == pytest.approx(
-            #         house_monthly_cost - rent_monthly_cost, abs=0.0001
+            #         home_monthly_cost - rent_monthly_cost, abs=0.0001
             #     )
             # else:
             #     assert row["Rent"]["Surplus (vs buying house)"] == 0
             #     assert row["House"]["Surplus (vs renting)"] == pytest.approx(
-            #         rent_monthly_cost - house_monthly_cost, abs=0.0001
+            #         rent_monthly_cost - home_monthly_cost, abs=0.0001
             #     )

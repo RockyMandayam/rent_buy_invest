@@ -52,10 +52,10 @@ class Calculator:
     def calculate(self) -> pd.DataFrame:
         # Some housing costs/gains can be calculated independently at once
         home_values = self.house_config.get_monthly_home_values(self.num_months)
-        house_monthly_costs_related_to_home_value = (
+        home_monthly_costs_related_to_home_value = (
             self.house_config.get_home_value_related_monthly_costs(self.num_months)
         )
-        house_monthly_costs_related_to_inflation = (
+        home_monthly_costs_related_to_inflation = (
             self.house_config.get_inflation_related_monthly_costs(
                 self.rent_config.annual_rent_inflation_rate, self.num_months
             )
@@ -148,8 +148,8 @@ class Calculator:
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
             housing_monthly_payment = (
-                house_monthly_costs_related_to_home_value[month]
-                + house_monthly_costs_related_to_inflation[month]
+                home_monthly_costs_related_to_home_value[month]
+                + home_monthly_costs_related_to_inflation[month]
                 + mortgage_interest
                 + toward_equity
                 + mortgage_insurance
@@ -200,8 +200,8 @@ class Calculator:
             "House: Market value": home_values,
             "House: Loan amount": loan_amounts,
             # House: costs
-            "House: Cost tied to market value": house_monthly_costs_related_to_home_value,
-            "House: Cost tied to inflation": house_monthly_costs_related_to_inflation,
+            "House: Cost tied to market value": home_monthly_costs_related_to_home_value,
+            "House: Cost tied to inflation": home_monthly_costs_related_to_inflation,
             "House: Mortgage Insurance": mortgage_insurances,
             "House: Mortgage interest payment": mortgage_interests,
             "House: Mortgage equity payment": paid_toward_equity,
