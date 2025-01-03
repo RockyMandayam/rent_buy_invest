@@ -1,12 +1,12 @@
 # House Configuration
 
-*Config file relating to assumptions about buying, owning, and selling a house.*
+*Config file relating to assumptions about buying, owning, and selling a home.*
 
 ## Properties
 
-- **`sale_price`** *(number, required)*: Sale price of the house (final nominal sale price).
-- **`annual_assessed_value_inflation_rate`** *(number, required)*: ANNUAL inflation rate of house assessed value as a fraction.
-- **`down_payment_fraction`** *(number, required)*: The fraction of the house price put down as the down payment (the remaining is assumed to be the loan amount).
+- **`sale_price`** *(number, required)*: Sale price of the home (final nominal sale price).
+- **`annual_assessed_value_inflation_rate`** *(number, required)*: ANNUAL inflation rate of home's assessed value as a fraction.
+- **`down_payment_fraction`** *(number, required)*: The fraction of the home price put down as the down payment (the remaining is assumed to be the loan amount).
 - **`mortgage_annual_interest_rate`** *(number, required)*: Mortgage ANNUAL interest rate. An 'equivalent' monthly interest rate can be calculated from this. Note that the equivalent monthly interest rate is not just 1/12 of the annual rate, due to the fact that the monthly rate is compounded monthly (i.e., it is a compound interst rate not a simple interest rate).
 - **`mortgage_term_months`** *(number, required)*: Mortgage term (length) in months.
 - **`upfront_mortgage_insurance_fraction`** *(number, required)*: Upfront mortgage insurance cost as a fraction of initial loan amount.
@@ -18,7 +18,7 @@
 - **`mortgage_discount_points_fee_fraction`** *(number, required)*: Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount.
 - **`home_appraisal_cost`** *(number, required)*: Home appraisal cost. Lenders often require a home appraisal. The buyer often pays for this up-front, regardless of whether the sale actually goes through.
 - **`credit_report_fee`** *(number, required)*: Credit report fee charged by lender to do a credit check.
-- **`transfer_tax_fraction`** *(number, required)*: Transfer tax as a fraction of the sale price. Note that there are often multiple transfer taxes (e.g., state and county). This field is the sum of all such transfer taxes. Transfer tax is a one-time tax per house purchase.
+- **`transfer_tax_fraction`** *(number, required)*: Transfer tax as a fraction of the sale price. Note that there are often multiple transfer taxes (e.g., state and county). This field is the sum of all such transfer taxes. Transfer tax is a one-time tax per home purchase.
 - **`seller_burden_of_transfer_tax_fraction`** *(number, required)*: The fraction of the transfer tax burden is borne by the seller (the remaining is borne by the buyer).
 - **`recording_fee_fraction`** *(number, required)*: The tax charged by the county/state/etc. to legally record the property's deed and mortgage information. This field is expressed as fraction of sale price. The recording fee is often considered part of the title fees and therefore part of the 'closing costs'.
 - **`annual_property_tax_rate`** *(number, required)*: ANNUAL property tax rate (a fraction of the house's assessed value).
@@ -44,4 +44,4 @@
 - **`monthly_utilities`** *(number, required)*: Monthly utilities for the first month.
 - **`annual_maintenance_cost_fraction`** *(number, required)*: ANNUAL maintenance cost as a fraction of the assessed home value (not sale price).
 - **`monthly_hoa_fees`** *(number, required)*: Monthly HOA (Home Owners Association) fees.
-- **`annual_management_cost_fraction`** *(number, required)*: Total ANNUAL cost of managing the house (expressed as a fraction of assessed house price) without living in it (i.e., being a landlord but not a resident), EXCEPT for maintenance costs that you'd expect to pay even if you lived in the house. Note that this means if you expect maintenance costs to be higher when you do not live in the house vs when you live in it (because you think tenants will take worse care of the house than you would if you lived in t), that difference in cost should contribute to this parameter. Note this parameter can include paying a management company, advertising the house, any trips you may have to make, anything associated with managing / landlord.
+- **`annual_management_cost_fraction`** *(number, required)*: Total ANNUAL cost of managing the home (expressed as a fraction of assessed home price) without living in it (i.e., being a landlord but not a resident), EXCEPT for maintenance costs that you'd expect to pay even if you lived in the house. Note that this means if you expect maintenance costs to be higher when you do not live in the home vs when you live in it (because you think tenants will take worse care of the home than you would if you lived in t), that difference in cost should contribute to this parameter. Note this parameter can include paying a management company, advertising the house, any trips you may have to make, anything associated with managing / landlord.

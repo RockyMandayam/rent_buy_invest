@@ -20,7 +20,7 @@
       "type": "string"
     },
     "start_date": {
-      "description": "Start date of the financial projection (the date when the house ownership is transferred to you)."
+      "description": "Start date of the financial projection (the date when the home ownership is transferred to you)."
     }
   },
   "required": [
