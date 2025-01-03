@@ -5,7 +5,7 @@ from rent_buy_invest.core.buy_config import BuyConfig
 from rent_buy_invest.core.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 
-TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
+TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
 BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
 
@@ -56,14 +56,14 @@ class TestBuyConfig:
             "annual_management_cost_fraction",
         ]
         for attribute in attributes:
-            test_config_filename = f"rent_buy_invest/core/test_resources/test-house-config_null_{attribute}.yaml"
+            test_config_filename = f"rent_buy_invest/core/test_resources/test-buy-config_null_{attribute}.yaml"
             with pytest.raises(jsonschema.ValidationError):
                 BuyConfig.parse(test_config_filename)
 
         # check missing field
         with pytest.raises(jsonschema.ValidationError):
             BuyConfig.parse(
-                "rent_buy_invest/core/test_resources/test-house-config_missing_annual_management_cost_fraction.yaml"
+                "rent_buy_invest/core/test_resources/test-buy-config_missing_annual_management_cost_fraction.yaml"
             )
 
     def test_invalid_inputs(self) -> None:

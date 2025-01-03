@@ -4,6 +4,6 @@ market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-confi
 
 rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.yaml"
 
-buy_config_path: !!str "rent_buy_invest/core/test_resources/test-house-config.yaml"
+buy_config_path: !!str "rent_buy_invest/core/test_resources/test-buy-config.yaml"
 
 start_date: !!timestamp "2025-01-01"
