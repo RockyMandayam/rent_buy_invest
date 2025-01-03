@@ -51,7 +51,7 @@ Steps:
 - Update the yaml config files, both examples and tests
     - examples are in `rent_buy_invest/configs/examples`
     - tests are in `rent_buy_invest/core/test_resources`
-- Update appropriate config classes (the following classes in `rent_buy_invest/core/`: `experiment_config.py`, `rent_config.py`, `market_config.py`, `house_config.py`)
+- Update appropriate config classes (the following classes in `rent_buy_invest/core/`: `experiment_config.py`, `rent_config.py`, `market_config.py`, `buy_config.py`)
 - Update tests, both invalid_schema and invalid_inputs methods in the relevant test file
 - Make sure all tests pass
 - Make sure you can run the code

@@ -17,7 +17,7 @@ OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="rent_buy_invest",
-        description="Calculates the long-term financial pros and cons of decisions related to renting a home, buying a house, and investing in the stock market.",
+        description="Calculates the long-term financial pros and cons of decisions related to renting a home, buying a home, and investing in the stock market.",
         epilog="See README for more details.",
     )
     parser.add_argument(

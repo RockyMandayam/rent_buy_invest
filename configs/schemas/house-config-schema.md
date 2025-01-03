@@ -1,4 +1,4 @@
-# House Configuration
+# Buy Configuration
 
 *Config file relating to assumptions about buying, owning, and selling a home.*
 

@@ -16,7 +16,7 @@
       "type": "string"
     },
     "buy_config_path": {
-      "description": "House config file path from the 'rent_buy_invest' directory.",
+      "description": "Buy config file path from the 'rent_buy_invest' directory.",
       "type": "string"
     },
     "start_date": {

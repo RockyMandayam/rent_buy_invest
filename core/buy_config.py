@@ -6,14 +6,13 @@ from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, project_growth
 
 
 class BuyConfig(Config):
-    """Stores house config.
+    """Stores buy config.
 
     Class Attributes:
-        schema_path (str): House config schema path
+        schema_path (str): Buy config schema path
 
     Instance Attributes:
-        See rent_buy_invest/configs/schemas/house-config-schema for documentation
-            instance attributes.
+        See rent_buy_invest/configs/schemas/buy-config-schema.md for documentation
     """
 
     MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
@@ -147,7 +146,7 @@ class BuyConfig(Config):
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
-        assert self.sale_price > 0, "House sale price must be positive."
+        assert self.sale_price > 0, "Home sale price must be positive."
         assert (
             self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
         ), "Down payment fraction must be between 0 and 1 inclusive."
@@ -202,7 +201,7 @@ class BuyConfig(Config):
         ), "Seller burden fraction of HOA fee must be between 0 and 1 inclusive."
         assert (
             self.home_inspection_cost >= 0
-        ), "House inspection cost must be non-negative."
+        ), "Home inspection cost must be non-negative."
         assert (
             self.pest_inspection_cost >= 0
         ), "Pest inspection cost must be non-negative."
