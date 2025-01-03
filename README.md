@@ -27,7 +27,7 @@ Some additional notes about the configs:
     - House value related costs: property tax, homeowners insurance, maintenance, and management. These change according to `annual_assessed_value_inflation_rate`
     - Inflation related costs: utilities and HOA fees. These increase change according to `annual_inflation_rate`
     - Mortgage insurance: Mortgage insurance is calculated based on the initial loan amount
-    - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the principal decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
+    - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the loan amount decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
 
 ## Installation & How to Run
 

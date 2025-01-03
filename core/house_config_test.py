@@ -357,7 +357,7 @@ class TestHouseConfig:
         )
 
     def test_get_monthly_mortgage_payment(self) -> None:
-        # Sale price is $500,000. Down payment is 20%. So initial mortgage amount is $400,000
+        # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
         # Mortgage term is 360 months
         # Annual interest rate is 0.06
         actual = HOUSE_CONFIG.get_monthly_mortgage_payment()

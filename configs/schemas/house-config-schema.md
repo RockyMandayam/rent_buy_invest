@@ -6,16 +6,16 @@
 
 - **`sale_price`** *(number, required)*: Sale price of the house (final nominal sale price).
 - **`annual_assessed_value_inflation_rate`** *(number, required)*: ANNUAL inflation rate of house assessed value as a fraction.
-- **`down_payment_fraction`** *(number, required)*: The fraction of the house price put down as the down payment (the remaining is assumed to be the mortgage principal).
+- **`down_payment_fraction`** *(number, required)*: The fraction of the house price put down as the down payment (the remaining is assumed to be the loan amount).
 - **`mortgage_annual_interest_rate`** *(number, required)*: Mortgage ANNUAL interest rate. An 'equivalent' monthly interest rate can be calculated from this. Note that the equivalent monthly interest rate is not just 1/12 of the annual rate, due to the fact that the monthly rate is compounded monthly (i.e., it is a compound interst rate not a simple interest rate).
 - **`mortgage_term_months`** *(number, required)*: Mortgage term (length) in months.
-- **`upfront_mortgage_insurance_fraction`** *(number, required)*: Upfront mortgage insurance cost as a fraction of initial mortgage principal.
-- **`annual_mortgage_insurance_fraction`** *(number, required)*: ANNUAL mortgage insurance cost as fraction of mortgage principal.
+- **`upfront_mortgage_insurance_fraction`** *(number, required)*: Upfront mortgage insurance cost as a fraction of initial loan amount.
+- **`annual_mortgage_insurance_fraction`** *(number, required)*: ANNUAL mortgage insurance cost as fraction of loan amount.
 - **`is_fha_loan`** *(boolean, required)*: True if the loan is a Federal Housing Administration (FHA) loan; false otherwise.
-- **`mortgage_origination_points_fee_fraction`** *(number, required)*: Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the mortgage amount.
+- **`mortgage_origination_points_fee_fraction`** *(number, required)*: Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the loan amount.
 - **`mortgage_processing_fee`** *(number, required)*: Mortgage processing fee. Some lenders include this in the origination fee. Do NOT include that amount here. Only include here any amount not covered under other fees.
 - **`mortgage_underwriting_fee`** *(number, required)*: Mortgage underwriting fee. Some lenders include this in the origination fee. Do NOT include that amount here. Only include here any amount not covered under other fees.
-- **`mortgage_discount_points_fee_fraction`** *(number, required)*: Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the mortgage amount.
+- **`mortgage_discount_points_fee_fraction`** *(number, required)*: Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount.
 - **`house_appraisal_cost`** *(number, required)*: House appraisal cost. Lenders often require a house appraisal. The buyer often pays for this up-front, regardless of whether the sale actually goes through.
 - **`credit_report_fee`** *(number, required)*: Credit report fee charged by lender to do a credit check.
 - **`transfer_tax_fraction`** *(number, required)*: Transfer tax as a fraction of the sale price. Note that there are often multiple transfer taxes (e.g., state and county). This field is the sum of all such transfer taxes. Transfer tax is a one-time tax per house purchase.
@@ -37,8 +37,8 @@
 - **`survey_fee`** *(number, required)*: Survey fee, which surveys the boundaries of the property. This is often loosely considered part of 'settlement fees'.
 - **`notary_fee`** *(number, required)*: Notary fee. This is often loosely considered part of 'settlement fees'.
 - **`deed_prep_fee`** *(number, required)*: Deed preparation fee. This is often loosely considered part of 'settlement fees'.
-- **`lenders_title_insurance_fraction`** *(number, required)*: Lender's title insurance (which protects the lender) as a fraction of the mortgage amount. Apparently there is a wide range of typical values here.
-- **`owners_title_insurance_fraction`** *(number, required)*: Owner's title insurance (which protects the owner (you!)) as a fraction of the mortgage amount. Apparently there is a wide range of typical values here.
+- **`lenders_title_insurance_fraction`** *(number, required)*: Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
+- **`owners_title_insurance_fraction`** *(number, required)*: Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
 - **`endorsement_fees`** *(number, required)*: Endorsement fees are for add-ons ('endorsements') that are not included in a standard title insurance (e.g., Easements And Encroachments, Zoning). A typical price per-endorsement is about $75. Enter the total amount you expect for all endorsements.
 - **`annual_homeowners_insurance_fraction`** *(number, required)*: ANNUAL cost of homeowners insurance as fraction of the assessed house value. This field depends a lot on the house, conditions, coverage, insurance, etc.
 - **`monthly_utilities`** *(number, required)*: Monthly utilities for the first month.

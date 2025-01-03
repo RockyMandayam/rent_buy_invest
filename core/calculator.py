@@ -9,22 +9,27 @@ from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, increment_month
 
-# For non-FHA loans, this is the maximum mortgage amount (as a fraction of the home value)
-# for which mortgage insurance is not required. When the mortgage amount is below
-# this fraction of the home value, the borrower can request that the mortgage insurance be removed. As of
-# Jan 25, 2024, this amount is 80%, and the lender is supposed to automatically
-# remove the mortgage_insurance at 78%.
-# The mortgage insurance is based on the initial value of the home. So when you feel that your home has
-# appreciated and/or enough principal has been paid that you now owe less than 80%, you can ask for a
-# re-appraisal of the home (which you have to pay for), and assuming you're right and you owe less than 80%,
-# the mortgage insurance will be removed
-NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE = 0.8
-# For FHA loans, at the moment of the start of the loan, if you owe more than this fraction of the home
-# value in principal, you must pay FHA mortgage insurance for the ENTIRETY of the loan.
-FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
-# If you fall below FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE at the time
-# of the start of the loan, then you need to pay for mortgage insurance for this many months
-FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
+# PMI means Private Mortgage Insurance, and this is the mortgage insurance you'd get for a conventional
+# (i.e., non-FHA) loan.
+# LTV means loan-to-value, which is the ratio, at a given time, of the loan amount to the home value. The
+# initial LTV is the same as the loan-to-purchase-price (LTPP), but the LTV can change over time (and generally
+# decreases, since the loan is usually paid off and home values usually rise).
+# This threshold is the threshold such that when the LTV at the time of home purchase (i.e., the LTPP)
+# is above this threshold, PMI is required; if the LTPP is less than or equal to this threshold, no PMI is required.
+# If PMI is required, the premium is set once and not recalculated again by default. If, however, during the mortgage
+# term, the buyer thinks the LTV has dropped to 0.8 or below, the borrower can request a re-appraisal (which the
+# borrower has to pay for) and if the resulting LTV is 0.8 or below, PMI is no longer required. By the way,
+# as of Jan 25, 2024, the lender is supposed to automatically remove the PMI at 78% but the rule is that the borrower
+# can demand to have it removed at 80%.
+PMI_LTV_THRESHOLD = 0.8
+
+# For FHA loans, the FHA requires FHA mortgage insurance (MI) if the loan-to-purchase-price (LTPP) is greater
+# than this threshold. This FHA MI lasts for the ENTIRETY of the loan
+FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
+
+# If the LTPP is at or below FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE, the borrower must pay for FHA MI
+# for this many months
+FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 
 
 class Calculator:
@@ -65,7 +70,7 @@ class Calculator:
         # which projects forward month by month
         mortgage_interests = []
         paid_toward_equity = []
-        mortgage_amounts = []
+        loan_amounts = []
         equities = []
         mortgage_insurances = []
         housing_monthly_surpluses = []
@@ -75,7 +80,7 @@ class Calculator:
         ]  # NOTE: first value filled in
         investment_values_if_house = [0]  # NOTE: first value filed in
 
-        mortgage_amount = self.house_config.initial_loan_amount
+        loan_amount = self.house_config.initial_loan_amount
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
         mortgage_insurance_if_required = round(
             self.house_config.annual_mortgage_insurance_fraction
@@ -85,11 +90,11 @@ class Calculator:
         )
 
         for month in range(self.num_months + 1):
-            mortgage_amounts.append(mortgage_amount)
+            loan_amounts.append(loan_amount)
 
             # mortgage interest cost
             mortgage_interest = round(
-                mortgage_amount
+                loan_amount
                 * self.house_config.mortgage_annual_interest_rate
                 / MONTHS_PER_YEAR,
                 2,
@@ -97,42 +102,35 @@ class Calculator:
             mortgage_interests.append(mortgage_interest)
 
             # mortgage equity payment and equity value
-            if mortgage_amount == 0:
-                # mortage already paid off
-                # no mortgage amount, so mortgage_interest is zero also
+            if loan_amount == 0:
+                # mortgage already paid off
+                # no loan amount, so mortgage_interest is zero also
                 toward_equity = 0
-            elif mortgage_amount + mortgage_interest <= monthly_mortgage_payment:
+            elif loan_amount + mortgage_interest <= monthly_mortgage_payment:
                 # final mortgage payment
-                # paying interest on prev month and the remaining little mortgage amount
-                toward_equity = mortgage_amount
+                # paying interest on prev month and the remaining little loan amount
+                toward_equity = loan_amount
             else:
                 # regular mortgage payment
                 toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
             paid_toward_equity.append(toward_equity)
-            equities.append(round(house_values[month] - mortgage_amount, 2))
+            equities.append(round(house_values[month] - loan_amount, 2))
 
             if not mortgage_interest:
                 mortgage_insurance = 0
             elif not self.house_config.is_fha_loan:
-                if (
-                    mortgage_amount
-                    <= NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
-                    * self.house_config.sale_price
-                ):
+                if loan_amount <= PMI_LTV_THRESHOLD * self.house_config.sale_price:
                     mortgage_insurance = 0
                 else:
                     mortgage_insurance = mortgage_insurance_if_required
             else:
                 if (
                     self.house_config.initial_loan_fraction
-                    > FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE
+                    > FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE
                 ):
                     mortgage_insurance = mortgage_insurance_if_required
                 else:
-                    if (
-                        month // MONTHS_PER_YEAR
-                        < FHA_MORTGAGE_INSURANCE_TERM_IF_BELOW_THRESHOLD
-                    ):
+                    if month // MONTHS_PER_YEAR < FHA_MI_TERM_IF_BELOW_THRESHOLD:
                         mortgage_insurance = mortgage_insurance_if_required
                     else:
                         mortgage_insurance = 0
@@ -179,9 +177,9 @@ class Calculator:
                     round(gain_in_investment_if_house + surplus, 2)
                 )
 
-            # update mortgage_amount for next iteration
-            mortgage_amount -= toward_equity
-            assert mortgage_amount >= 0, "Mortgage amount cannot be negative."
+            # update loan_amount for next iteration
+            loan_amount -= toward_equity
+            assert loan_amount >= 0, "Loan amount cannot be negative."
         # Pop last element from lists which have an extra item (starting value)
         investment_values_if_renting.pop()
         investment_values_if_house.pop()
@@ -192,7 +190,7 @@ class Calculator:
             "House: Non-house investment": investment_values_if_house,
             "House: House equity": equities,
             "House: Market value": house_values,
-            "House: Mortgage amount": mortgage_amounts,
+            "House: Loan amount": loan_amounts,
             # House: costs
             "House: Cost tied to market value": house_monthly_costs_related_to_house_value,
             "House: Cost tied to inflation": house_monthly_costs_related_to_inflation,

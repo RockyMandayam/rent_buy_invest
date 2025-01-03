@@ -12,7 +12,7 @@
       "type": "number"
     },
     "down_payment_fraction": {
-      "description": "The fraction of the house price put down as the down payment (the remaining is assumed to be the mortgage principal).",
+      "description": "The fraction of the house price put down as the down payment (the remaining is assumed to be the loan amount).",
       "type": "number"
     },
     "mortgage_annual_interest_rate": {
@@ -24,11 +24,11 @@
       "type": "number"
     },
     "upfront_mortgage_insurance_fraction": {
-      "description": "Upfront mortgage insurance cost as a fraction of initial mortgage principal.",
+      "description": "Upfront mortgage insurance cost as a fraction of initial loan amount.",
       "type": "number"
     },
     "annual_mortgage_insurance_fraction": {
-      "description": "ANNUAL mortgage insurance cost as fraction of mortgage principal.",
+      "description": "ANNUAL mortgage insurance cost as fraction of loan amount.",
       "type": "number"
     },
     "is_fha_loan": {
@@ -36,7 +36,7 @@
       "type": "boolean"
     },
     "mortgage_origination_points_fee_fraction": {
-      "description": "Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the mortgage amount",
+      "description": "Mortgage origination points (a.k.a. loan origination fee) are basically just a fee the lender charges for originating (creating), reviewing, processing, etc. the loan. This field is expressed as a fraction of the loan amount",
       "type": "number"
     },
     "mortgage_processing_fee": {
@@ -48,7 +48,7 @@
       "type": "number"
     },
     "mortgage_discount_points_fee_fraction": {
-      "description": "Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the mortgage amount.",
+      "description": "Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount.",
       "type": "number"
     },
     "house_appraisal_cost": {
@@ -136,11 +136,11 @@
       "type": "number"
     },
     "lenders_title_insurance_fraction": {
-      "description": "Lender's title insurance (which protects the lender) as a fraction of the mortgage amount. Apparently there is a wide range of typical values here.",
+      "description": "Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
       "type": "number"
     },
     "owners_title_insurance_fraction": {
-      "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the mortgage amount. Apparently there is a wide range of typical values here.",
+      "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
       "type": "number"
     },
     "endorsement_fees": {

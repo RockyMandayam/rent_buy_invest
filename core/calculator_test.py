@@ -2,7 +2,7 @@ import pytest
 
 # isort: off
 from rent_buy_invest.core.calculator import (
-    NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE,
+    PMI_LTV_THRESHOLD,
     Calculator,
 )
 
@@ -63,18 +63,17 @@ class TestCalculator:
                 <= EXPERIMENT_CONFIG.num_months * 0.005
             )
 
-            mortgage_amount = row["House"]["Mortgage amount"]
+            loan_amount = row["House"]["Loan amount"]
             mortgage_insurance = row["House"]["Mortgage Insurance"]
             if (
-                mortgage_amount
-                <= NON_FHA_MAXIMUM_MORTGAGE_AMOUNT_FRACTION_WITH_NO_MORTGAGE_INSURANCE
-                * EXPERIMENT_CONFIG.house_config.sale_price
+                loan_amount
+                <= PMI_LTV_THRESHOLD * EXPERIMENT_CONFIG.house_config.sale_price
             ):
                 assert mortgage_insurance == 0
             else:
                 assert mortgage_insurance == round(
                     EXPERIMENT_CONFIG.house_config.annual_mortgage_insurance_fraction
-                    * mortgage_amount,
+                    * loan_amount,
                     2,
                 )
 
