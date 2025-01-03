@@ -3,7 +3,7 @@ import itertools
 import jsonschema
 import pytest
 
-from rent_buy_invest.core.rent_config import RentConfig
+from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR

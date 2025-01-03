@@ -1,7 +1,7 @@
 import jsonschema
 import pytest
 
-from rent_buy_invest.core.experiment_config import ExperimentConfig
+from rent_buy_invest.configs.experiment_config import ExperimentConfig
 
 # isort: off
 from rent_buy_invest.core.utils_for_testing import (

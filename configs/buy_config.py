@@ -1,7 +1,7 @@
 import math
 from typing import Any
 
-from rent_buy_invest.core.config import Config
+from rent_buy_invest.configs.config import Config
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, project_growth
 
 

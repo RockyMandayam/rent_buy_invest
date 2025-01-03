@@ -1,6 +1,6 @@
 import math
 
-from rent_buy_invest.core.config import Config
+from rent_buy_invest.configs.config import Config
 from rent_buy_invest.utils import math_utils
 
 DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS = True
