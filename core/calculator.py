@@ -2,7 +2,7 @@ import datetime
 
 import pandas as pd
 
-from rent_buy_invest.core.buy_config import HouseConfig
+from rent_buy_invest.core.buy_config import BuyConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.market_config import MarketConfig
 from rent_buy_invest.core.rent_config import RentConfig
@@ -35,14 +35,14 @@ FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 class Calculator:
     def __init__(
         self,
-        house_config: HouseConfig,
+        house_config: BuyConfig,
         rent_config: RentConfig,
         market_config: MarketConfig,
         num_months: int,
         start_date: datetime.date,
         initial_state: InitialState,
     ) -> None:
-        self.house_config: HouseConfig = house_config
+        self.house_config: BuyConfig = house_config
         self.rent_config: RentConfig = rent_config
         self.market_config: MarketConfig = market_config
         self.num_months: int = num_months

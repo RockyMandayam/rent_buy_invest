@@ -5,7 +5,7 @@ from rent_buy_invest.core.config import Config
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, project_growth
 
 
-class HouseConfig(Config):
+class BuyConfig(Config):
     """Stores house config.
 
     Class Attributes:
@@ -247,103 +247,103 @@ class HouseConfig(Config):
         ), "Annual management cost fraction must be non-negative."
         self._validate_max_value(
             "annual_assessed_value_inflation_rate",
-            HouseConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
+            BuyConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
         )
         self._validate_max_value(
             "mortgage_annual_interest_rate",
-            HouseConfig.MAX_MORTGAGE_ANNUAL_INTEREST_RATE,
+            BuyConfig.MAX_MORTGAGE_ANNUAL_INTEREST_RATE,
         )
-        self._validate_max_value("mortgage_term_months", HouseConfig.MAX_MORTGAGE_TERM)
+        self._validate_max_value("mortgage_term_months", BuyConfig.MAX_MORTGAGE_TERM)
         if self.initial_loan_amount:
             self._validate_max_value_as_fraction(
                 "upfront_mortgage_insurance_fraction",
                 "initial_loan_amount",
-                HouseConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION,
+                BuyConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION,
             )
             self._validate_max_value_as_fraction(
                 "annual_mortgage_insurance_fraction",
                 "initial_loan_amount",
-                HouseConfig.MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION,
+                BuyConfig.MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION,
             )
             self._validate_max_value_as_fraction(
                 "mortgage_origination_points_fee_fraction",
                 "initial_loan_amount",
-                HouseConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION,
+                BuyConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION,
             )
         self._validate_max_value(
-            "mortgage_processing_fee", HouseConfig.MAX_MORTGAGE_PROCESSING_FEE
+            "mortgage_processing_fee", BuyConfig.MAX_MORTGAGE_PROCESSING_FEE
         )
         self._validate_max_value(
-            "mortgage_underwriting_fee", HouseConfig.MAX_MORTGAGE_UNDERWRITING_FEE
+            "mortgage_underwriting_fee", BuyConfig.MAX_MORTGAGE_UNDERWRITING_FEE
         )
         if self.initial_loan_amount:
             self._validate_max_value_as_fraction(
                 "mortgage_discount_points_fee_fraction",
                 "initial_loan_amount",
-                HouseConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION,
+                BuyConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION,
             )
         self._validate_max_value(
-            "home_appraisal_cost", HouseConfig.MAX_HOME_APPRAISAL_COST
+            "home_appraisal_cost", BuyConfig.MAX_HOME_APPRAISAL_COST
         )
-        self._validate_max_value("credit_report_fee", HouseConfig.MAX_CREDIT_REPORT_FEE)
+        self._validate_max_value("credit_report_fee", BuyConfig.MAX_CREDIT_REPORT_FEE)
         self._validate_max_value(
-            "transfer_tax_fraction", HouseConfig.MAX_TRANSFER_TAX_FRACTION
+            "transfer_tax_fraction", BuyConfig.MAX_TRANSFER_TAX_FRACTION
         )
         self._validate_max_value(
             "recording_fee_fraction",
-            HouseConfig.MAX_RECORDING_FEE_FRACTION,
+            BuyConfig.MAX_RECORDING_FEE_FRACTION,
         )
         self._validate_max_value(
-            "annual_property_tax_rate", HouseConfig.MAX_ANNUAL_PROPERTY_TAX_RATE
+            "annual_property_tax_rate", BuyConfig.MAX_ANNUAL_PROPERTY_TAX_RATE
         )
         self._validate_max_value(
             "realtor_commission_fraction",
-            HouseConfig.MAX_REALTOR_COMMISSION_FRACTION,
+            BuyConfig.MAX_REALTOR_COMMISSION_FRACTION,
         )
-        self._validate_max_value("hoa_transfer_fee", HouseConfig.MAX_HOA_TRANSFER_FEE)
+        self._validate_max_value("hoa_transfer_fee", BuyConfig.MAX_HOA_TRANSFER_FEE)
         self._validate_max_value(
-            "home_inspection_cost", HouseConfig.MAX_HOME_INSPECTION_COST
+            "home_inspection_cost", BuyConfig.MAX_HOME_INSPECTION_COST
         )
         self._validate_max_value(
-            "pest_inspection_cost", HouseConfig.MAX_PEST_INSPECTION_COST
+            "pest_inspection_cost", BuyConfig.MAX_PEST_INSPECTION_COST
         )
-        self._validate_max_value("escrow_fixed_fee", HouseConfig.MAX_ESCROW_FIXED_FEE)
+        self._validate_max_value("escrow_fixed_fee", BuyConfig.MAX_ESCROW_FIXED_FEE)
         self._validate_max_value(
-            "flood_certification_fee", HouseConfig.MAX_FLOOD_CERTIFICATION_FEE
+            "flood_certification_fee", BuyConfig.MAX_FLOOD_CERTIFICATION_FEE
         )
-        self._validate_max_value("title_search_fee", HouseConfig.MAX_TITLE_SEARCH_FEE)
-        self._validate_max_value("attorney_fee", HouseConfig.MAX_ATTORNEY_FEE)
+        self._validate_max_value("title_search_fee", BuyConfig.MAX_TITLE_SEARCH_FEE)
+        self._validate_max_value("attorney_fee", BuyConfig.MAX_ATTORNEY_FEE)
         self._validate_max_value(
             "closing_protection_letter_fee",
-            HouseConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
+            BuyConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
         )
         self._validate_max_value(
-            "search_abstract_fee", HouseConfig.MAX_SEARCH_ABSTRACT_FEE
+            "search_abstract_fee", BuyConfig.MAX_SEARCH_ABSTRACT_FEE
         )
-        self._validate_max_value("survey_fee", HouseConfig.MAX_SURVEY_FEE)
-        self._validate_max_value("notary_fee", HouseConfig.MAX_NOTARY_FEE)
-        self._validate_max_value("deed_prep_fee", HouseConfig.MAX_DEED_PREP_FEE)
-        self._validate_max_value("endorsement_fees", HouseConfig.MAX_ENDORSEMENT_FEES)
+        self._validate_max_value("survey_fee", BuyConfig.MAX_SURVEY_FEE)
+        self._validate_max_value("notary_fee", BuyConfig.MAX_NOTARY_FEE)
+        self._validate_max_value("deed_prep_fee", BuyConfig.MAX_DEED_PREP_FEE)
+        self._validate_max_value("endorsement_fees", BuyConfig.MAX_ENDORSEMENT_FEES)
         self._validate_max_value(
             "annual_homeowners_insurance_fraction",
-            HouseConfig.MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION,
+            BuyConfig.MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION,
         )
-        self._validate_max_value("monthly_utilities", HouseConfig.MAX_MONTHLY_UTILITIES)
+        self._validate_max_value("monthly_utilities", BuyConfig.MAX_MONTHLY_UTILITIES)
         self._validate_max_value(
             "annual_maintenance_cost_fraction",
-            HouseConfig.MAX_ANNUAL_MAINTENANCE_COST_FRACTION,
+            BuyConfig.MAX_ANNUAL_MAINTENANCE_COST_FRACTION,
         )
-        self._validate_max_value("monthly_hoa_fees", HouseConfig.MAX_MONTHLY_HOA_FEES)
+        self._validate_max_value("monthly_hoa_fees", BuyConfig.MAX_MONTHLY_HOA_FEES)
         self._validate_max_value(
             "annual_management_cost_fraction",
-            HouseConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+            BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
         )
 
         assert (
             self.get_upfront_one_time_cost()
-            <= HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE
+            <= BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE
             * self.sale_price
-        ), f"Please check the house config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
+        ), f"Please check the house config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
 
     @property
     def initial_loan_fraction(self):

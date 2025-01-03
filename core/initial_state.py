@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from rent_buy_invest.core.buy_config import HouseConfig
+from rent_buy_invest.core.buy_config import BuyConfig
 from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils.data_utils import to_df
 
@@ -14,7 +14,7 @@ class InitialState:
     invested_in_home: float
 
     @staticmethod
-    def from_configs(house_config: HouseConfig, rent_config: RentConfig) -> None:
+    def from_configs(house_config: BuyConfig, rent_config: RentConfig) -> None:
         rent_one_time_cost = rent_config.get_upfront_one_time_cost()
         home_one_time_cost = house_config.get_upfront_one_time_cost()
         assert (
