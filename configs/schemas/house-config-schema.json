@@ -51,7 +51,7 @@
       "description": "Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount.",
       "type": "number"
     },
-    "house_appraisal_cost": {
+    "home_appraisal_cost": {
       "description": "House appraisal cost. Lenders often require a house appraisal. The buyer often pays for this up-front, regardless of whether the sale actually goes through.",
       "type": "number"
     },
@@ -181,7 +181,7 @@
     "mortgage_processing_fee",
     "mortgage_underwriting_fee",
     "mortgage_discount_points_fee_fraction",
-    "house_appraisal_cost",
+    "home_appraisal_cost",
     "credit_report_fee",
     "transfer_tax_fraction",
     "seller_burden_of_transfer_tax_fraction",

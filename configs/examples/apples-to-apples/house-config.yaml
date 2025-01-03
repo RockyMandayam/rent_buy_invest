@@ -26,7 +26,7 @@ mortgage_underwriting_fee: !!float 0.0
 
 mortgage_discount_points_fee_fraction: !!float 0.0
 
-house_appraisal_cost: !!float 500
+home_appraisal_cost: !!float 500
 
 credit_report_fee: !!float 0.0
 

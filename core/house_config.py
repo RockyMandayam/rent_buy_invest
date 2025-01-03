@@ -25,7 +25,7 @@ class HouseConfig(Config):
     MAX_MORTGAGE_PROCESSING_FEE = 1000.0
     MAX_MORTGAGE_UNDERWRITING_FEE = 1000.0
     MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION = 0.05
-    MAX_HOUSE_APPRAISAL_COST = 5000.0
+    MAX_HOME_APPRAISAL_COST = 5000.0
     MAX_CREDIT_REPORT_FEE = 500.0
     MAX_TRANSFER_TAX_FRACTION = 0.01
     MAX_RECORDING_FEE_FRACTION = 0.1
@@ -88,7 +88,7 @@ class HouseConfig(Config):
         self.mortgage_discount_points_fee_fraction: float = kwargs[
             "mortgage_discount_points_fee_fraction"
         ]
-        self.house_appraisal_cost: float = kwargs["house_appraisal_cost"]
+        self.home_appraisal_cost: float = kwargs["home_appraisal_cost"]
         self.credit_report_fee: float = kwargs["credit_report_fee"]
         self.transfer_tax_fraction: float = kwargs["transfer_tax_fraction"]
         self.seller_burden_of_transfer_tax_fraction: float = kwargs[
@@ -176,7 +176,7 @@ class HouseConfig(Config):
             self.mortgage_discount_points_fee_fraction >= 0
         ), "Mortgage discount points fee fraction must be non-negative."
         assert (
-            self.house_appraisal_cost >= 0
+            self.home_appraisal_cost >= 0
         ), "House appraisal cost must be non-negative."
         assert self.credit_report_fee >= 0, "Credit report fee must be non-negative."
         assert (
@@ -283,7 +283,7 @@ class HouseConfig(Config):
                 HouseConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION,
             )
         self._validate_max_value(
-            "house_appraisal_cost", HouseConfig.MAX_HOUSE_APPRAISAL_COST
+            "home_appraisal_cost", HouseConfig.MAX_HOME_APPRAISAL_COST
         )
         self._validate_max_value("credit_report_fee", HouseConfig.MAX_CREDIT_REPORT_FEE)
         self._validate_max_value(
@@ -370,7 +370,7 @@ class HouseConfig(Config):
             + self.mortgage_discount_points_fee_fraction
                 * self.initial_loan_amount
             # fmt: on
-            + self.house_appraisal_cost
+            + self.home_appraisal_cost
             + self.credit_report_fee
             # fmt: off
             + (1 - self.seller_burden_of_transfer_tax_fraction)

@@ -25,7 +25,7 @@ class TestHouseConfig:
             "mortgage_processing_fee",
             "mortgage_underwriting_fee",
             "mortgage_discount_points_fee_fraction",
-            "house_appraisal_cost",
+            "home_appraisal_cost",
             "credit_report_fee",
             "transfer_tax_fraction",
             "seller_burden_of_transfer_tax_fraction",
@@ -157,9 +157,9 @@ class TestHouseConfig:
         check_float_field(
             HouseConfig,
             config_kwargs,
-            ["house_appraisal_cost"],
+            ["home_appraisal_cost"],
             allow_negative=False,
-            max_value=HouseConfig.MAX_HOUSE_APPRAISAL_COST,
+            max_value=HouseConfig.MAX_HOME_APPRAISAL_COST,
         )
         check_float_field(
             HouseConfig,
