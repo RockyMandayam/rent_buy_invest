@@ -72,7 +72,7 @@
       "type": "number"
     },
     "annual_property_tax_rate": {
-      "description": "ANNUAL property tax rate (a fraction of the house's assessed value).",
+      "description": "ANNUAL property tax rate (a fraction of the home's assessed value).",
       "type": "number"
     },
     "realtor_commission_fraction": {
@@ -148,7 +148,7 @@
       "type": "number"
     },
     "annual_homeowners_insurance_fraction": {
-      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed home value. This field depends a lot on the house, conditions, coverage, insurance, etc.",
+      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed home value. This field depends a lot on the home, conditions, coverage, insurance, etc.",
       "type": "number"
     },
     "monthly_utilities": {
@@ -164,7 +164,7 @@
       "type": "number"
     },
     "annual_management_cost_fraction": {
-      "description": "Total ANNUAL cost of managing the home (expressed as a fraction of assessed home price) without living in it (i.e., being a landlord but not a resident), EXCEPT for maintenance costs that you'd expect to pay even if you lived in the house. Note that this means if you expect maintenance costs to be higher when you do not live in the home vs when you live in it (because you think tenants will take worse care of the home than you would if you lived in t), that difference in cost should contribute to this parameter. Note this parameter can include paying a management company, advertising the house, any trips you may have to make, anything associated with managing / landlord",
+      "description": "Total ANNUAL cost of managing the home (expressed as a fraction of assessed home price) without living in it (i.e., being a landlord but not a resident), EXCEPT for maintenance costs that you'd expect to pay even if you lived in the home. Note that this means if you expect maintenance costs to be higher when you do not live in the home vs when you live in it (because you think tenants will take worse care of the home than you would if you lived in t), that difference in cost should contribute to this parameter. Note this parameter can include paying a management company, advertising the home, any trips you may have to make, anything associated with managing / landlord",
       "type": "number"
     }
   },

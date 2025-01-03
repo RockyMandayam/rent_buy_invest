@@ -17,14 +17,14 @@ class TestInitialState:
         assert (
             act.loc["One-time costs", "Rent"]
             + act.loc["Invested in market", "Rent"]
-            + act.loc["Invested in house", "Rent"]
+            + act.loc["Invested in home", "Rent"]
             == act.loc["One-time costs", "Buy"]
             + act.loc["Invested in market", "Buy"]
-            + act.loc["Invested in house", "Buy"]
+            + act.loc["Invested in home", "Buy"]
         )
 
         # now for a more specific test
-        exp_rows = ["One-time costs", "Invested in market", "Invested in house"]
+        exp_rows = ["One-time costs", "Invested in market", "Invested in home"]
         exp_cols = {
             "Rent": [
                 RENT_CONFIG.get_upfront_one_time_cost(),

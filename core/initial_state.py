@@ -19,7 +19,7 @@ class InitialState:
         buy_one_time_cost = buy_config.get_upfront_one_time_cost()
         assert (
             rent_one_time_cost <= buy_one_time_cost
-        ), "Renting should not have a larger upfront one-time cost than buying a house."
+        ), "Renting should not have a larger upfront one-time cost than buying a home."
         invested_in_home = buy_config.down_payment
         invested_in_market_if_renting = (
             buy_one_time_cost + invested_in_home - rent_one_time_cost
@@ -32,7 +32,7 @@ class InitialState:
         )
 
     def get_df(self) -> list[list[Any | None]]:
-        rows = ["One-time costs", "Invested in market", "Invested in house"]
+        rows = ["One-time costs", "Invested in market", "Invested in home"]
         cols = {
             "Rent": [self.rent_one_time_cost, self.invested_in_market_if_renting, 0],
             "Buy": [self.buy_one_time_cost, 0, self.invested_in_home],

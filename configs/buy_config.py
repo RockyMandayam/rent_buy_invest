@@ -140,7 +140,7 @@ class BuyConfig(Config):
         """Sanity checks the configs.
 
         Raises:
-            AssertionError: If any house configs are invalid
+            AssertionError: If any buy config fields are invalid
         """
         for attribute, value in self.__dict__.items():
             assert math.isfinite(
@@ -342,7 +342,7 @@ class BuyConfig(Config):
             self.get_upfront_one_time_cost()
             <= BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE
             * self.sale_price
-        ), f"Please check the house config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
+        ), f"Please check the buy config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
 
     @property
     def initial_loan_fraction(self):

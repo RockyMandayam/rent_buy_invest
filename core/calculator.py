@@ -217,7 +217,7 @@ class Calculator:
             # Rent: costs
             "Rent: Cost tied to inflation": rent_monthly_costs,
             # Rent: relative surplus
-            "Rent: Surplus (vs buying house)": rent_monthly_surpluses,
+            "Rent: Surplus (vs buying home)": rent_monthly_surpluses,
         }
         rows = []
         date = self.start_date
