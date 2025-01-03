@@ -68,7 +68,7 @@ class TestBuyConfig:
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
-        test_house_config = BuyConfig(**config_kwargs)
+        test_buy_config = BuyConfig(**config_kwargs)
 
         check_float_field(
             BuyConfig,
@@ -112,7 +112,7 @@ class TestBuyConfig:
             ["upfront_mortgage_insurance_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION
-            * test_house_config.initial_loan_amount,
+            * test_buy_config.initial_loan_amount,
         ),
         check_float_field(
             BuyConfig,
@@ -120,7 +120,7 @@ class TestBuyConfig:
             ["annual_mortgage_insurance_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION
-            * test_house_config.initial_loan_amount,
+            * test_buy_config.initial_loan_amount,
         )
         check_float_field(
             BuyConfig,
@@ -128,7 +128,7 @@ class TestBuyConfig:
             ["mortgage_origination_points_fee_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION
-            * test_house_config.initial_loan_amount,
+            * test_buy_config.initial_loan_amount,
         )
         check_float_field(
             BuyConfig,
@@ -136,7 +136,7 @@ class TestBuyConfig:
             ["mortgage_processing_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_MORTGAGE_PROCESSING_FEE
-            * test_house_config.initial_loan_amount,
+            * test_buy_config.initial_loan_amount,
         )
         check_float_field(
             BuyConfig,
@@ -144,7 +144,7 @@ class TestBuyConfig:
             ["mortgage_underwriting_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_MORTGAGE_UNDERWRITING_FEE
-            * test_house_config.initial_loan_amount,
+            * test_buy_config.initial_loan_amount,
         )
         check_float_field(
             BuyConfig,
@@ -152,7 +152,7 @@ class TestBuyConfig:
             ["mortgage_discount_points_fee_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION
-            * test_house_config.initial_loan_amount,
+            * test_buy_config.initial_loan_amount,
         )
         check_float_field(
             BuyConfig,
