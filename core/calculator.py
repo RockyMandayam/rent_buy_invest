@@ -123,7 +123,7 @@ class Calculator:
                 mortgage_insurance = 0
             elif not self.house_config.is_fha_loan:
                 if loan_amount <= PMI_LTV_THRESHOLD * self.house_config.sale_price:
-                    if mortgage_insurances[-1] != 0:
+                    if mortgage_insurances and mortgage_insurances[-1] != 0:
                         house_one_off_cost += self.house_config.house_appraisal_cost
                     mortgage_insurance = 0
                 else:
