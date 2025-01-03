@@ -1,5 +1,4 @@
 import math
-from typing import Dict
 
 # isort: off
 from rent_buy_invest.core.utils_for_testing import (
@@ -17,7 +16,7 @@ def test_check_float_field() -> None:
             def __init__(self, x: float) -> None:
                 assert math.isfinite(x) and x > 0 and x <= 1
 
-        def __init__(self, nested: Dict):
+        def __init__(self, nested: dict):
             self.nested = FloatFieldTestClass.FloatFieldNestedTestClass(**nested)
 
     check_float_field(
@@ -36,7 +35,7 @@ def test_check_filepath_field() -> None:
             def __init__(self, filepath: str) -> None:
                 io_utils.read_yaml(filepath)
 
-        def __init__(self, nested: Dict):
+        def __init__(self, nested: dict):
             self.nested = FilepathFieldTestClass.FilepathFieldNestedTestClass(**nested)
 
     check_filepath_field(

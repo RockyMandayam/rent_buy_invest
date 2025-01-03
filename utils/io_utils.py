@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Dict, List, Union
+from typing import Any
 
 import pandas as pd
 import yaml
@@ -58,10 +58,10 @@ def delete_dir(project_path) -> None:
     os.rmdir(get_abs_path(project_path))
 
 
-def read_yaml(project_path: str) -> Union[Dict[str, Any], List]:
+def read_yaml(project_path: str) -> dict[str, Any] | list:
     """Load yaml given by path (from 'rent_buy_invest' directory) as dictionary."""
     with RentBuyInvestFileOpener(project_path, mode="r") as f:
-        general_config: Dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
+        general_config: dict[str, Any] = yaml.load(f, Loader=yaml.SafeLoader)
     return general_config
 
 
@@ -86,6 +86,6 @@ def write_xlsx_df(project_path: str, df: pd.DataFrame) -> None:
     df.to_excel(abs_path)
 
 
-def read_json(project_path: str) -> Union[Dict, List]:
+def read_json(project_path: str) -> dict | list:
     with RentBuyInvestFileOpener(project_path, mode="r") as f:
         return json.load(f)
