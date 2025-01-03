@@ -75,11 +75,11 @@ class Calculator:
         ]  # NOTE: first value filled in
         investment_values_if_house = [0]  # NOTE: first value filed in
 
-        mortgage_amount = self.house_config.initial_mortgage_amount
+        mortgage_amount = self.house_config.initial_loan_amount
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
         mortgage_insurance_if_required = round(
             self.house_config.annual_mortgage_insurance_fraction
-            * self.house_config.initial_mortgage_amount
+            * self.house_config.initial_loan_amount
             / MONTHS_PER_YEAR,
             2,
         )
