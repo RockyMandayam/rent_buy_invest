@@ -175,7 +175,7 @@ class Calculator:
                 housing_monthly_surpluses.append(0)
                 investment_values_if_house.append(gain_in_investment_if_house)
             elif surplus < 0:
-                # if house option has a relative surplus
+                # if buy option has a relative surplus
                 # negate surplus to make it a positive from the perspective of housing
                 surplus = -surplus
                 rent_monthly_surpluses.append(0)
