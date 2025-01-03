@@ -1,7 +1,7 @@
 import math
 
 # isort: off
-from rent_buy_invest.core.utils_for_testing import (
+from rent_buy_invest.configs.utils_for_testing import (
     check_filepath_field,
     check_float_field,
 )
