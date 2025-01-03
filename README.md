@@ -2,7 +2,7 @@
 
 ## Overview
 
-Calculates the long-term financial pros and cons of decisions related to renting a home, buying a house, and investing in the stock market.
+Calculates the long-term financial pros and cons of decisions related to renting a home, buying a home, and investing in the stock market.
 
 This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
 
@@ -23,8 +23,8 @@ Some additional notes about the configs:
     - Prepaid property tax: Similarly, you may prepay some amount of future property tax. To make the calculations simpler, `rent_buy_invest` does not include prepaid homeowners insurance. It should not really affect the rent vs buy comparison anyways - it seems to be a matter of accounting and payment schedule, not a matter of a change in amounts owed.
     - Prepaid mortgage insurance: This is the upfront part of the mortgage insurance. This may be 0. Ideally, `rent_buy_invest` would handle this, but as of now it does not.
 - Rental cost inflation: Currently, the `annual_rent_inflation_rate` is applied to all rental expenses, not just rent (e.g., rent, utilities, renter's insruance, etc.). Ideally `rent_buy_invest` would have separate inflation rates for different categories.
-- House cost inflation: There are a few different categories of costs associated with buying a house:
-    - House value related costs: property tax, homeowners insurance, maintenance, and management. These change according to `annual_assessed_value_inflation_rate`
+- Home cost inflation: There are a few different categories of costs associated with buying a home:
+    - Home value related costs: property tax, homeowners insurance, maintenance, and management. These change according to `annual_assessed_value_inflation_rate`
     - Inflation related costs: utilities and HOA fees. These increase change according to `annual_inflation_rate`
     - Mortgage insurance: Mortgage insurance is calculated based on the initial loan amount
     - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the loan amount decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
