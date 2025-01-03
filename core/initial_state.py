@@ -11,7 +11,7 @@ class InitialState:
     rent_one_time_cost: float
     home_one_time_cost: float
     invested_in_market_if_renting: float
-    invested_in_house: float
+    invested_in_home: float
 
     @staticmethod
     def from_configs(house_config: HouseConfig, rent_config: RentConfig) -> None:
@@ -20,21 +20,21 @@ class InitialState:
         assert (
             rent_one_time_cost <= home_one_time_cost
         ), "Renting should not have a larger upfront one-time cost than buying a house."
-        invested_in_house = house_config.down_payment
+        invested_in_home = house_config.down_payment
         invested_in_market_if_renting = (
-            home_one_time_cost + invested_in_house - rent_one_time_cost
+            home_one_time_cost + invested_in_home - rent_one_time_cost
         )
         return InitialState(
             rent_one_time_cost,
             home_one_time_cost,
             invested_in_market_if_renting,
-            invested_in_house,
+            invested_in_home,
         )
 
     def get_df(self) -> list[list[Any | None]]:
         rows = ["One-time costs", "Invested in market", "Invested in house"]
         cols = {
             "Rent": [self.rent_one_time_cost, self.invested_in_market_if_renting, 0],
-            "House": [self.home_one_time_cost, 0, self.invested_in_house],
+            "House": [self.home_one_time_cost, 0, self.invested_in_home],
         }
         return to_df(cols, rows)
