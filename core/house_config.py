@@ -347,6 +347,7 @@ class HouseConfig(Config):
 
     @property
     def initial_loan_fraction(self):
+        """This is also known as the loan-to-purchase-price (LTPP)"""
         return 1 - self.down_payment_fraction
 
     @property
