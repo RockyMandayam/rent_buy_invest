@@ -2,8 +2,7 @@ import copy
 
 import pytest
 
-# from rent_buy_invest.core.house_config import HouseConfig
-from rent_buy_invest.core.house_config_test import HOUSE_CONFIG
+from rent_buy_invest.core.buy_config_test import BUY_CONFIG
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.rent_config_test import RENT_CONFIG
 from rent_buy_invest.utils.data_utils import to_df
@@ -11,7 +10,7 @@ from rent_buy_invest.utils.data_utils import to_df
 
 class TestInitialState:
     def test_get_df(self) -> None:
-        initial_state = InitialState.from_configs(HOUSE_CONFIG, RENT_CONFIG)
+        initial_state = InitialState.from_configs(BUY_CONFIG, RENT_CONFIG)
         act = initial_state.get_df()
 
         # total money put in initially must be same in both cases
@@ -19,9 +18,9 @@ class TestInitialState:
             act.loc["One-time costs", "Rent"]
             + act.loc["Invested in market", "Rent"]
             + act.loc["Invested in house", "Rent"]
-            == act.loc["One-time costs", "House"]
-            + act.loc["Invested in market", "House"]
-            + act.loc["Invested in house", "House"]
+            == act.loc["One-time costs", "Buy"]
+            + act.loc["Invested in market", "Buy"]
+            + act.loc["Invested in house", "Buy"]
         )
 
         # now for a more specific test
@@ -29,15 +28,15 @@ class TestInitialState:
         exp_cols = {
             "Rent": [
                 RENT_CONFIG.get_upfront_one_time_cost(),
-                HOUSE_CONFIG.get_upfront_one_time_cost()
-                + HOUSE_CONFIG.down_payment
+                BUY_CONFIG.get_upfront_one_time_cost()
+                + BUY_CONFIG.down_payment
                 - RENT_CONFIG.get_upfront_one_time_cost(),
                 0,
             ],
-            "House": [
-                HOUSE_CONFIG.get_upfront_one_time_cost(),
+            "Buy": [
+                BUY_CONFIG.get_upfront_one_time_cost(),
                 0,
-                HOUSE_CONFIG.down_payment,
+                BUY_CONFIG.down_payment,
             ],
         }
         exp = to_df(exp_cols, exp_rows)
@@ -46,4 +45,4 @@ class TestInitialState:
         rent_config_bad = copy.deepcopy(RENT_CONFIG)
         rent_config_bad.security_deposit = 1000000
         with pytest.raises(AssertionError):
-            initial_state = InitialState.from_configs(HOUSE_CONFIG, rent_config_bad)
+            initial_state = InitialState.from_configs(BUY_CONFIG, rent_config_bad)

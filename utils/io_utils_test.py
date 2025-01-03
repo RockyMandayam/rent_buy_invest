@@ -43,7 +43,7 @@ def test_read_yaml() -> None:
     io_utils.read_yaml(
         "rent_buy_invest/configs/examples/example-1/experiment-config.yaml"
     )
-    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/house-config.yaml")
+    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/buy-config.yaml")
     io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/market-config.yaml")
     io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/rent-config.yaml")
 
@@ -102,6 +102,6 @@ def test_read_json() -> None:
 
     # try reading example jsons
     io_utils.read_json("rent_buy_invest/configs/schemas/experiment-config-schema.json")
-    io_utils.read_json("rent_buy_invest/configs/schemas/house-config-schema.json")
+    io_utils.read_json("rent_buy_invest/configs/schemas/buy-config-schema.json")
     io_utils.read_json("rent_buy_invest/configs/schemas/market-config-schema.json")
     io_utils.read_json("rent_buy_invest/configs/schemas/rent-config-schema.json")

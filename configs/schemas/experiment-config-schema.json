@@ -15,19 +15,19 @@
       "description": "Rent config file path from the 'rent_buy_invest' directory.",
       "type": "string"
     },
-    "house_config_path": {
-      "description": "House config file path from the 'rent_buy_invest' directory.",
+    "buy_config_path": {
+      "description": "Buy config file path from the 'rent_buy_invest' directory.",
       "type": "string"
     },
     "start_date": {
-      "description": "Start date of the financial projection (the date when the house ownership is transferred to you)."
+      "description": "Start date of the financial projection (the date when the home ownership is transferred to you)."
     }
   },
   "required": [
     "num_months",
     "market_config_path",
     "rent_config_path",
-    "house_config_path",
+    "buy_config_path",
     "start_date"
   ]
 }
