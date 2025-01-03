@@ -2,7 +2,7 @@ import jsonschema
 import pytest
 
 from rent_buy_invest.configs.buy_config import BuyConfig
-from rent_buy_invest.core.utils_for_testing import check_float_field
+from rent_buy_invest.configs.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
