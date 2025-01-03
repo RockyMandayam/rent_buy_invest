@@ -30,14 +30,14 @@ class TestInitialState:
             "Rent": [
                 RENT_CONFIG.get_upfront_one_time_cost(),
                 HOUSE_CONFIG.get_upfront_one_time_cost()
-                + HOUSE_CONFIG.get_down_payment()
+                + HOUSE_CONFIG.down_payment
                 - RENT_CONFIG.get_upfront_one_time_cost(),
                 0,
             ],
             "House": [
                 HOUSE_CONFIG.get_upfront_one_time_cost(),
                 0,
-                HOUSE_CONFIG.get_down_payment(),
+                HOUSE_CONFIG.down_payment,
             ],
         }
         exp = to_df(exp_cols, exp_rows)

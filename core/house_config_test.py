@@ -112,7 +112,7 @@ class TestHouseConfig:
             ["upfront_mortgage_insurance_fraction"],
             allow_negative=False,
             max_value=HouseConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION
-            * test_house_config.initial_mortgage_amount,
+            * test_house_config.initial_loan_amount,
         ),
         check_float_field(
             HouseConfig,
@@ -120,7 +120,7 @@ class TestHouseConfig:
             ["annual_mortgage_insurance_fraction"],
             allow_negative=False,
             max_value=HouseConfig.MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION
-            * test_house_config.initial_mortgage_amount,
+            * test_house_config.initial_loan_amount,
         )
         check_float_field(
             HouseConfig,
@@ -128,7 +128,7 @@ class TestHouseConfig:
             ["mortgage_origination_points_fee_fraction"],
             allow_negative=False,
             max_value=HouseConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION
-            * test_house_config.initial_mortgage_amount,
+            * test_house_config.initial_loan_amount,
         )
         check_float_field(
             HouseConfig,
@@ -136,7 +136,7 @@ class TestHouseConfig:
             ["mortgage_processing_fee"],
             allow_negative=False,
             max_value=HouseConfig.MAX_MORTGAGE_PROCESSING_FEE
-            * test_house_config.initial_mortgage_amount,
+            * test_house_config.initial_loan_amount,
         )
         check_float_field(
             HouseConfig,
@@ -144,7 +144,7 @@ class TestHouseConfig:
             ["mortgage_underwriting_fee"],
             allow_negative=False,
             max_value=HouseConfig.MAX_MORTGAGE_UNDERWRITING_FEE
-            * test_house_config.initial_mortgage_amount,
+            * test_house_config.initial_loan_amount,
         )
         check_float_field(
             HouseConfig,
@@ -152,7 +152,7 @@ class TestHouseConfig:
             ["mortgage_discount_points_fee_fraction"],
             allow_negative=False,
             max_value=HouseConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION
-            * test_house_config.initial_mortgage_amount,
+            * test_house_config.initial_loan_amount,
         )
         check_float_field(
             HouseConfig,

@@ -254,20 +254,20 @@ class HouseConfig(Config):
             HouseConfig.MAX_MORTGAGE_ANNUAL_INTEREST_RATE,
         )
         self._validate_max_value("mortgage_term_months", HouseConfig.MAX_MORTGAGE_TERM)
-        if self.initial_mortgage_amount:
+        if self.initial_loan_amount:
             self._validate_max_value_as_fraction(
                 "upfront_mortgage_insurance_fraction",
-                "initial_mortgage_amount",
+                "initial_loan_amount",
                 HouseConfig.MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION,
             )
             self._validate_max_value_as_fraction(
                 "annual_mortgage_insurance_fraction",
-                "initial_mortgage_amount",
+                "initial_loan_amount",
                 HouseConfig.MAX_ANNUAL_MORTGAGE_INSURANCE_FRACTION,
             )
             self._validate_max_value_as_fraction(
                 "mortgage_origination_points_fee_fraction",
-                "initial_mortgage_amount",
+                "initial_loan_amount",
                 HouseConfig.MAX_MORTGAGE_ORIGINATION_POINTS_FEE_FRACTION,
             )
         self._validate_max_value(
@@ -276,10 +276,10 @@ class HouseConfig(Config):
         self._validate_max_value(
             "mortgage_underwriting_fee", HouseConfig.MAX_MORTGAGE_UNDERWRITING_FEE
         )
-        if self.initial_mortgage_amount:
+        if self.initial_loan_amount:
             self._validate_max_value_as_fraction(
                 "mortgage_discount_points_fee_fraction",
-                "initial_mortgage_amount",
+                "initial_loan_amount",
                 HouseConfig.MAX_MORTGAGE_DISCOUNT_POINTS_FEE_FRACTION,
             )
         self._validate_max_value(
@@ -345,24 +345,30 @@ class HouseConfig(Config):
             * self.sale_price
         ), f"Please check the house config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {HouseConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
 
-    def get_down_payment(self):
+    @property
+    def initial_loan_fraction(self):
+        """This is also known as the loan-to-purchase-price (LTPP)"""
+        return 1 - self.down_payment_fraction
+
+    @property
+    def down_payment(self):
         return self.down_payment_fraction * self.sale_price
 
     @property
-    def initial_mortgage_amount(self):
-        return (1 - self.down_payment_fraction) * self.sale_price
+    def initial_loan_amount(self):
+        return self.initial_loan_fraction * self.sale_price
 
     def get_upfront_one_time_cost(self):
         return (
             # fmt: off
             self.mortgage_origination_points_fee_fraction
-                * self.initial_mortgage_amount
+                * self.initial_loan_amount
             # fmt: on
             + self.mortgage_processing_fee
             + self.mortgage_underwriting_fee
             # fmt: off
             + self.mortgage_discount_points_fee_fraction
-                * self.initial_mortgage_amount
+                * self.initial_loan_amount
             # fmt: on
             + self.house_appraisal_cost
             + self.credit_report_fee
@@ -388,8 +394,8 @@ class HouseConfig(Config):
             + self.survey_fee
             + self.notary_fee
             + self.deed_prep_fee
-            + self.lenders_title_insurance_fraction * self.initial_mortgage_amount
-            + self.owners_title_insurance_fraction * self.initial_mortgage_amount
+            + self.lenders_title_insurance_fraction * self.initial_loan_amount
+            + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.endorsement_fees
         )
 
@@ -399,7 +405,7 @@ class HouseConfig(Config):
         # as opposed to using the "equivalent" monthly compound rate
         i = self.mortgage_annual_interest_rate / MONTHS_PER_YEAR
         r = 1 / (1 + i)
-        L = self.initial_mortgage_amount
+        L = self.initial_loan_amount
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_monthly_house_values(self, num_months: int):

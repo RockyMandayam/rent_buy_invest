@@ -20,7 +20,7 @@ class InitialState:
         assert (
             rent_one_time_cost <= house_one_time_cost
         ), "Renting should not have a larger upfront one-time cost than buying a house."
-        invested_in_house = house_config.get_down_payment()
+        invested_in_house = house_config.down_payment
         invested_in_market_if_renting = (
             house_one_time_cost + invested_in_house - rent_one_time_cost
         )
