@@ -2,9 +2,9 @@ import copy
 
 import pytest
 
-from rent_buy_invest.core.buy_config_test import BUY_CONFIG
+from rent_buy_invest.configs.buy_config_test import BUY_CONFIG
+from rent_buy_invest.configs.rent_config_test import RENT_CONFIG
 from rent_buy_invest.core.initial_state import InitialState
-from rent_buy_invest.core.rent_config_test import RENT_CONFIG
 from rent_buy_invest.utils.data_utils import to_df
 
 

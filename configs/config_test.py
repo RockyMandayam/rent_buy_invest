@@ -1,6 +1,6 @@
 import pytest
 
-from rent_buy_invest.core.config import Config
+from rent_buy_invest.configs.config import Config
 
 
 class TestConfig:

@@ -1,9 +1,9 @@
 import datetime
 
-from rent_buy_invest.core.buy_config import BuyConfig
-from rent_buy_invest.core.config import Config
-from rent_buy_invest.core.market_config import MarketConfig
-from rent_buy_invest.core.rent_config import RentConfig
+from rent_buy_invest.configs.buy_config import BuyConfig
+from rent_buy_invest.configs.config import Config
+from rent_buy_invest.configs.market_config import MarketConfig
+from rent_buy_invest.configs.rent_config import RentConfig
 
 
 class ExperimentConfig(Config):

@@ -6,8 +6,8 @@ from typing import Any
 import openpyxl
 import pandas as pd
 
+from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.core.calculator import Calculator
-from rent_buy_invest.core.experiment_config import ExperimentConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils import io_utils
 

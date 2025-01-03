@@ -2,10 +2,10 @@ import datetime
 
 import pandas as pd
 
-from rent_buy_invest.core.buy_config import BuyConfig
+from rent_buy_invest.configs.buy_config import BuyConfig
+from rent_buy_invest.configs.market_config import MarketConfig
+from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.initial_state import InitialState
-from rent_buy_invest.core.market_config import MarketConfig
-from rent_buy_invest.core.rent_config import RentConfig
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, increment_month
 
