@@ -78,7 +78,7 @@ class Calculator:
         investment_values_if_renting = [
             self.initial_state.invested_in_market_if_renting
         ]  # NOTE: first value filled in
-        investment_values_if_house = [0]  # NOTE: first value filed in
+        investment_values_if_buying = [0]  # NOTE: first value filed in
 
         loan_amount = self.house_config.initial_loan_amount
         monthly_mortgage_payment = self.house_config.get_monthly_mortgage_payment()
@@ -144,7 +144,7 @@ class Calculator:
             house_one_off_costs.append(house_one_off_cost)
 
             # monthly surplus from one option vs the other
-            # investment_values_if_renting and investment_values_if_house have their
+            # investment_values_if_renting and investment_values_if_buying have their
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
             housing_monthly_payment = (
@@ -162,7 +162,7 @@ class Calculator:
                 )[1]
             )
             gain_in_investment_if_house = self.market_config.get_pretax_monthly_wealth(
-                investment_values_if_house[-1], 1
+                investment_values_if_buying[-1], 1
             )[1]
             # Surplus from the perspective of renting
             surplus = round(housing_monthly_payment - rent_monthly_payment, 2)
@@ -173,7 +173,7 @@ class Calculator:
                     round(gain_in_investment_if_renting + surplus, 2)
                 )
                 housing_monthly_surpluses.append(0)
-                investment_values_if_house.append(gain_in_investment_if_house)
+                investment_values_if_buying.append(gain_in_investment_if_house)
             elif surplus < 0:
                 # if buy option has a relative surplus
                 # negate surplus to make it a positive from the perspective of housing
@@ -181,7 +181,7 @@ class Calculator:
                 rent_monthly_surpluses.append(0)
                 investment_values_if_renting.append(gain_in_investment_if_renting)
                 housing_monthly_surpluses.append(surplus)
-                investment_values_if_house.append(
+                investment_values_if_buying.append(
                     round(gain_in_investment_if_house + surplus, 2)
                 )
 
@@ -190,12 +190,12 @@ class Calculator:
             assert loan_amount >= 0, "Loan amount cannot be negative."
         # Pop last element from lists which have an extra item (starting value)
         investment_values_if_renting.pop()
-        investment_values_if_house.pop()
+        investment_values_if_buying.pop()
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
             # House: state
-            "House: Non-house investment": investment_values_if_house,
+            "House: Non-house investment": investment_values_if_buying,
             "House: House equity": equities,
             "House: Market value": home_values,
             "House: Loan amount": loan_amounts,
