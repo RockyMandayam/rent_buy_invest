@@ -124,7 +124,7 @@ class Calculator:
                     mortgage_insurance = mortgage_insurance_if_required
             else:
                 if (
-                    (1 - self.house_config.down_payment_fraction)
+                    self.house_config.initial_loan_fraction
                     > FHA_INITIAL_MORTGAGE_AMOUNT_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE
                 ):
                     mortgage_insurance = mortgage_insurance_if_required
