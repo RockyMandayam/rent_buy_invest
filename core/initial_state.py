@@ -35,6 +35,6 @@ class InitialState:
         rows = ["One-time costs", "Invested in market", "Invested in house"]
         cols = {
             "Rent": [self.rent_one_time_cost, self.invested_in_market_if_renting, 0],
-            "House": [self.home_one_time_cost, 0, self.invested_in_home],
+            "Buy": [self.home_one_time_cost, 0, self.invested_in_home],
         }
         return to_df(cols, rows)

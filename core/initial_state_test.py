@@ -19,9 +19,9 @@ class TestInitialState:
             act.loc["One-time costs", "Rent"]
             + act.loc["Invested in market", "Rent"]
             + act.loc["Invested in house", "Rent"]
-            == act.loc["One-time costs", "House"]
-            + act.loc["Invested in market", "House"]
-            + act.loc["Invested in house", "House"]
+            == act.loc["One-time costs", "Buy"]
+            + act.loc["Invested in market", "Buy"]
+            + act.loc["Invested in house", "Buy"]
         )
 
         # now for a more specific test
@@ -34,7 +34,7 @@ class TestInitialState:
                 - RENT_CONFIG.get_upfront_one_time_cost(),
                 0,
             ],
-            "House": [
+            "Buy": [
                 HOUSE_CONFIG.get_upfront_one_time_cost(),
                 0,
                 HOUSE_CONFIG.down_payment,
