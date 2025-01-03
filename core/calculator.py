@@ -76,7 +76,7 @@ class Calculator:
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
         investment_values_if_renting = [
-            self.initial_state.invested_in_market_if_renting
+            self.initial_state.invested_if_renting
         ]  # NOTE: first value filled in
         investment_values_if_buying = [0]  # NOTE: first value filed in
 
