@@ -6,7 +6,7 @@ from rent_buy_invest.core.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-house-config.yaml"
-HOUSE_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
+BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
 
 class TestBuyConfig:
@@ -360,12 +360,12 @@ class TestBuyConfig:
         # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
         # Mortgage term is 360 months
         # Annual interest rate is 0.06
-        actual = HOUSE_CONFIG.get_monthly_mortgage_payment()
+        actual = BUY_CONFIG.get_monthly_mortgage_payment()
         expected = 2398.20
         assert actual == expected
 
     def test_get_upfront_one_time_cost(self) -> None:
-        actual = HOUSE_CONFIG.get_upfront_one_time_cost()
+        actual = BUY_CONFIG.get_upfront_one_time_cost()
         expected = (
             0.015 * 400000
             + 300
