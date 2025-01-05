@@ -25,6 +25,7 @@ class TestRentConfig(TestConfig):
             "inflation_adjustment_period",
             "security_deposit",
             "unrecoverable_fraction_of_security_deposit",
+            "subsidy_fraction",
         ]
         self._test_inputs_with_invalid_schema(RentConfig, attributes)
 
@@ -88,6 +89,13 @@ class TestRentConfig(TestConfig):
             RentConfig,
             config_kwargs,
             ["unrecoverable_fraction_of_security_deposit"],
+            allow_negative=False,
+            allow_greater_than_one=False,
+        )
+        check_float_field(
+            RentConfig,
+            config_kwargs,
+            ["subsidy_fraction"],
             allow_negative=False,
             allow_greater_than_one=False,
         )

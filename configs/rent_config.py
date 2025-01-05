@@ -42,6 +42,7 @@ class RentConfig(Config):
         self.unrecoverable_fraction_of_security_deposit: float = kwargs[
             "unrecoverable_fraction_of_security_deposit"
         ]
+        self.subsidy_fraction: float = kwargs["subsidy_fraction"]
         self._validate()
 
     def _validate(self) -> None:
@@ -70,6 +71,9 @@ class RentConfig(Config):
             self.unrecoverable_fraction_of_security_deposit >= 0
             and self.unrecoverable_fraction_of_security_deposit <= 1
         ), "Unrecoverable fraction of security deposit must be between 0 and 1 inclusive."
+        assert (
+            self.subsidy_fraction >= 0 and self.subsidy_fraction <= 1
+        ), "Subsidy fraction of rental costs must be between 0 and 1 inclusive."
         self._validate_max_value_as_fraction(
             "monthly_utilities",
             "monthly_rent",

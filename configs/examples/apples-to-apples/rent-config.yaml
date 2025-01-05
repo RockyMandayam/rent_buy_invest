@@ -13,3 +13,5 @@ inflation_adjustment_period: !!int 12
 security_deposit: !!float 2000.
 
 unrecoverable_fraction_of_security_deposit: !!float 0.5
+
+subsidy_fraction: !!float 0.0
