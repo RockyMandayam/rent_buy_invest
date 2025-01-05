@@ -44,6 +44,11 @@ Navigate to the directory containing `rent_buy_invest` and run:
 
 ## For Developers
 
+### Making a PR
+Steps:
+- Before finalizing the PR, and ideally before every commit, from the `rent_buy_invest` folder, run `black .`, `isort .`, and for each of the four config files run `jsonschema2md path/to/<config_file>.json path/to/<config_file>.md`. Also make sure tests pass by running `pytest .`
+- You can set at least some of this stuff up in a pre-commit hook, but I haven't done that yet.
+
 ### Updating the config schema
 Steps:
 - Update json schema (add/remove/modify the field in the appropriate .json file in `rent_buy_invest/configs/schemas/`). Remove to update the list of `required` fields appropriately.
