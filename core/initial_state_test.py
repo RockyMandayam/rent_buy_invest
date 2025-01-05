@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from rent_buy_invest.configs.buy_config_test import BUY_CONFIG
+from rent_buy_invest.configs.buy_config_test import TestBuyConfig
 from rent_buy_invest.configs.rent_config_test import TestRentConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.data_utils import to_df
@@ -11,7 +11,7 @@ from rent_buy_invest.utils.data_utils import to_df
 class TestInitialState:
     def test_get_df(self) -> None:
         initial_state = InitialState.from_configs(
-            BUY_CONFIG, TestRentConfig.RENT_CONFIG
+            TestBuyConfig.BUY_CONFIG, TestRentConfig.RENT_CONFIG
         )
         act = initial_state.get_df()
 
@@ -31,13 +31,13 @@ class TestInitialState:
             "Rent": [
                 TestRentConfig.RENT_CONFIG.get_upfront_one_time_cost(),
                 0,
-                BUY_CONFIG.get_upfront_one_time_cost()
-                + BUY_CONFIG.down_payment
+                TestBuyConfig.BUY_CONFIG.get_upfront_one_time_cost()
+                + TestBuyConfig.BUY_CONFIG.down_payment
                 - TestRentConfig.RENT_CONFIG.get_upfront_one_time_cost(),
             ],
             "Buy": [
-                BUY_CONFIG.get_upfront_one_time_cost(),
-                BUY_CONFIG.down_payment,
+                TestBuyConfig.BUY_CONFIG.get_upfront_one_time_cost(),
+                TestBuyConfig.BUY_CONFIG.down_payment,
                 0,
             ],
         }
@@ -47,4 +47,6 @@ class TestInitialState:
         rent_config_bad = copy.deepcopy(TestRentConfig.RENT_CONFIG)
         rent_config_bad.security_deposit = 1000000
         with pytest.raises(AssertionError):
-            initial_state = InitialState.from_configs(BUY_CONFIG, rent_config_bad)
+            initial_state = InitialState.from_configs(
+                TestBuyConfig.BUY_CONFIG, rent_config_bad
+            )

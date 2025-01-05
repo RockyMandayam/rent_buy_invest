@@ -2,14 +2,15 @@ import jsonschema
 import pytest
 
 from rent_buy_invest.configs.buy_config import BuyConfig
+from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 
-TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
-BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
+class TestBuyConfig(TestConfig):
+    TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
+    BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
-class TestBuyConfig:
     def test_inputs_with_invalid_schema(self) -> None:
         # check null fields
         attributes = [
@@ -55,19 +56,10 @@ class TestBuyConfig:
             "monthly_hoa_fees",
             "annual_management_cost_fraction",
         ]
-        for attribute in attributes:
-            test_config_filename = f"rent_buy_invest/core/test_resources/test-buy-config_null_{attribute}.yaml"
-            with pytest.raises(jsonschema.ValidationError):
-                BuyConfig.parse(test_config_filename)
-
-        # check missing field
-        with pytest.raises(jsonschema.ValidationError):
-            BuyConfig.parse(
-                "rent_buy_invest/core/test_resources/test-buy-config_missing_annual_management_cost_fraction.yaml"
-            )
+        self._test_inputs_with_invalid_schema(BuyConfig, attributes)
 
     def test_invalid_inputs(self) -> None:
-        config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
+        config_kwargs = io_utils.read_yaml(TestBuyConfig.TEST_CONFIG_PATH)
         test_buy_config = BuyConfig(**config_kwargs)
 
         check_float_field(
@@ -360,12 +352,12 @@ class TestBuyConfig:
         # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
         # Mortgage term is 360 months
         # Annual interest rate is 0.06
-        actual = BUY_CONFIG.get_monthly_mortgage_payment()
+        actual = TestBuyConfig.BUY_CONFIG.get_monthly_mortgage_payment()
         expected = 2398.20
         assert actual == expected
 
     def test_get_upfront_one_time_cost(self) -> None:
-        actual = BUY_CONFIG.get_upfront_one_time_cost()
+        actual = TestBuyConfig.BUY_CONFIG.get_upfront_one_time_cost()
         expected = (
             0.015 * 400000
             + 300
