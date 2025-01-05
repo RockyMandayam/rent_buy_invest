@@ -33,29 +33,29 @@ def test_make_dirs_and_remove_dirs() -> None:
     assert not os.path.isdir(abs_path_dir)
 
 
-def test_read_yaml() -> None:
-    # simple custom test case
+def test_read_yaml_and_write_yaml() -> None:
+    # simple yaml test
     actual = io_utils.read_yaml(TEST_YAML_PATH)
     assert actual == EXPECTED_TEST_VALUE
-
-    # try reading example yamls
-    # TODO use test files not example files
-    io_utils.read_yaml(
-        "rent_buy_invest/core/test_resources/test-experiment-config.yaml"
-    )
-    io_utils.read_yaml("rent_buy_invest/core/test_resources/test-buy-config.yaml")
-    io_utils.read_yaml("rent_buy_invest/core/test_resources/test-market-config.yaml")
-    io_utils.read_yaml("rent_buy_invest/core/test_resources/test-rent-config.yaml")
-
-
-def test_write_yaml() -> None:
-    # simple custom test case
+    # ideally, write it and check equality, but two files can be formatted differently with the same content
+    # so, write and read again, and check that it's the same
     dir = f"rent_buy_invest/temp/test_write_yaml"
     project_path = f"{dir}/test_write_yaml.yaml"
-    io_utils.make_dirs(dir, exist_ok=True)
-    io_utils.write_yaml(project_path, EXPECTED_TEST_VALUE)
-    act = io_utils.read_yaml(project_path)
-    assert act == EXPECTED_TEST_VALUE
+    io_utils.write_yaml(project_path, actual)
+    reread_actual = io_utils.read_yaml(project_path)
+    assert reread_actual == actual
+
+    # similarly, but without an expected result for the first read, check write+read idempotency
+    # for the config classes
+    for yaml_path in (
+        "rent_buy_invest/core/test_resources/test-experiment-config.yaml",
+        "rent_buy_invest/core/test_resources/test-buy-config.yaml",
+        "rent_buy_invest/core/test_resources/test-market-config.yaml",
+        "rent_buy_invest/core/test_resources/test-rent-config.yaml",
+    ):
+        actual = io_utils.read_yaml(yaml_path)
+        io_utils.write_yaml(project_path, actual)
+        reread_actual = io_utils.read_yaml(project_path)
     io_utils.delete_file(project_path)
 
 
