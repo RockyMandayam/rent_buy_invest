@@ -100,11 +100,15 @@ class RentConfig(Config):
         )
 
     def get_upfront_one_time_cost(self) -> float:
-        return self.security_deposit * self.unrecoverable_fraction_of_security_deposit
+        return (
+            (1 - self.subsidy_fraction)
+            * self.security_deposit
+            * self.unrecoverable_fraction_of_security_deposit
+        )
 
     def _get_first_monthly_cost(self) -> float:
         """Get monthly cost of renting for the first month"""
-        return (
+        return (1 - self.subsidy_fraction) * (
             self.monthly_rent
             + self.monthly_utilities
             + self.monthly_renters_insurance
