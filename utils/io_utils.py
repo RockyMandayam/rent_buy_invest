@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from typing import Any
 
 import pandas as pd
@@ -39,6 +40,8 @@ class RentBuyInvestFileOpener:
         self.mode = mode
 
     def __enter__(self) -> Any:
+        dir_path = os.path.dirname(self.abs_path)
+        os.makedirs(dir_path, exist_ok=True)
         self.file = open(self.abs_path, mode=self.mode)
         return self.file
 
@@ -54,8 +57,8 @@ def make_dirs(project_path: str, exist_ok: bool = True) -> None:
     os.makedirs(get_abs_path(project_path), exist_ok=exist_ok)
 
 
-def delete_dir(project_path) -> None:
-    os.rmdir(get_abs_path(project_path))
+def delete_dir(project_path: str) -> None:
+    shutil.rmtree(get_abs_path(project_path))
 
 
 def read_yaml(project_path: str) -> dict[str, Any] | list:

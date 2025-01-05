@@ -25,7 +25,7 @@ def test_get_abs_path() -> None:
 
 
 def test_make_dirs_and_remove_dirs() -> None:
-    project_path_dir = "rent_buy_invest/test_dir/"
+    project_path_dir = "rent_buy_invest/temp/test_dir/"
     io_utils.make_dirs(project_path_dir)
     abs_path_dir = io_utils.get_abs_path(project_path_dir)
     assert os.path.isdir(abs_path_dir)
@@ -56,7 +56,7 @@ def test_read_yaml_and_write_yaml() -> None:
         actual = io_utils.read_yaml(yaml_path)
         io_utils.write_yaml(project_path, actual)
         reread_actual = io_utils.read_yaml(project_path)
-    io_utils.delete_file(project_path)
+    io_utils.delete_dir(dir)
 
 
 def test_write_xlsx_df() -> None:
@@ -74,7 +74,6 @@ def test_write_xlsx_df() -> None:
     io_utils.write_xlsx_df(project_path, exp)
     act = pd.read_excel(io_utils.get_abs_path(project_path), index_col=0)
     assert act.equals(exp)
-    io_utils.delete_file(project_path)
 
     # test multi-index column
     exp = pd.DataFrame(
@@ -86,7 +85,8 @@ def test_write_xlsx_df() -> None:
     io_utils.write_xlsx_df(project_path, exp)
     act = pd.read_excel(io_utils.get_abs_path(project_path), index_col=0, header=[0, 1])
     assert act.equals(exp)
-    io_utils.delete_file(project_path)
+
+    io_utils.delete_dir(dir)
 
 
 def test_read_json() -> None:

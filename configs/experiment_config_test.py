@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import jsonschema
 import pytest
 
@@ -13,6 +15,7 @@ from rent_buy_invest.configs.utils_for_testing import (
 from rent_buy_invest.utils import io_utils
 
 TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-experiment-config.yaml"
+TEST_CONFIG_KWARGS = io_utils.read_yaml(TEST_CONFIG_PATH)
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TEST_CONFIG_PATH)
 
 
@@ -25,28 +28,38 @@ class TestExperimentConfig:
             "rent_config_path",
             "buy_config_path",
         ]
+        dir = f"rent_buy_invest/temp/experiment_config_test/TestExperimentConfig"
         for attribute in attributes:
-            test_config_filename = f"rent_buy_invest/core/test_resources/test-experiment-config_null_{attribute}.yaml"
+            test_config_kwargs_copy = deepcopy(TEST_CONFIG_KWARGS)
+            # first try null field
+            test_config_kwargs_copy[attribute] = None
+            project_path = (
+                f"{dir}/test_inputs_with_invalid_schema_null_{attribute}.yaml"
+            )
+            io_utils.write_yaml(project_path, test_config_kwargs_copy)
             with pytest.raises(jsonschema.ValidationError):
-                ExperimentConfig.parse(test_config_filename)
+                ExperimentConfig.parse(project_path)
+            # now try missing field
+            del test_config_kwargs_copy[attribute]
+            project_path = (
+                f"{dir}/test_inputs_with_invalid_schema_missing_{attribute}.yaml"
+            )
+            io_utils.write_yaml(project_path, test_config_kwargs_copy)
+            with pytest.raises(jsonschema.ValidationError):
+                ExperimentConfig.parse(project_path)
+
         # test start_date separately since jsonschema does not check this field (it cannot test a datetime object)
         with pytest.raises(AssertionError):
             ExperimentConfig.parse(
                 "rent_buy_invest/core/test_resources/test-experiment-config_null_start_date.yaml"
             )
 
-        # check missing field
-        with pytest.raises(jsonschema.ValidationError):
-            ExperimentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-experiment-config_missing_start_date.yaml"
-            )
+        io_utils.delete_dir(dir)
 
     def test_invalid_inputs(self) -> None:
-        config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
-
         check_float_field(
             ExperimentConfig,
-            config_kwargs,
+            TEST_CONFIG_KWARGS,
             ["num_months"],
             allow_negative=False,
             allow_zero=False,
@@ -54,16 +67,16 @@ class TestExperimentConfig:
         )
         check_filepath_field(
             ExperimentConfig,
-            config_kwargs,
+            TEST_CONFIG_KWARGS,
             ["market_config_path"],
         )
         check_filepath_field(
             ExperimentConfig,
-            config_kwargs,
+            TEST_CONFIG_KWARGS,
             ["rent_config_path"],
         )
         check_filepath_field(
             ExperimentConfig,
-            config_kwargs,
+            TEST_CONFIG_KWARGS,
             ["buy_config_path"],
         )
