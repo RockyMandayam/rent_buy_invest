@@ -3,16 +3,17 @@ import itertools
 import jsonschema
 import pytest
 
+from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
 from rent_buy_invest.utils import io_utils
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
-TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
-RENT_CONFIG = RentConfig.parse(TEST_CONFIG_PATH)
 
+class TestRentConfig(TestConfig):
+    TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-rent-config.yaml"
+    RENT_CONFIG = RentConfig.parse(TEST_CONFIG_PATH)
 
-class TestRentConfig:
     def test_inputs_with_invalid_schema(self) -> None:
         # check null fields
         attributes = [
@@ -25,19 +26,10 @@ class TestRentConfig:
             "security_deposit",
             "unrecoverable_fraction_of_security_deposit",
         ]
-        for attribute in attributes:
-            test_config_filename = f"rent_buy_invest/core/test_resources/test-rent-config_null_{attribute}.yaml"
-            with pytest.raises(jsonschema.ValidationError):
-                RentConfig.parse(test_config_filename)
-
-        # check missing field
-        with pytest.raises(jsonschema.ValidationError):
-            RentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-rent-config_missing_inflation_adjustment_period.yaml"
-            )
+        self._test_inputs_with_invalid_schema(RentConfig, attributes)
 
     def test_invalid_inputs(self) -> None:
-        config_kwargs = io_utils.read_yaml(TEST_CONFIG_PATH)
+        config_kwargs = io_utils.read_yaml(TestRentConfig.TEST_CONFIG_PATH)
 
         check_float_field(
             RentConfig,
@@ -101,32 +93,36 @@ class TestRentConfig:
         )
 
     def test_get_upfront_one_time_cost(self) -> None:
-        act = RENT_CONFIG.get_upfront_one_time_cost()
+        act = TestRentConfig.RENT_CONFIG.get_upfront_one_time_cost()
         exp = (
-            RENT_CONFIG.security_deposit
-            * RENT_CONFIG.unrecoverable_fraction_of_security_deposit
+            TestRentConfig.RENT_CONFIG.security_deposit
+            * TestRentConfig.RENT_CONFIG.unrecoverable_fraction_of_security_deposit
         )
         assert act == exp
 
     def test_get_monthly_costs_of_renting(self) -> None:
         with pytest.raises(AssertionError):
-            RENT_CONFIG.get_monthly_costs_of_renting(0)
+            TestRentConfig.RENT_CONFIG.get_monthly_costs_of_renting(0)
 
         for num_months in [1, 2, 24, 25]:
-            actual = RENT_CONFIG.get_monthly_costs_of_renting(num_months)
+            actual = TestRentConfig.RENT_CONFIG.get_monthly_costs_of_renting(num_months)
 
             num_full_years = num_months // MONTHS_PER_YEAR
             exp = []
             # calculate for all but last year
             for year in range(num_full_years):
                 monthly_rent = round(
-                    2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** year,
+                    2420.0
+                    * (1 + TestRentConfig.RENT_CONFIG.annual_rent_inflation_rate)
+                    ** year,
                     2,
                 )
                 exp.extend([monthly_rent] * MONTHS_PER_YEAR)
             # calculate for last year
             monthly_rent = round(
-                2420.0 * (1 + RENT_CONFIG.annual_rent_inflation_rate) ** num_full_years,
+                2420.0
+                * (1 + TestRentConfig.RENT_CONFIG.annual_rent_inflation_rate)
+                ** num_full_years,
                 2,
             )
             exp.extend([monthly_rent] * ((num_months % MONTHS_PER_YEAR) + 1))

@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from copy import deepcopy
 
 import jsonschema
@@ -20,10 +21,14 @@ class TestConfig:
         TEST_CONFIG_KWARGS = io_utils.read_yaml(self.TEST_CONFIG_PATH)
         dir = f"rent_buy_invest/temp/{clz}"
         for attribute in attributes:
-            # error_type = AssertionError if attribute == "start_date" else jsonschema.ValidationError
             test_config_kwargs_copy = deepcopy(TEST_CONFIG_KWARGS)
+            attribute_parent = test_config_kwargs_copy
+            if not isinstance(attribute, str):
+                for nested_attribute in attribute[:-1]:
+                    attribute_parent = attribute_parent[nested_attribute]
+                attribute = attribute[-1]
             # first try null field
-            test_config_kwargs_copy[attribute] = None
+            attribute_parent[attribute] = None
             project_path = (
                 f"{dir}/test_inputs_with_invalid_schema_null_{attribute}.yaml"
             )
@@ -37,7 +42,7 @@ class TestConfig:
             ):
                 clz.parse(project_path)
             # now try missing field
-            del test_config_kwargs_copy[attribute]
+            del attribute_parent[attribute]
             project_path = (
                 f"{dir}/test_inputs_with_invalid_schema_missing_{attribute}.yaml"
             )

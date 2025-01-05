@@ -67,4 +67,4 @@ class ExperimentConfig(Config):
         ), f"Number of months must be positive and at most {ExperimentConfig.MAX_NUM_MONTHS}."
         assert isinstance(
             self.start_date, datetime.date
-        ), "Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date)."
+        ), f"Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date); received {self.start_date}"
