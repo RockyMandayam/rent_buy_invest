@@ -27,9 +27,11 @@ class TestExperimentConfig:
             "market_config_path",
             "rent_config_path",
             "buy_config_path",
+            "start_date",
         ]
         dir = f"rent_buy_invest/temp/experiment_config_test/TestExperimentConfig"
         for attribute in attributes:
+            # error_type = AssertionError if attribute == "start_date" else jsonschema.ValidationError
             test_config_kwargs_copy = deepcopy(TEST_CONFIG_KWARGS)
             # first try null field
             test_config_kwargs_copy[attribute] = None
@@ -37,7 +39,13 @@ class TestExperimentConfig:
                 f"{dir}/test_inputs_with_invalid_schema_null_{attribute}.yaml"
             )
             io_utils.write_yaml(project_path, test_config_kwargs_copy)
-            with pytest.raises(jsonschema.ValidationError):
+            # for a null start date, jsonschema won't raise a validation error (it cannot test a datetime object)
+            # an assertion error will be raised instead
+            with pytest.raises(
+                AssertionError
+                if attribute == "start_date"
+                else jsonschema.ValidationError
+            ):
                 ExperimentConfig.parse(project_path)
             # now try missing field
             del test_config_kwargs_copy[attribute]
@@ -47,12 +55,6 @@ class TestExperimentConfig:
             io_utils.write_yaml(project_path, test_config_kwargs_copy)
             with pytest.raises(jsonschema.ValidationError):
                 ExperimentConfig.parse(project_path)
-
-        # test start_date separately since jsonschema does not check this field (it cannot test a datetime object)
-        with pytest.raises(AssertionError):
-            ExperimentConfig.parse(
-                "rent_buy_invest/core/test_resources/test-experiment-config_null_start_date.yaml"
-            )
 
         io_utils.delete_dir(dir)
 
