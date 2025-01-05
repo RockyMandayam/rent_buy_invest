@@ -7,9 +7,12 @@ from rent_buy_invest.core.calculator import (
 )
 
 # isort: on
-from rent_buy_invest.configs.experiment_config_test import EXPERIMENT_CONFIG
+from rent_buy_invest.configs.experiment_config import ExperimentConfig
+from rent_buy_invest.configs.experiment_config_test import TestExperimentConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
+
+EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH)
 
 
 class TestCalculator:
