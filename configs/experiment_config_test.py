@@ -21,7 +21,7 @@ EXPERIMENT_CONFIG = ExperimentConfig.parse(TEST_CONFIG_PATH)
 
 class TestExperimentConfig:
     def test_inputs_with_invalid_schema(self) -> None:
-        # check null fields
+        # for now, can't use EXPERIMENT_CONFIG.__dict__ has for example 'market_config' not 'market_config_path'
         attributes = [
             "num_months",
             "market_config_path",
