@@ -36,7 +36,7 @@
       "type": "number"
     },
     "subsidy_fraction": {
-      "description": "The fraction of the total rental costs (including utilities, parking, etc.) that are subsidized for you (maybe you don't have to pay it due to family or friends covering it for example).",
+      "description": "The fraction of ALL total rental costs (including utilities, parking, etc.) that are subsidized for you (maybe you don't have to pay it due to family or friends covering it for example). Note that includes upfront costs (e.g., unrecoverable part of the security deposit) as well as monthly costs.",
       "type": "number"
     }
   },
