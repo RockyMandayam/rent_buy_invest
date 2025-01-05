@@ -41,11 +41,11 @@ def test_read_yaml() -> None:
     # try reading example yamls
     # TODO use test files not example files
     io_utils.read_yaml(
-        "rent_buy_invest/configs/examples/example-1/experiment-config.yaml"
+        "rent_buy_invest/core/test_resources/test-experiment-config.yaml"
     )
-    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/buy-config.yaml")
-    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/market-config.yaml")
-    io_utils.read_yaml("rent_buy_invest/configs/examples/example-1/rent-config.yaml")
+    io_utils.read_yaml("rent_buy_invest/core/test_resources/test-buy-config.yaml")
+    io_utils.read_yaml("rent_buy_invest/core/test_resources/test-market-config.yaml")
+    io_utils.read_yaml("rent_buy_invest/core/test_resources/test-rent-config.yaml")
 
 
 def test_write_yaml() -> None:
