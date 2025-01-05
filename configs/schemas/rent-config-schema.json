@@ -34,6 +34,10 @@
     "unrecoverable_fraction_of_security_deposit": {
       "description": "The fraction of the security deposit that you expect NOT to be returned to you ever.",
       "type": "number"
+    },
+    "subsidy_fraction": {
+      "description": "The fraction of ALL total rental costs (including utilities, parking, etc.) that are subsidized for you (maybe you don't have to pay it due to family or friends covering it for example). Note that includes upfront costs (e.g., unrecoverable part of the security deposit) as well as monthly costs.",
+      "type": "number"
     }
   },
   "required": [
@@ -44,6 +48,7 @@
     "annual_rent_inflation_rate",
     "inflation_adjustment_period",
     "security_deposit",
-    "unrecoverable_fraction_of_security_deposit"
+    "unrecoverable_fraction_of_security_deposit",
+    "subsidy_fraction"
   ]
 }
