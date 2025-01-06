@@ -48,6 +48,8 @@ class BuyConfig(Config):
     MAX_ANNUAL_MAINTENANCE_COST_FRACTION = 0.05
     MAX_MONTHLY_HOA_FEES = 1000.0
     MAX_ANNUAL_MANAGEMENT_COST_FRACTION = 0.05
+    # TODO add upper limit for monthly_rental_income
+    MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE = 0.3
     MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE = 0.5
 
     @classmethod
@@ -134,6 +136,14 @@ class BuyConfig(Config):
         self.annual_management_cost_fraction: float = kwargs[
             "annual_management_cost_fraction"
         ]
+        self.rental_income_waiting_period_months = kwargs[
+            "rental_income_waiting_period_months"
+        ]
+        self.monthly_rental_income = kwargs["monthly_rental_income"]
+        self.rental_income_annual_inflation_rate = kwargs[
+            "rental_income_annual_inflation_rate"
+        ]
+        self.occupancy_rate = kwargs["occupancy_rate"]
         self._validate()
 
     def _validate(self) -> None:
@@ -244,6 +254,15 @@ class BuyConfig(Config):
         assert (
             self.annual_management_cost_fraction >= 0
         ), "Annual management cost fraction must be non-negative."
+        assert (
+            self.rental_income_waiting_period_months >= 0
+        ), "rental_income_waiting_period_months must be non-negative."
+        assert (
+            self.monthly_rental_income >= 0
+        ), "monthly_rental_income must be non-negative."
+        assert (
+            self.occupancy_rate >= 0 and self.occupancy_rate <= 1
+        ), "occupancy_rate must be between 0 and 1 inclusive."
         self._validate_max_value(
             "annual_assessed_value_inflation_rate",
             BuyConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
@@ -336,6 +355,10 @@ class BuyConfig(Config):
         self._validate_max_value(
             "annual_management_cost_fraction",
             BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+        )
+        self._validate_max_value(
+            "rental_income_annual_inflation_rate",
+            BuyConfig.MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE,
         )
 
         assert (
@@ -450,3 +473,28 @@ class BuyConfig(Config):
             compound_monthly=False,
             num_months=num_months,
         )
+
+    def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
+        if self.rental_income_waiting_period_months >= num_months:
+            return [0 for _ in range(self.num_months)]
+        period_of_no_rental_income = [
+            0 for _ in range(self.rental_income_waiting_period_months)
+        ]
+        if self.rental_income_waiting_period_months == 0:
+            first_month_rent_after_waiting = self.monthly_rental_income
+        else:
+            first_month_rent_after_waiting = project_growth(
+                principal=self.monthly_rental_income,
+                annual_growth_rate=self.rental_income_annual_inflation_rate,
+                # I want the most up-to-date rental price even if it doesn't coincide with a year boundary
+                compound_monthly=True,
+                num_months=self.rental_income_waiting_period_months,
+            )[-1]
+        first_month_rent_after_waiting *= self.occupancy_rate
+        period_of_rental_income = project_growth(
+            principal=first_month_rent_after_waiting,
+            annual_growth_rate=self.rental_income_annual_inflation_rate,
+            compound_monthly=False,
+            num_months=(num_months - self.rental_income_waiting_period_months),
+        )
+        return period_of_no_rental_income + period_of_rental_income

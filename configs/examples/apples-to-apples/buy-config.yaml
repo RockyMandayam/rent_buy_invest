@@ -88,6 +88,14 @@ annual_maintenance_cost_fraction: !!float 0.01
 
 monthly_hoa_fees: !!float 200.0
 
-##### MANAGEMENT COSTS
+##### RENTAL INCOME RELATED COSTS
 
 annual_management_cost_fraction: !!float 0.0
+
+rental_income_waiting_period_months: 24
+
+monthly_rental_income: 1000
+
+rental_income_annual_inflation_rate: 0.02
+
+occupancy_rate: 0.6

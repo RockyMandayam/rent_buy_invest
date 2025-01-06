@@ -13,13 +13,13 @@ def project_growth(
     compound_monthly: bool,
     num_months: int,
     round_to_cent: bool = True,
-) -> float:
+) -> list[float]:
     """Given a principal (starting amount) and an annual growth rate, return
     the value at the beginning of each month for num_months months, and a final
     value representing the value at the end of num_months months.
 
     Returns:
-        List[float]: monthly value in dollars
+        list[float]: monthly value in dollars
 
     Raises:
         AssertionError: If principal is negative or num_months is not positive

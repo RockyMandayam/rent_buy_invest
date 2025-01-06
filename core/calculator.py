@@ -60,6 +60,9 @@ class Calculator:
                 self.rent_config.annual_rent_inflation_rate, self.num_months
             )
         )
+        home_monthly_rental_incomes = self.buy_config.get_monthly_rental_incomes(
+            self.num_months
+        )
 
         # Some renting costs/gains can be calculated independently at once
         rent_monthly_costs = self.rent_config.get_monthly_costs_of_renting(
@@ -210,6 +213,7 @@ class Calculator:
             # fmt: off
             "Buy: Mortgage Payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
+            "Buy: Rental Income": home_monthly_rental_incomes,
             # Buy: relative surplus
             "Buy: Surplus": housing_monthly_surpluses,
             # Rent: state

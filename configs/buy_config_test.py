@@ -55,6 +55,10 @@ class TestBuyConfig(TestConfig):
             "annual_maintenance_cost_fraction",
             "monthly_hoa_fees",
             "annual_management_cost_fraction",
+            "rental_income_waiting_period_months",
+            "monthly_rental_income",
+            "rental_income_annual_inflation_rate",
+            "occupancy_rate",
         ]
         self._test_inputs_with_invalid_schema(BuyConfig, attributes)
 
@@ -346,6 +350,31 @@ class TestBuyConfig(TestConfig):
             ["annual_management_cost_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+        )
+
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["rental_income_waiting_period_months"],
+            allow_negative=False,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["monthly_rental_income"],
+            allow_negative=False,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["rental_income_annual_inflation_rate"],
+            max_value=BuyConfig.MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["occupancy_rate"],
+            allow_greater_than_one=False,
         )
 
     def test_get_monthly_mortgage_payment(self) -> None:

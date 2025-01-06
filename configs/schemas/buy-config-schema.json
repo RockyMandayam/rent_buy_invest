@@ -166,6 +166,22 @@
     "annual_management_cost_fraction": {
       "description": "Total ANNUAL cost of managing the home (expressed as a fraction of assessed home price) without living in it (i.e., being a landlord but not a resident), EXCEPT for maintenance costs that you'd expect to pay even if you lived in the home. Note that this means if you expect maintenance costs to be higher when you do not live in the home vs when you live in it (because you think tenants will take worse care of the home than you would if you lived in t), that difference in cost should contribute to this parameter. Note this parameter can include paying a management company, advertising the home, any trips you may have to make, anything associated with managing / landlord",
       "type": "number"
+    },
+    "rental_income_waiting_period_months": {
+      "description": "The number of months you are required to wait before you can rent out your home. There may be restrictions on when you can rent out the home based on the laws (city, state, nation, etc.), the seller, the builder, the HOA, the lender, etc.",
+      "type": "number"
+    },
+    "monthly_rental_income": {
+      "description": "The estimated rental income IF you were to rent out the home as soon as you bought it, ignoring any rental_income_waiting_period_months. This is just to get a price point. This code will simulate the rent increases.",
+      "type": "number"
+    },
+    "rental_income_annual_inflation_rate": {
+      "description": "The estimated rate of growth of the monthly rental income, which will be compounded annually.",
+      "type": "number"
+    },
+    "occupancy_rate": {
+      "description": "The estimated fraction of time you expect the home to be rented out. This is based on how long it takes to find a tenant and/or perhaps you have preferences for how often/when you want to rent out the home. And you may have down periods for maintenance, renovation, etc.",
+      "type": "number"
     }
   },
   "required": [
@@ -209,6 +225,10 @@
     "monthly_utilities",
     "annual_maintenance_cost_fraction",
     "monthly_hoa_fees",
-    "annual_management_cost_fraction"
+    "annual_management_cost_fraction",
+    "rental_income_waiting_period_months",
+    "monthly_rental_income",
+    "rental_income_annual_inflation_rate",
+    "occupancy_rate"
   ]
 }
