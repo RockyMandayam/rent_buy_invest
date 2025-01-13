@@ -24,11 +24,11 @@
       "type": "number"
     },
     "upfront_mortgage_insurance_fraction": {
-      "description": "Upfront mortgage insurance cost as a fraction of initial loan amount.",
+      "description": "Upfront mortgage insurance cost as a fraction of initial loan amount. It's possible that the upfront mortgage insurance payment used to be tax deductible, but in any case, it is not anymore.",
       "type": "number"
     },
     "annual_mortgage_insurance_fraction": {
-      "description": "ANNUAL mortgage insurance cost as fraction of loan amount.",
+      "description": "ANNUAL mortgage insurance cost as fraction of loan amount. Mortgage insurance premiums used to be tax deductible, but no longer are.",
       "type": "number"
     },
     "is_fha_loan": {
