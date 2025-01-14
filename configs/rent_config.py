@@ -30,7 +30,7 @@ class RentConfig(Config):
         """Initializes the class.
 
         To see why I don't use yaml tags, see the docstring for __init__
-        in GeneralConfig.
+        in Config.
         """
         self.monthly_rent: float = kwargs["monthly_rent"]
         self.monthly_utilities: float = kwargs["monthly_utilities"]

@@ -52,6 +52,63 @@ class BuyConfig(Config):
     MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE = 0.3
     MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE = 0.5
 
+    class RentalIncomeConfig:
+        def __init__(
+            self,
+            annual_management_cost_fraction: float,
+            rental_income_waiting_period_months: int,
+            monthly_rental_income: float,
+            rental_income_annual_inflation_rate: float,
+            occupancy_rate: float,
+        ) -> None:
+            self.annual_management_cost_fraction = annual_management_cost_fraction
+            self.rental_income_waiting_period_months = (
+                rental_income_waiting_period_months
+            )
+            self.monthly_rental_income = monthly_rental_income
+            self.rental_income_annual_inflation_rate = (
+                rental_income_annual_inflation_rate
+            )
+            self.occupancy_rate = occupancy_rate
+            self._validate()
+
+        def _validate(self) -> None:
+            # TODO this is duplicate code, feels wrong...
+            for attribute, value in self.__dict__.items():
+                assert math.isfinite(
+                    value
+                ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
+            assert (
+                self.annual_management_cost_fraction >= 0
+            ), "Annual management cost fraction must be non-negative."
+            assert (
+                self.rental_income_waiting_period_months >= 0
+            ), "rental_income_waiting_period_months must be non-negative."
+            assert (
+                self.monthly_rental_income >= 0
+            ), "monthly_rental_income must be non-negative."
+            assert (
+                self.occupancy_rate >= 0 and self.occupancy_rate <= 1
+            ), "occupancy_rate must be between 0 and 1 inclusive."
+            # TODO can't access _validate_max_value since that is in Config class and RentalIncomeConfig
+            # doesn't inherit from Config. RentalIncomeConfig could inherit from Config, but then specifying
+            # the schema is tricky. For now, I'm just "ad hoc" checking these fields instead of calling
+            # _validate_max_value
+            for attr_name, max_value in (
+                (
+                    "annual_management_cost_fraction",
+                    BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+                ),
+                (
+                    "rental_income_annual_inflation_rate",
+                    BuyConfig.MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE,
+                ),
+            ):
+                attr_val = getattr(self, attr_name)
+                assert (
+                    attr_val <= max_value
+                ), f"Please set '{attr_name}' to something reasonable (at most {max_value})"
+
     @classmethod
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/buy-config-schema.json"
@@ -63,7 +120,7 @@ class BuyConfig(Config):
         """Initializes the class.
 
         To see why I don't use yaml tags, see the docstring for __init__
-        in GeneralConfig.
+        in Config.
         """
         self.sale_price: float = kwargs["sale_price"]
         self.annual_assessed_value_inflation_rate: float = kwargs[
@@ -133,17 +190,18 @@ class BuyConfig(Config):
             "annual_maintenance_cost_fraction"
         ]
         self.monthly_hoa_fees: float = kwargs["monthly_hoa_fees"]
-        self.annual_management_cost_fraction: float = kwargs[
-            "annual_management_cost_fraction"
-        ]
-        self.rental_income_waiting_period_months = kwargs[
-            "rental_income_waiting_period_months"
-        ]
-        self.monthly_rental_income = kwargs["monthly_rental_income"]
-        self.rental_income_annual_inflation_rate = kwargs[
-            "rental_income_annual_inflation_rate"
-        ]
-        self.occupancy_rate = kwargs["occupancy_rate"]
+        # TODO this seems wrong
+        rental_income_config_kwargs = kwargs["rental_income_config"]
+        if rental_income_config_kwargs:
+            self.rental_income_config = BuyConfig.RentalIncomeConfig(
+                rental_income_config_kwargs["annual_management_cost_fraction"],
+                rental_income_config_kwargs["rental_income_waiting_period_months"],
+                rental_income_config_kwargs["monthly_rental_income"],
+                rental_income_config_kwargs["rental_income_annual_inflation_rate"],
+                rental_income_config_kwargs["occupancy_rate"],
+            )
+        else:
+            self.rental_income_config = None
         self._validate()
 
     def _validate(self) -> None:
@@ -153,6 +211,9 @@ class BuyConfig(Config):
             AssertionError: If any buy config fields are invalid
         """
         for attribute, value in self.__dict__.items():
+            # TODO this feels wrong
+            if attribute == "rental_income_config":
+                continue
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
@@ -251,18 +312,6 @@ class BuyConfig(Config):
             self.annual_maintenance_cost_fraction >= 0
         ), "Annual maintenance cost fraction must be non-negative."
         assert self.monthly_hoa_fees >= 0, "Monthly HOA fees must be non-negative."
-        assert (
-            self.annual_management_cost_fraction >= 0
-        ), "Annual management cost fraction must be non-negative."
-        assert (
-            self.rental_income_waiting_period_months >= 0
-        ), "rental_income_waiting_period_months must be non-negative."
-        assert (
-            self.monthly_rental_income >= 0
-        ), "monthly_rental_income must be non-negative."
-        assert (
-            self.occupancy_rate >= 0 and self.occupancy_rate <= 1
-        ), "occupancy_rate must be between 0 and 1 inclusive."
         self._validate_max_value(
             "annual_assessed_value_inflation_rate",
             BuyConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
@@ -352,14 +401,6 @@ class BuyConfig(Config):
             BuyConfig.MAX_ANNUAL_MAINTENANCE_COST_FRACTION,
         )
         self._validate_max_value("monthly_hoa_fees", BuyConfig.MAX_MONTHLY_HOA_FEES)
-        self._validate_max_value(
-            "annual_management_cost_fraction",
-            BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
-        )
-        self._validate_max_value(
-            "rental_income_annual_inflation_rate",
-            BuyConfig.MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE,
-        )
 
         assert (
             self.get_upfront_one_time_cost()
@@ -438,18 +479,25 @@ class BuyConfig(Config):
             num_months=num_months,
         )
 
-    def get_home_value_related_monthly_costs(self, num_months: int) -> float:
-        first_month_cost = (
+    def _get_first_home_value_related_monthly_costs(self) -> float:
+        management_cost_fraction = (
+            self.rental_income_config.annual_management_cost_fraction
+            if self.rental_income_config
+            else 0
+        )
+        return (
             self.sale_price
             * (
                 self.annual_property_tax_rate
                 + self.annual_maintenance_cost_fraction
-                + self.annual_management_cost_fraction
+                + management_cost_fraction
             )
             / MONTHS_PER_YEAR
         )
+
+    def get_home_value_related_monthly_costs(self, num_months: int) -> float:
         return project_growth(
-            principal=first_month_cost,
+            principal=self._get_first_home_value_related_monthly_costs(),
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
             compound_monthly=False,
             num_months=num_months,
@@ -475,26 +523,34 @@ class BuyConfig(Config):
         )
 
     def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
-        if self.rental_income_waiting_period_months >= num_months:
+        if self.rental_income_config.rental_income_waiting_period_months >= num_months:
             return [0 for _ in range(self.num_months)]
         period_of_no_rental_income = [
-            0 for _ in range(self.rental_income_waiting_period_months)
+            0
+            for _ in range(
+                self.rental_income_config.rental_income_waiting_period_months
+            )
         ]
-        if self.rental_income_waiting_period_months == 0:
-            first_month_rent_after_waiting = self.monthly_rental_income
+        if self.rental_income_config.rental_income_waiting_period_months == 0:
+            first_month_rent_after_waiting = (
+                self.rental_income_config.monthly_rental_income
+            )
         else:
             first_month_rent_after_waiting = project_growth(
-                principal=self.monthly_rental_income,
-                annual_growth_rate=self.rental_income_annual_inflation_rate,
+                principal=self.rental_income_config.monthly_rental_income,
+                annual_growth_rate=self.rental_income_config.rental_income_annual_inflation_rate,
                 # I want the most up-to-date rental price even if it doesn't coincide with a year boundary
                 compound_monthly=True,
-                num_months=self.rental_income_waiting_period_months,
+                num_months=self.rental_income_config.rental_income_waiting_period_months,
             )[-1]
-        first_month_rent_after_waiting *= self.occupancy_rate
+        first_month_rent_after_waiting *= self.rental_income_config.occupancy_rate
         period_of_rental_income = project_growth(
             principal=first_month_rent_after_waiting,
-            annual_growth_rate=self.rental_income_annual_inflation_rate,
+            annual_growth_rate=self.rental_income_config.rental_income_annual_inflation_rate,
             compound_monthly=False,
-            num_months=(num_months - self.rental_income_waiting_period_months),
+            num_months=(
+                num_months
+                - self.rental_income_config.rental_income_waiting_period_months
+            ),
         )
         return period_of_no_rental_income + period_of_rental_income

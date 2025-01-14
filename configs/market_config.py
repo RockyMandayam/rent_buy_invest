@@ -47,7 +47,7 @@ class MarketConfig(Config):
             """Initializes the class.
 
             To see why I don't use yaml tags, see the docstring for __init__
-            in GeneralConfig.
+            in Config.
             """
             self.tax_brackets: list[dict[str, float]] = tax_brackets
             self.validate_non_regressive_tax_brackets = (
@@ -121,7 +121,7 @@ class MarketConfig(Config):
         """Initializes the class.
 
         To see why I don't use yaml tags, see the docstring for __init__
-        in GeneralConfig.
+        in Config.
         """
         self.market_rate_of_return: float = market_rate_of_return
         self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
