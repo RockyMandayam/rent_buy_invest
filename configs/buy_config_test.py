@@ -12,7 +12,7 @@ class TestBuyConfig(TestConfig):
     BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
     def test_inputs_with_invalid_schema(self) -> None:
-        # check null fields
+        # check missing and null fields
         attributes = [
             "sale_price",
             "annual_assessed_value_inflation_rate",
@@ -54,13 +54,17 @@ class TestBuyConfig(TestConfig):
             "monthly_utilities",
             "annual_maintenance_cost_fraction",
             "monthly_hoa_fees",
-            "annual_management_cost_fraction",
-            "rental_income_waiting_period_months",
-            "monthly_rental_income",
-            "rental_income_annual_inflation_rate",
-            "occupancy_rate",
+            "rental_income_config",
+            ("rental_income_config", "annual_management_cost_fraction"),
+            ("rental_income_config", "rental_income_waiting_period_months"),
+            ("rental_income_config", "monthly_rental_income"),
+            ("rental_income_config", "rental_income_annual_inflation_rate"),
+            ("rental_income_config", "occupancy_rate"),
         ]
-        self._test_inputs_with_invalid_schema(BuyConfig, attributes)
+        nullable_attributes = ("rental_income_config",)
+        self._test_inputs_with_invalid_schema(
+            BuyConfig, attributes, nullable_attributes
+        )
 
     def test_invalid_inputs(self) -> None:
         config_kwargs = io_utils.read_yaml(TestBuyConfig.TEST_CONFIG_PATH)
@@ -347,7 +351,7 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["annual_management_cost_fraction"],
+            ["rental_income_config", "annual_management_cost_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
         )
@@ -355,25 +359,25 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["rental_income_waiting_period_months"],
+            ["rental_income_config", "rental_income_waiting_period_months"],
             allow_negative=False,
         )
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["monthly_rental_income"],
+            ["rental_income_config", "monthly_rental_income"],
             allow_negative=False,
         )
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["rental_income_annual_inflation_rate"],
+            ["rental_income_config", "rental_income_annual_inflation_rate"],
             max_value=BuyConfig.MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE,
         )
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["occupancy_rate"],
+            ["rental_income_config", "occupancy_rate"],
             allow_greater_than_one=False,
         )
 
