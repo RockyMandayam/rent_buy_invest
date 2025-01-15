@@ -6,4 +6,6 @@ rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.ya
 
 buy_config_path: !!str "rent_buy_invest/core/test_resources/test-buy-config.yaml"
 
+personal_config_path: !!str "rent_buy_invest/core/test_resources/test-personal-config.yaml"
+
 start_date: !!timestamp "2025-01-01"

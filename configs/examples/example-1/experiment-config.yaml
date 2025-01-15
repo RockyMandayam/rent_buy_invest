@@ -6,4 +6,6 @@ rent_config_path: !!str "rent_buy_invest/configs/examples/example-1/rent-config.
 
 buy_config_path: !!str "rent_buy_invest/configs/examples/example-1/buy-config.yaml"
 
+personal_config_path: !!str "rent_buy_invest/configs/examples/example-1/personal-config.yaml"
+
 start_date: !!timestamp "2030-07-01"
