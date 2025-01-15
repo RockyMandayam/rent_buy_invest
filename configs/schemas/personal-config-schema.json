@@ -4,7 +4,7 @@
   "type": "object",
   "properties": {
     "income": {
-      "description": "ANNUAL income",
+      "description": "ANNUAL income. Income is used only for tax implications, not for determination of affordability.",
       "type": "number"
     },
     "income_growth_rate": {
@@ -12,7 +12,7 @@
       "type": "number"
     },
     "years_till_retirement": {
-      "description": "Number of years till retirement",
+      "description": "Number of years till retirement. After this many years, the income will reduce to 0. In reality, due to return on assets, government programs, etc., it should be more, but we ignore this for now.",
       "type": "number"
     }
   },
