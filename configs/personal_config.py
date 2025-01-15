@@ -49,3 +49,23 @@ class PersonalConfig(Config):
         assert (
             self.years_till_retirement >= 0
         ), "years_till_retirement must be non-negative"
+
+    def get_incomes(self, num_months: int) -> list[float]:
+        first_month_income = self.income / math_utils.MONTHS_PER_YEAR
+        months_till_retirement = self.years_till_retirement * math_utils.MONTHS_PER_YEAR
+        if months_till_retirement >= num_months:
+            return math_utils.project_growth(
+                principal=first_month_income,
+                annual_growth_rate=self.income_growth_rate,
+                compound_monthly=False,
+                num_months=num_months,
+            )
+        else:  # retire during projection
+            incomes_during_growth = math_utils.project_growth(
+                principal=first_month_income,
+                annual_growth_rate=self.income_growth_rate,
+                compound_monthly=False,
+                num_months=months_till_retirement,
+            )
+            incomes_during_retirement = [0] * (num_months - months_till_retirement)
+            return incomes_during_growth + incomes_during_retirement
