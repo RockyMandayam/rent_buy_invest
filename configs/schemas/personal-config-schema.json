@@ -10,7 +10,11 @@
     "income_growth_rate": {
       "description": "ANNUAL rate of growth of income",
       "type": "number"
+    },
+    "years_till_retirement": {
+      "description": "Number of years till retirement",
+      "type": "number"
     }
   },
-  "required": ["income", "income_growth_rate"]
+  "required": ["income", "income_growth_rate", "years_till_retirement"]
 }

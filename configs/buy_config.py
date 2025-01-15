@@ -56,6 +56,7 @@ class BuyConfig(Config):
         def __init__(
             self,
             annual_management_cost_fraction: float,
+            # TODO do type checking for all args like this
             rental_income_waiting_period_months: int,
             monthly_rental_income: float,
             rental_income_annual_inflation_rate: float,
