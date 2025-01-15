@@ -87,6 +87,7 @@ def main() -> None:
     experiment_config = ExperimentConfig.parse(args.experiment_config)
     num_months = experiment_config.num_months
     market_config = experiment_config.market_config
+    personal_config = experiment_config.personal_config
     rent_config = experiment_config.rent_config
     buy_config = experiment_config.buy_config
     start_date = experiment_config.start_date
@@ -105,7 +106,13 @@ def main() -> None:
 
     # project forward in time
     calculator = Calculator(
-        buy_config, rent_config, market_config, num_months, start_date, initial_state
+        buy_config,
+        rent_config,
+        market_config,
+        personal_config,
+        num_months,
+        start_date,
+        initial_state,
     )
     projection = calculator.calculate()
     _write_output_xlsx_df(output_dir, "projection.xlsx", projection, num_header_rows=2)

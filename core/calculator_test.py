@@ -21,6 +21,7 @@ class TestCalculator:
             EXPERIMENT_CONFIG.buy_config,
             EXPERIMENT_CONFIG.rent_config,
             EXPERIMENT_CONFIG.market_config,
+            EXPERIMENT_CONFIG.personal_config,
             EXPERIMENT_CONFIG.num_months,
             EXPERIMENT_CONFIG.start_date,
             InitialState.from_configs(

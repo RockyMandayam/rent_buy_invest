@@ -4,6 +4,7 @@ import pandas as pd
 
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.market_config import MarketConfig
+from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.data_utils import to_df
@@ -38,6 +39,7 @@ class Calculator:
         buy_config: BuyConfig,
         rent_config: RentConfig,
         market_config: MarketConfig,
+        personal_config: PersonalConfig,
         num_months: int,
         start_date: datetime.date,
         initial_state: InitialState,
@@ -45,6 +47,7 @@ class Calculator:
         self.buy_config: BuyConfig = buy_config
         self.rent_config: RentConfig = rent_config
         self.market_config: MarketConfig = market_config
+        self.personal_config: PersonalConfig = personal_config
         self.num_months: int = num_months
         self.start_date: datetime.date = start_date
         self.initial_state: InitialState = initial_state
@@ -64,6 +67,9 @@ class Calculator:
             self.num_months
         )
 
+        # Projected incomes (used only for tax projection purposes)
+        incomes = self.personal_config.get_incomes(self.num_months)
+
         # Some renting costs/gains can be calculated independently at once
         rent_monthly_costs = self.rent_config.get_monthly_costs_of_renting(
             self.num_months
@@ -72,6 +78,7 @@ class Calculator:
         # The remaining housing and rental costs/gains are calculated in the loop
         # which projects forward month by month
         mortgage_interests = []
+        mortgage_interest_deduction_savings = []
         paid_toward_equity = []
         loan_amounts = []
         equities = []
@@ -106,6 +113,16 @@ class Calculator:
                 2,
             )
             mortgage_interests.append(mortgage_interest)
+            # income tax savings due to mortgage interest deduction
+            # TODO conditions on when you can deduct
+            mortgage_interest_deduction_saving = (
+                self.market_config.get_income_tax_savings_from_deduction(
+                    incomes[month], mortgage_interest
+                )
+            )
+            mortgage_interest_deduction_savings.append(
+                mortgage_interest_deduction_saving
+            )
 
             # mortgage equity payment and equity value
             if loan_amount == 0:
@@ -208,6 +225,7 @@ class Calculator:
             "Buy: Mortgage Insurance": mortgage_insurances,
             "Buy: Mortgage Interest Payment": mortgage_interests,
             "Buy: Mortgage Equity Payment": paid_toward_equity,
+            "Buy: Mortgage Interest Deduction Savings": mortgage_interest_deduction_savings,
             "Buy: One-Off Costs": buy_one_off_costs,
             # black formats the following line in an easy-to-misread way
             # fmt: off

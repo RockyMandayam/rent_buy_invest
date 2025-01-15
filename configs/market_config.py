@@ -89,7 +89,7 @@ class MarketConfig(Config):
                     prev_tax_rate = bracket["tax_rate"]
                 upper_limit = bracket["upper_limit"]
 
-        def _get_tax(self, income: float) -> float:
+        def _get_income_tax(self, income: float, deduction: float = 0) -> float:
             """Calculates tax owed given income.
 
             Args:
@@ -100,6 +100,8 @@ class MarketConfig(Config):
             """
             tax = 0
             lower_limit = 0
+            deduction = min(deduction, income)
+            income -= deduction
             for bracket in self.tax_brackets:
                 if income < lower_limit:
                     break
@@ -143,7 +145,7 @@ class MarketConfig(Config):
         ), "Please set a reasonable market rate of return (at most 0.5)"
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
 
-    def get_tax(self, income: float) -> float:
+    def get_tax(self, income: float, deduction: float = 0) -> float:
         """Calculates tax owed given income.
 
         Args:
@@ -153,7 +155,25 @@ class MarketConfig(Config):
             tax: non-negative tax owed
         """
         assert income >= 0, "Income must be non-negative"
-        return self.tax_brackets._get_tax(income)
+        assert deduction >= 0, "Deduction must be non-negative"
+        return self.tax_brackets._get_income_tax(income, deduction)
+
+    def get_income_tax_savings_from_deduction(
+        self, income: float, deduction: float
+    ) -> float:
+        """Calculates income tax savings due to deduction at the given original income.
+
+        Args:
+            income: non-negative income
+
+        Returns:
+            tax: non-negative tax owed
+        """
+        assert income >= 0, "Income must be non-negative"
+        assert deduction >= 0, "Deduction must be non-negative"
+        original_tax = self.get_tax(income)
+        modified_tax = self.get_tax(income, deduction)
+        return original_tax - modified_tax
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
         """Return the pretax wealth in the market at the BEGINNING of each month
