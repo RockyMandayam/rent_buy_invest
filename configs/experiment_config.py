@@ -3,6 +3,7 @@ import datetime
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.config import Config
 from rent_buy_invest.configs.market_config import MarketConfig
+from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 
 
@@ -16,7 +17,8 @@ class ExperimentConfig(Config):
         num_months (int): Number of months to run the projection for
         market_config (MarketConfig): MarketConfig
         rent_config (RentConfig): RentConfig.
-        buy_config: (BuyConfig): BuyConfig
+        buy_config (BuyConfig): BuyConfig
+        personal_config (PersonalConfig): PersonalConfig
         start_date: (datetime.datetime): Start date of the projection
     """
 
@@ -32,6 +34,7 @@ class ExperimentConfig(Config):
         market_config_path: str,
         rent_config_path: str,
         buy_config_path: str,
+        personal_config_path: str,
         start_date: datetime.datetime,
     ) -> None:
         """Initializes the class.
@@ -52,6 +55,9 @@ class ExperimentConfig(Config):
         self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
         self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
         self.buy_config: BuyConfig = BuyConfig.parse(buy_config_path)
+        self.personal_config: PersonalConfig = PersonalConfig.parse(
+            personal_config_path
+        )
         self.start_date: datetime.datetime = start_date
         self._validate()
 
