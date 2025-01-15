@@ -1,0 +1,5 @@
+income: !!float 100000
+
+income_growth_rate: !!float 0.025
+
+years_till_retirement: !!int 40
