@@ -1,0 +1,16 @@
+{
+  "title": "Personal Configuration",
+  "description": "Config file relating to assumptions about the person making the rent vs buy decision.",
+  "type": "object",
+  "properties": {
+    "income": {
+      "description": "ANNUAL income",
+      "type": "number"
+    },
+    "income_growth_rate": {
+      "description": "ANNUAL rate of growth of income",
+      "type": "number"
+    }
+  },
+  "required": ["income", "income_growth_rate"]
+}
