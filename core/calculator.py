@@ -215,7 +215,7 @@ class Calculator:
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
             # Buy: state
-            "Buy: Invested": investment_values_if_buying,
+            "Buy: Invested (Pre-Tax)": investment_values_if_buying,
             "Buy: Home Equity": equities,
             "Buy: Home Value": home_values,
             "Buy: Loan Amount": loan_amounts,
@@ -235,7 +235,7 @@ class Calculator:
             # Buy: relative surplus
             "Buy: Surplus": housing_monthly_surpluses,
             # Rent: state
-            "Rent: Invested": investment_values_if_renting,
+            "Rent: Invested (Pre-Tax)": investment_values_if_renting,
             # Rent: costs
             "Rent: Costs Tied to Inflation": rent_monthly_costs,
             # Rent: relative surplus
