@@ -34,7 +34,7 @@ class InitialState:
         )
 
     def get_df(self) -> list[list[Any | None]]:
-        rows = ["Upfront one-time costs", "Home equity", "Invested"]
+        rows = ["Upfront one-time costs", "Home equity", "Invested (Pre-Tax)"]
         cols = {
             "Rent": [self.rent_upfront_one_time_cost, 0, self.invested_if_renting],
             "Buy": [self.buy_upfront_one_time_cost, self.home_equity_if_buying, 0],

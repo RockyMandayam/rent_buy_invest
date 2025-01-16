@@ -18,15 +18,15 @@ class TestInitialState:
         # total money put in initially must be same in both cases
         assert (
             act.loc["Upfront one-time costs", "Rent"]
-            + act.loc["Invested", "Rent"]
+            + act.loc["Invested (Pre-Tax)", "Rent"]
             + act.loc["Home equity", "Rent"]
             == act.loc["Upfront one-time costs", "Buy"]
-            + act.loc["Invested", "Buy"]
+            + act.loc["Invested (Pre-Tax)", "Buy"]
             + act.loc["Home equity", "Buy"]
         )
 
         # now for a more specific test
-        exp_rows = ["Upfront one-time costs", "Home equity", "Invested"]
+        exp_rows = ["Upfront one-time costs", "Home equity", "Invested (Pre-Tax)"]
         exp_cols = {
             "Rent": [
                 TestRentConfig.RENT_CONFIG.get_upfront_one_time_cost(),

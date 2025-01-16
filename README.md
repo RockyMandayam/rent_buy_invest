@@ -7,6 +7,8 @@ Calculates the long-term financial pros and cons of decisions related to renting
 This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
 
 Some additional notes about the configs:
+- There is a mortgage interest tax deduction. To get this deduction, you need to itemize your deductions instead of taking the standard deduction. This script assumes you will itemize your deductions. Although deductions are calculated annually, for convenience sake, it's done monthly in these calculations.
+- Mortgage insurance used to be tax deductible, but it seems it no longer is.
 - Property tax: Property taxes are billed annually based on the assessed value of the home. For convenience / to make the math easy, `rent_buy_invest` assumes this annual billing cycle start coincides with the start of the mortgage term.
 - Homeowners insurance: Homeowners insurance pricing is based on the replacement cost of the home (the cost of rebuilding the home if it gets destroyed), plus the regular supply+demand of the market. Since replacement cost has to do with constructing the home and not the market value, it is put under the inflation-related home ownership costs, not the home value related home ownership costs.
 - Depending on your situation, you may be required (by the lender, as a condition to getting a loan).
