@@ -16,7 +16,9 @@ class PersonalConfig(Config):
             instance attributes.
     """
 
-    # TODO add limits
+    MAX_INCOME = 100000000
+    MAX_INCOME_GROWTH_RATE = 0.35
+    MAX_YEARS_TILL_RETIREMENT = 80
 
     @classmethod
     def schema_path(cls) -> str:
@@ -49,6 +51,14 @@ class PersonalConfig(Config):
         assert (
             self.years_till_retirement >= 0
         ), "years_till_retirement must be non-negative"
+
+        self._validate_max_value("income", PersonalConfig.MAX_INCOME)
+        self._validate_max_value(
+            "income_growth_rate", PersonalConfig.MAX_INCOME_GROWTH_RATE
+        )
+        self._validate_max_value(
+            "years_till_retirement", PersonalConfig.MAX_YEARS_TILL_RETIREMENT
+        )
 
     def get_incomes(self, num_months: int) -> list[float]:
         first_month_income = self.income / math_utils.MONTHS_PER_YEAR
