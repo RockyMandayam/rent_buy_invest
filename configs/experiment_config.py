@@ -68,11 +68,11 @@ class ExperimentConfig(Config):
             AssertionError: If any experiment configs are invalid
         """
         assert (
-            self.start_date.year >= 2018
-        ), "Please select a start date during the year 2018 or later (start date does not really matter, but there were some different laws regarding mortgage interest deduction in 2017 and earlier, so just for clarity, I'm enforcing a state date in 2018 or later)."
-        assert (
             self.num_months > 0 and self.num_months <= ExperimentConfig.MAX_NUM_MONTHS
         ), f"Number of months must be positive and at most {ExperimentConfig.MAX_NUM_MONTHS}."
         assert isinstance(
             self.start_date, datetime.date
         ), f"Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date); received {self.start_date}"
+        assert (
+            self.start_date.year >= 2018
+        ), "Please select a start date during the year 2018 or later (start date does not really matter, but there were some different laws regarding mortgage interest deduction in 2017 and earlier, so just for clarity, I'm enforcing a state date in 2018 or later)."

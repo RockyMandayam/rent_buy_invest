@@ -32,6 +32,12 @@ FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
 # for this many months
 FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 
+# For a given year, if the average mortgage balance is 375,000 or less, all mortgage interest is tax deducible
+# Otherwise, a "prorated" amount is deductible. E.g., if the average mortgage balance was 400,000, then
+# (375/400)*(mortgage interest paid that year) is deductible
+# For convenience sake, instead of doing it annually, I'll do it monthly in the calculations
+MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE = 375000
+
 
 class Calculator:
     def __init__(
@@ -113,13 +119,24 @@ class Calculator:
                 2,
             )
             mortgage_interests.append(mortgage_interest)
-            # income tax savings due to mortgage interest deduction
-            # TODO conditions on when you can deduct
-            mortgage_interest_deduction_saving = (
-                self.market_config.get_income_tax_savings_from_deduction(
-                    incomes[month], mortgage_interest
+            if mortgage_interest:
+                # income tax savings due to mortgage interest deduction
+                # with this formula, if the loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
+                # but if the loan amount is larger than that, you only get a "prorated" deduction
+                deductible_fraction_of_interest = (
+                    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
+                    / max(
+                        MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
+                        loan_amount,
+                    )
                 )
-            )
+                mortgage_interest_deduction_saving = deductible_fraction_of_interest * (
+                    self.market_config.get_income_tax_savings_from_deduction(
+                        incomes[month], mortgage_interest
+                    )
+                )
+            else:
+                mortgage_interest_deduction_saving = 0
             mortgage_interest_deduction_savings.append(
                 mortgage_interest_deduction_saving
             )
