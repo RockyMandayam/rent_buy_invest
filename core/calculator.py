@@ -184,7 +184,7 @@ class Calculator:
             # investment_values_if_renting and investment_values_if_buying have their
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
-            housing_monthly_payment = (
+            housing_monthly_cost = (
                 home_monthly_costs_related_to_home_value[month]
                 + home_monthly_costs_related_to_inflation[month]
                 + mortgage_interest
@@ -192,7 +192,11 @@ class Calculator:
                 + mortgage_insurance
                 + buy_one_off_cost
             )
-            rent_monthly_payment = rent_monthly_costs[month]
+            housing_monthly_income = home_monthly_rental_incomes[month]
+            housing_net_monthly_cost = housing_monthly_cost - housing_monthly_income
+            rent_monthly_cost = rent_monthly_costs[month]
+            rent_monthly_income = 0
+            rent_net_monthly_cost = rent_monthly_cost - rent_monthly_income
             gain_in_investment_if_renting = (
                 self.market_config.get_pretax_monthly_wealth(
                     investment_values_if_renting[-1], 1
@@ -202,7 +206,7 @@ class Calculator:
                 investment_values_if_buying[-1], 1
             )[1]
             # Surplus from the perspective of renting
-            surplus = round(housing_monthly_payment - rent_monthly_payment, 2)
+            surplus = round(housing_net_monthly_cost - rent_net_monthly_cost, 2)
             if surplus > 0:
                 # if rent option has a relative surplus
                 rent_monthly_surpluses.append(surplus)
