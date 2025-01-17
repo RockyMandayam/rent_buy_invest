@@ -79,6 +79,10 @@
       "description": "The buyer's realtor's commission as a fraction of sale price.",
       "type": "number"
     },
+    "seller_burden_of_realtor_commission_fraction": {
+      "description": "The seller's burden of the realtor commission as a fraction of the fee.",
+      "type": "number"
+    },
     "hoa_transfer_fee": {
       "description": "The fee to sell a home that is part of an HOA (Home Owners Association).",
       "type": "number"

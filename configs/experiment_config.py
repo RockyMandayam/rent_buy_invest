@@ -73,6 +73,3 @@ class ExperimentConfig(Config):
         assert isinstance(
             self.start_date, datetime.date
         ), f"Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date); received {self.start_date}"
-        assert (
-            self.start_date.year >= 2018
-        ), "Please select a start date during the year 2018 or later (start date does not really matter, but there were some different laws regarding mortgage interest deduction in 2017 and earlier, so just for clarity, I'm enforcing a state date in 2018 or later)."
