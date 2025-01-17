@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from rent_buy_invest.configs.buy_config import BuyConfig
+from rent_buy_invest.configs.market_config import MarketConfig
+from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.utils.data_utils import to_df
 
@@ -14,9 +16,25 @@ class InitialState:
     home_equity_if_buying: float
 
     @staticmethod
-    def from_configs(buy_config: BuyConfig, rent_config: RentConfig) -> None:
+    def from_configs(
+        buy_config: BuyConfig,
+        rent_config: RentConfig,
+        market_config: MarketConfig,
+        personal_config: PersonalConfig,
+    ) -> None:
         rent_upfront_one_time_cost = rent_config.get_upfront_one_time_cost()
         buy_upfront_one_time_cost = buy_config.get_upfront_one_time_cost()
+        # handle income tax deduction savings due to deducting mortgage discount points
+        discount_points_payment = (
+            buy_config.mortgage_discount_points_fee_fraction
+            * buy_config.initial_loan_amount
+        )
+        discount_points_deduction_savings = (
+            market_config.get_income_tax_savings_from_deduction(
+                personal_config.income, discount_points_payment
+            )
+        )
+        buy_upfront_one_time_cost -= discount_points_deduction_savings
         assert (
             rent_upfront_one_time_cost <= buy_upfront_one_time_cost
         ), "Renting should not have a larger upfront one-time cost than buying a home."
