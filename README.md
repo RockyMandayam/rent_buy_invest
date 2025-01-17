@@ -7,6 +7,7 @@ Calculates the long-term financial pros and cons of decisions related to renting
 This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
 
 Some additional notes about the configs:
+- You can set the start date to any time, but this calculator is not meant to indicate that the results here would match what happened historically. This calculator is just a limited approximator using the customs/laws as of around 2024/2025.
 - There is a mortgage interest tax deduction. To get this deduction, you need to itemize your deductions instead of taking the standard deduction. This script assumes you will itemize your deductions. Although deductions are calculated annually, for convenience sake, it's done monthly in these calculations.
     - See IRS 2024 Publication 936 for details
 - Typically, discount points which are paid upfront to reduce the interest rate on the mortgage can also be deducted from taxes. There are some finer details, but by and large, you can deduct discount points from your taxes if they are computed as a fraction of the principal balance and appear clearly as points on your settlement. Discount point payments are often thought of as some kind of prepaid interest. In this calculator, any deduction savings are accounted for in the initial state.
