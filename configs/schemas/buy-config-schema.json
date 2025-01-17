@@ -48,7 +48,7 @@
       "type": "number"
     },
     "mortgage_discount_points_fee_fraction": {
-      "description": "Mortgage discount points (a.k.a. mortgage points) are a fee you can pay up-front to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount.",
+      "description": "Mortgage discount points (a.k.a. mortgage points) are a kind of fee you can pay upfront to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount. Discount point payments are often thought of as prepaid interest.",
       "type": "number"
     },
     "home_appraisal_cost": {
