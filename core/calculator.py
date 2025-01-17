@@ -76,6 +76,15 @@ class Calculator:
         # Projected incomes (used only for tax projection purposes)
         incomes = self.personal_config.get_incomes(self.num_months)
 
+        # Need to get post-tax rental incomes
+        # TODO this is approximate logic, doesn't consider income putting you across multiple marginal rates
+        marginal_tax_rate = self.market_config.get_marginal_tax_rate(
+            self.personal_config.income
+        )
+        home_monthly_rental_incomes = [
+            (1 - marginal_tax_rate) * inc for inc in home_monthly_rental_incomes
+        ]
+
         # Some renting costs/gains can be calculated independently at once
         rent_monthly_costs = self.rent_config.get_monthly_costs_of_renting(
             self.num_months
@@ -252,7 +261,8 @@ class Calculator:
             # fmt: off
             "Buy: Mortgage Payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
-            "Buy: Rental Income": home_monthly_rental_incomes,
+            # TODO rental income's effect on your taxable income and therefore brackets and deductions savings
+            "Buy: Rental Income (Post-Tax)": home_monthly_rental_incomes,
             # Buy: relative surplus
             "Buy: Surplus": housing_monthly_surpluses,
             # Rent: state
