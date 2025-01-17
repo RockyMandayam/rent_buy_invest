@@ -76,6 +76,15 @@ class Calculator:
         # Projected incomes (used only for tax projection purposes)
         incomes = self.personal_config.get_incomes(self.num_months)
 
+        # Need to get post-tax rental incomes
+        # TODO this is approximate logic, doesn't consider income putting you across multiple marginal rates
+        marginal_tax_rate = self.market_config.get_marginal_tax_rate(
+            self.personal_config.income
+        )
+        home_monthly_rental_incomes = [
+            (1 - marginal_tax_rate) * inc for inc in home_monthly_rental_incomes
+        ]
+
         # Some renting costs/gains can be calculated independently at once
         rent_monthly_costs = self.rent_config.get_monthly_costs_of_renting(
             self.num_months
@@ -184,7 +193,7 @@ class Calculator:
             # investment_values_if_renting and investment_values_if_buying have their
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
-            housing_monthly_payment = (
+            housing_monthly_cost = (
                 home_monthly_costs_related_to_home_value[month]
                 + home_monthly_costs_related_to_inflation[month]
                 + mortgage_interest
@@ -192,7 +201,11 @@ class Calculator:
                 + mortgage_insurance
                 + buy_one_off_cost
             )
-            rent_monthly_payment = rent_monthly_costs[month]
+            housing_monthly_income = home_monthly_rental_incomes[month]
+            housing_net_monthly_cost = housing_monthly_cost - housing_monthly_income
+            rent_monthly_cost = rent_monthly_costs[month]
+            rent_monthly_income = 0
+            rent_net_monthly_cost = rent_monthly_cost - rent_monthly_income
             gain_in_investment_if_renting = (
                 self.market_config.get_pretax_monthly_wealth(
                     investment_values_if_renting[-1], 1
@@ -202,7 +215,7 @@ class Calculator:
                 investment_values_if_buying[-1], 1
             )[1]
             # Surplus from the perspective of renting
-            surplus = round(housing_monthly_payment - rent_monthly_payment, 2)
+            surplus = round(housing_net_monthly_cost - rent_net_monthly_cost, 2)
             if surplus > 0:
                 # if rent option has a relative surplus
                 rent_monthly_surpluses.append(surplus)
@@ -248,7 +261,8 @@ class Calculator:
             # fmt: off
             "Buy: Mortgage Payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
             # fmt: on
-            "Buy: Rental Income": home_monthly_rental_incomes,
+            # TODO rental income's effect on your taxable income and therefore brackets and deductions savings
+            "Buy: Rental Income (Post-Tax)": home_monthly_rental_incomes,
             # Buy: relative surplus
             "Buy: Surplus": housing_monthly_surpluses,
             # Rent: state
