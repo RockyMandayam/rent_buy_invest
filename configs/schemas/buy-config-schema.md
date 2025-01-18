@@ -25,7 +25,7 @@
 - **`annual_property_tax_rate`** *(number, required)*: ANNUAL property tax rate (a fraction of the home's assessed value).
 - **`buyer_realtor_commission_fraction`** *(number, required)*: The buyer's realtor's commission as a fraction of sale price. This commission will get split between the buyer's real estate agent and the buyer's real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.
 - **`seller_realtor_commission_fraction`** *(number, required)*: The sller's realtor's commission as a fraction of sale price. This commission will get split between the seller's real estate agent and the seller's real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.
-- **`hoa_transfer_fee`** *(number, required)*: The fee to sell a home that is part of an HOA (Home Owners Association).
+- **`hoa_transfer_fee`** *(number, required)*: The fee to sell a home that is part of an HOA (Home Owners Association). There is also an HOA document delivery fee or something, but just include that amount under this field too.
 - **`seller_burden_of_hoa_transfer_fee`** *(number, required)*: The seller's burden of the HOA transfer fee as a fraction of the fee.
 - **`home_inspection_cost`** *(number, required)*: The home inspection cost. The home inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a home inspection does NOT include a pest inspection.
 - **`pest_inspection_cost`** *(number, required)*: The pest inspection cost (note that the home inspection probably does not include pest inspection).

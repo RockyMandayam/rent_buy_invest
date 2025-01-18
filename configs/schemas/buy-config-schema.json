@@ -88,7 +88,7 @@
       "type": "number"
     },
     "hoa_transfer_fee": {
-      "description": "The fee to sell a home that is part of an HOA (Home Owners Association).",
+      "description": "The fee to sell a home that is part of an HOA (Home Owners Association). There is also an HOA document delivery fee or something, but just include that amount under this field too.",
       "type": "number"
     },
     "seller_burden_of_hoa_transfer_fee": {
