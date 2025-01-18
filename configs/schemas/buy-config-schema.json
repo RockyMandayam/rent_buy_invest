@@ -135,6 +135,14 @@
       "description": "Seller's attorney fee.",
       "type": "number"
     },
+    "lenders_title_insurance_fraction": {
+      "description": "Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
+      "type": "number"
+    },
+    "owners_title_insurance_fraction": {
+      "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
+      "type": "number"
+    },
     "closing_protection_letter_fee": {
       "description": "The closing protection letter (CPL) fee.",
       "type": "number"
@@ -149,14 +157,6 @@
     },
     "deed_prep_fee": {
       "description": "Deed preparation fee. This is often loosely considered part of 'settlement fees'.",
-      "type": "number"
-    },
-    "lenders_title_insurance_fraction": {
-      "description": "Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
-      "type": "number"
-    },
-    "owners_title_insurance_fraction": {
-      "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
       "type": "number"
     },
     "endorsement_fees": {
@@ -247,12 +247,12 @@
     "seller_burden_of_title_search_abstract_fee",
     "buyer_attorney_fee",
     "seller_attorney_fee",
+    "lenders_title_insurance_fraction",
+    "owners_title_insurance_fraction",
     "closing_protection_letter_fee",
     "survey_fee",
     "notary_fee",
     "deed_prep_fee",
-    "lenders_title_insurance_fraction",
-    "owners_title_insurance_fraction",
     "endorsement_fees",
     "annual_homeowners_insurance_fraction",
     "monthly_utilities",
