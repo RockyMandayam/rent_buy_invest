@@ -196,6 +196,9 @@ class BuyConfig(Config):
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
         self.seller_deed_prep_fee: float = kwargs["seller_deed_prep_fee"]
+        self.seller_natural_hazard_report_fee: float = kwargs[
+            "seller_natural_hazard_report_fee"
+        ]
         self.annual_homeowners_insurance_fraction: float = kwargs[
             "annual_homeowners_insurance_fraction"
         ]
@@ -332,6 +335,9 @@ class BuyConfig(Config):
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
         assert self.seller_deed_prep_fee >= 0, "Dead prep fee must be non-negative."
+        assert (
+            self.seller_natural_hazard_report_fee >= 0
+        ), "seller_natural_hazard_report_fee must be non-negative."
         assert (
             self.annual_homeowners_insurance_fraction >= 0
         ), "Annual homeowners insurance fraction must be non-negative."
