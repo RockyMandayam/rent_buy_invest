@@ -188,13 +188,13 @@ class BuyConfig(Config):
         self.owners_title_insurance_fraction: float = kwargs[
             "owners_title_insurance_fraction"
         ]
+        self.endorsement_fees: float = kwargs["endorsement_fees"]
         self.closing_protection_letter_fee: float = kwargs[
             "closing_protection_letter_fee"
         ]
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
         self.seller_deed_prep_fee: float = kwargs["seller_deed_prep_fee"]
-        self.endorsement_fees: float = kwargs["endorsement_fees"]
         self.annual_homeowners_insurance_fraction: float = kwargs[
             "annual_homeowners_insurance_fraction"
         ]
@@ -322,13 +322,13 @@ class BuyConfig(Config):
             self.owners_title_insurance_fraction >= 0
             and self.owners_title_insurance_fraction <= 1
         ), "Owners title insurance fraction must be between 0 and 1 inclusive."
+        assert self.endorsement_fees >= 0, "Endorsement fees must be non-negative."
         assert (
             self.closing_protection_letter_fee >= 0
         ), "Closing protection letter fee must be non-negative."
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
         assert self.seller_deed_prep_fee >= 0, "Dead prep fee must be non-negative."
-        assert self.endorsement_fees >= 0, "Endorsement fees must be non-negative."
         assert (
             self.annual_homeowners_insurance_fraction >= 0
         ), "Annual homeowners insurance fraction must be non-negative."
@@ -413,6 +413,7 @@ class BuyConfig(Config):
         )
         self._validate_max_value("buyer_attorney_fee", BuyConfig.MAX_ATTORNEY_FEE)
         self._validate_max_value("seller_attorney_fee", BuyConfig.MAX_ATTORNEY_FEE)
+        self._validate_max_value("endorsement_fees", BuyConfig.MAX_ENDORSEMENT_FEES)
         self._validate_max_value(
             "closing_protection_letter_fee",
             BuyConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
@@ -420,7 +421,6 @@ class BuyConfig(Config):
         self._validate_max_value("survey_fee", BuyConfig.MAX_SURVEY_FEE)
         self._validate_max_value("notary_fee", BuyConfig.MAX_NOTARY_FEE)
         self._validate_max_value("seller_deed_prep_fee", BuyConfig.MAX_DEED_PREP_FEE)
-        self._validate_max_value("endorsement_fees", BuyConfig.MAX_ENDORSEMENT_FEES)
         self._validate_max_value(
             "annual_homeowners_insurance_fraction",
             BuyConfig.MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION,
@@ -485,10 +485,10 @@ class BuyConfig(Config):
             + self.buyer_attorney_fee
             + self.lenders_title_insurance_fraction * self.initial_loan_amount
             + self.owners_title_insurance_fraction * self.initial_loan_amount
+            + self.endorsement_fees
             + self.closing_protection_letter_fee
             + self.survey_fee
             + self.notary_fee
-            + self.endorsement_fees
         )
 
     def get_monthly_mortgage_payment(self):

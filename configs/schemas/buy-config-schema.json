@@ -143,6 +143,10 @@
       "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
       "type": "number"
     },
+    "endorsement_fees": {
+      "description": "Endorsement fees are for add-ons ('endorsements') that are not included in a standard title insurance (e.g., Easements And Encroachments, Zoning). A typical price per-endorsement is about $75. Enter the total amount you expect for all endorsements.",
+      "type": "number"
+    },
     "closing_protection_letter_fee": {
       "description": "The closing protection letter (CPL) fee.",
       "type": "number"
@@ -157,10 +161,6 @@
     },
     "seller_deed_prep_fee": {
       "description": "Deed preparation fee. This is often loosely considered part of 'settlement fees'.",
-      "type": "number"
-    },
-    "endorsement_fees": {
-      "description": "Endorsement fees are for add-ons ('endorsements') that are not included in a standard title insurance (e.g., Easements And Encroachments, Zoning). A typical price per-endorsement is about $75. Enter the total amount you expect for all endorsements.",
       "type": "number"
     },
     "annual_homeowners_insurance_fraction": {
@@ -249,11 +249,11 @@
     "seller_attorney_fee",
     "lenders_title_insurance_fraction",
     "owners_title_insurance_fraction",
+    "endorsement_fees",
     "closing_protection_letter_fee",
     "survey_fee",
     "notary_fee",
     "seller_deed_prep_fee",
-    "endorsement_fees",
     "annual_homeowners_insurance_fraction",
     "monthly_utilities",
     "annual_maintenance_cost_fraction",
