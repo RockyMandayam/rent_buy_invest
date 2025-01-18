@@ -103,6 +103,10 @@
       "description": "Escrow fixed fee. I don't think there is a basic price-based fee except for specific line items, e.g., flood certification fee.",
       "type": "number"
     },
+    "seller_burden_of_escrow_fixed_fee": {
+      "description": "The seller's burden of the escrow fixed fee.",
+      "type": "number"
+    },
     "flood_certification_fee": {
       "description": "Flood certification fee.",
       "type": "number"
@@ -227,6 +231,7 @@
     "home_inspection_cost",
     "pest_inspection_cost",
     "escrow_fixed_fee",
+    "seller_burden_of_escrow_fixed_fee",
     "flood_certification_fee",
     "title_search_fee",
     "seller_burden_of_title_search_fee_fraction",

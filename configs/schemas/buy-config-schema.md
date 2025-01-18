@@ -22,12 +22,14 @@
 - **`seller_burden_of_transfer_tax_fraction`** *(number, required)*: The fraction of the transfer tax burden is borne by the seller (the remaining is borne by the buyer).
 - **`recording_fee_fraction`** *(number, required)*: The tax charged by the county/state/etc. to legally record the property's deed and mortgage information. This field is expressed as fraction of sale price. The recording fee is often considered part of the title fees and therefore part of the 'closing costs'.
 - **`annual_property_tax_rate`** *(number, required)*: ANNUAL property tax rate (a fraction of the home's assessed value).
-- **`buyer_realtor_commission_fraction`** *(number, required)*: The buyer's realtor's commission as a fraction of sale price. This commission will get split between the real estate agent and the real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.
+- **`buyer_realtor_commission_fraction`** *(number, required)*: The buyer's realtor's commission as a fraction of sale price. This commission will get split between the buyer's real estate agent and the buyer's real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.
+- **`seller_realtor_commission_fraction`** *(number, required)*: The sller's realtor's commission as a fraction of sale price. This commission will get split between the seller's real estate agent and the seller's real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.
 - **`hoa_transfer_fee`** *(number, required)*: The fee to sell a home that is part of an HOA (Home Owners Association).
 - **`seller_burden_of_hoa_transfer_fee`** *(number, required)*: The seller's burden of the HOA transfer fee as a fraction of the fee.
 - **`home_inspection_cost`** *(number, required)*: The home inspection cost. The home inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a home inspection does NOT include a pest inspection.
 - **`pest_inspection_cost`** *(number, required)*: The pest inspection cost (note that the home inspection probably does not include pest inspection).
 - **`escrow_fixed_fee`** *(number, required)*: Escrow fixed fee. I don't think there is a basic price-based fee except for specific line items, e.g., flood certification fee.
+- **`seller_burden_of_escrow_fixed_fee`** *(number, required)*: The seller's burden of the escrow fixed fee.
 - **`flood_certification_fee`** *(number, required)*: Flood certification fee.
 - **`title_search_fee`** *(number, required)*: Title search fee.
 - **`seller_burden_of_title_search_fee_fraction`** *(number, required)*: The seller's burden of the title search fee as a fraction.

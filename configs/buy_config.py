@@ -168,6 +168,9 @@ class BuyConfig(Config):
         self.home_inspection_cost: float = kwargs["home_inspection_cost"]
         self.pest_inspection_cost: float = kwargs["pest_inspection_cost"]
         self.escrow_fixed_fee: float = kwargs["escrow_fixed_fee"]
+        self.seller_burden_of_escrow_fixed_fee: float = kwargs[
+            "seller_burden_of_escrow_fixed_fee"
+        ]
         self.flood_certification_fee: float = kwargs["flood_certification_fee"]
         self.title_search_fee: float = kwargs["title_search_fee"]
         self.seller_burden_of_title_search_fee_fraction: float = kwargs[
@@ -286,6 +289,10 @@ class BuyConfig(Config):
             self.pest_inspection_cost >= 0
         ), "Pest inspection cost must be non-negative."
         assert self.escrow_fixed_fee >= 0, "Escrow fixed fee must be non-negative."
+        assert (
+            self.seller_burden_of_escrow_fixed_fee >= 0
+            and self.seller_burden_of_escrow_fixed_fee <= 1
+        ), "seller_burden_of_escrow_fixed_fee must be between 0 and 1 inclusve."
         assert (
             self.flood_certification_fee >= 0
         ), "Flood certification fee must be non-negative."
@@ -458,7 +465,7 @@ class BuyConfig(Config):
             + (1 - self.seller_burden_of_hoa_transfer_fee) * self.hoa_transfer_fee
             + self.home_inspection_cost
             + self.pest_inspection_cost
-            + self.escrow_fixed_fee
+            + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
             + self.flood_certification_fee
             # fmt: off
             + (1 - self.seller_burden_of_title_search_fee_fraction)
