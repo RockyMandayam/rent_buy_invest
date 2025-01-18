@@ -119,6 +119,10 @@
       "description": "The seller's burden of the title search fee as a fraction.",
       "type": "number"
     },
+    "title_search_abstract_fee": {
+      "description": "Search abstract fee. This may be included in the title search fee. Do NOT include that amount here. Only include here any amount not covered under other fees. This is often loosely considered part of 'title fees' or 'settlement fees'.",
+      "type": "number"
+    },
     "buyer_attorney_fee": {
       "description": "Buyer's attorney fee.",
       "type": "number"
@@ -129,10 +133,6 @@
     },
     "closing_protection_letter_fee": {
       "description": "The closing protection letter (CPL) fee.",
-      "type": "number"
-    },
-    "search_abstract_fee": {
-      "description": "Search abstract fee. This may be included in the title search fee. Do NOT include that amount here. Only include here any amount not covered under other fees. This is often loosely considered part of 'title fees' or 'settlement fees'.",
       "type": "number"
     },
     "survey_fee": {
@@ -239,10 +239,10 @@
     "seller_burden_of_escrow_fixed_fee",
     "title_search_fee",
     "seller_burden_of_title_search_fee_fraction",
+    "title_search_abstract_fee",
     "buyer_attorney_fee",
     "seller_attorney_fee",
     "closing_protection_letter_fee",
-    "search_abstract_fee",
     "survey_fee",
     "notary_fee",
     "deed_prep_fee",

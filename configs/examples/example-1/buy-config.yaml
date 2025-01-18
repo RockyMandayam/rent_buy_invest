@@ -64,13 +64,13 @@ title_search_fee: !!float 100.
 
 seller_burden_of_title_search_fee_fraction: !!float 1.
 
+title_search_abstract_fee: !!float 300.
+
 buyer_attorney_fee: !!float 800.
 
 seller_attorney_fee: !!float 800.
 
 closing_protection_letter_fee: !!float 35.
-
-search_abstract_fee: !!float 300.
 
 survey_fee: !!float 500.
 
