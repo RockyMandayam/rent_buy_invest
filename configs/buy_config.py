@@ -182,18 +182,18 @@ class BuyConfig(Config):
         ]
         self.buyer_attorney_fee: float = kwargs["buyer_attorney_fee"]
         self.seller_attorney_fee: float = kwargs["seller_attorney_fee"]
-        self.closing_protection_letter_fee: float = kwargs[
-            "closing_protection_letter_fee"
-        ]
-        self.survey_fee: float = kwargs["survey_fee"]
-        self.notary_fee: float = kwargs["notary_fee"]
-        self.deed_prep_fee: float = kwargs["deed_prep_fee"]
         self.lenders_title_insurance_fraction: float = kwargs[
             "lenders_title_insurance_fraction"
         ]
         self.owners_title_insurance_fraction: float = kwargs[
             "owners_title_insurance_fraction"
         ]
+        self.closing_protection_letter_fee: float = kwargs[
+            "closing_protection_letter_fee"
+        ]
+        self.survey_fee: float = kwargs["survey_fee"]
+        self.notary_fee: float = kwargs["notary_fee"]
+        self.deed_prep_fee: float = kwargs["deed_prep_fee"]
         self.endorsement_fees: float = kwargs["endorsement_fees"]
         self.annual_homeowners_insurance_fraction: float = kwargs[
             "annual_homeowners_insurance_fraction"
@@ -315,12 +315,6 @@ class BuyConfig(Config):
         assert self.buyer_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert self.seller_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert (
-            self.closing_protection_letter_fee >= 0
-        ), "Closing protection letter fee must be non-negative."
-        assert self.survey_fee >= 0, "Survey fee must be non-negative."
-        assert self.notary_fee >= 0, "Notary fee must be non-negative."
-        assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
-        assert (
             self.lenders_title_insurance_fraction >= 0
             and self.lenders_title_insurance_fraction <= 1
         ), "Lenders title insurance fraction must be between 0 and 1 inclusive."
@@ -328,6 +322,12 @@ class BuyConfig(Config):
             self.owners_title_insurance_fraction >= 0
             and self.owners_title_insurance_fraction <= 1
         ), "Owners title insurance fraction must be between 0 and 1 inclusive."
+        assert (
+            self.closing_protection_letter_fee >= 0
+        ), "Closing protection letter fee must be non-negative."
+        assert self.survey_fee >= 0, "Survey fee must be non-negative."
+        assert self.notary_fee >= 0, "Notary fee must be non-negative."
+        assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
         assert self.endorsement_fees >= 0, "Endorsement fees must be non-negative."
         assert (
             self.annual_homeowners_insurance_fraction >= 0
@@ -483,12 +483,12 @@ class BuyConfig(Config):
             + (1 - self.seller_burden_of_title_search_abstract_fee) * self.title_search_abstract_fee
             # fmt: on
             + self.buyer_attorney_fee
+            + self.lenders_title_insurance_fraction * self.initial_loan_amount
+            + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.closing_protection_letter_fee
             + self.survey_fee
             + self.notary_fee
             + self.deed_prep_fee
-            + self.lenders_title_insurance_fraction * self.initial_loan_amount
-            + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.endorsement_fees
         )
 

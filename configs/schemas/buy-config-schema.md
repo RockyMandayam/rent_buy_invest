@@ -37,12 +37,12 @@
 - **`seller_burden_of_title_search_abstract_fee`** *(number, required)*: The seller's burden of the title search abstract fee as a fraction.
 - **`buyer_attorney_fee`** *(number, required)*: Buyer's attorney fee.
 - **`seller_attorney_fee`** *(number, required)*: Seller's attorney fee.
+- **`lenders_title_insurance_fraction`** *(number, required)*: Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
+- **`owners_title_insurance_fraction`** *(number, required)*: Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
 - **`closing_protection_letter_fee`** *(number, required)*: The closing protection letter (CPL) fee.
 - **`survey_fee`** *(number, required)*: Survey fee, which surveys the boundaries of the property. This is often loosely considered part of 'settlement fees'.
 - **`notary_fee`** *(number, required)*: Notary fee. This is often loosely considered part of 'settlement fees'.
 - **`deed_prep_fee`** *(number, required)*: Deed preparation fee. This is often loosely considered part of 'settlement fees'.
-- **`lenders_title_insurance_fraction`** *(number, required)*: Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
-- **`owners_title_insurance_fraction`** *(number, required)*: Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
 - **`endorsement_fees`** *(number, required)*: Endorsement fees are for add-ons ('endorsements') that are not included in a standard title insurance (e.g., Easements And Encroachments, Zoning). A typical price per-endorsement is about $75. Enter the total amount you expect for all endorsements.
 - **`annual_homeowners_insurance_fraction`** *(number, required)*: ANNUAL cost of homeowners insurance as fraction of the assessed home value. This field depends a lot on the home, conditions, coverage, insurance, etc.
 - **`monthly_utilities`** *(number, required)*: Monthly utilities for the first month.

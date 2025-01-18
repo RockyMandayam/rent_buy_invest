@@ -72,6 +72,10 @@ buyer_attorney_fee: !!float 800.
 
 seller_attorney_fee: !!float 800.
 
+lenders_title_insurance_fraction: !!float 0.02
+
+owners_title_insurance_fraction: !!float 0.01 
+
 closing_protection_letter_fee: !!float 35.
 
 survey_fee: !!float 500.
@@ -79,10 +83,6 @@ survey_fee: !!float 500.
 notary_fee: !!float 100.
 
 deed_prep_fee: !!float 50.
-
-lenders_title_insurance_fraction: !!float 0.02
-
-owners_title_insurance_fraction: !!float 0.01 
 
 endorsement_fees: !!float 150.
 
