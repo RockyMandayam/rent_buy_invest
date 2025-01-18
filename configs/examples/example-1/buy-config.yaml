@@ -78,7 +78,7 @@ survey_fee: !!float 500.
 
 notary_fee: !!float 100.
 
-deed_prep_fee: !!float 50.
+seller_deed_prep_fee: !!float 50.
 
 lenders_title_insurance_fraction: !!float 0.02
 

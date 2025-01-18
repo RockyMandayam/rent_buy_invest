@@ -193,7 +193,7 @@ class BuyConfig(Config):
         ]
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
-        self.deed_prep_fee: float = kwargs["deed_prep_fee"]
+        self.seller_deed_prep_fee: float = kwargs["seller_deed_prep_fee"]
         self.endorsement_fees: float = kwargs["endorsement_fees"]
         self.annual_homeowners_insurance_fraction: float = kwargs[
             "annual_homeowners_insurance_fraction"
@@ -327,7 +327,7 @@ class BuyConfig(Config):
         ), "Closing protection letter fee must be non-negative."
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
-        assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
+        assert self.seller_deed_prep_fee >= 0, "Dead prep fee must be non-negative."
         assert self.endorsement_fees >= 0, "Endorsement fees must be non-negative."
         assert (
             self.annual_homeowners_insurance_fraction >= 0
@@ -419,7 +419,7 @@ class BuyConfig(Config):
         )
         self._validate_max_value("survey_fee", BuyConfig.MAX_SURVEY_FEE)
         self._validate_max_value("notary_fee", BuyConfig.MAX_NOTARY_FEE)
-        self._validate_max_value("deed_prep_fee", BuyConfig.MAX_DEED_PREP_FEE)
+        self._validate_max_value("seller_deed_prep_fee", BuyConfig.MAX_DEED_PREP_FEE)
         self._validate_max_value("endorsement_fees", BuyConfig.MAX_ENDORSEMENT_FEES)
         self._validate_max_value(
             "annual_homeowners_insurance_fraction",
@@ -488,7 +488,7 @@ class BuyConfig(Config):
             + self.closing_protection_letter_fee
             + self.survey_fee
             + self.notary_fee
-            + self.deed_prep_fee
+            + self.seller_deed_prep_fee
             + self.endorsement_fees
         )
 

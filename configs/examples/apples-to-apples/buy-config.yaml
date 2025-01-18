@@ -82,7 +82,7 @@ survey_fee: !!float 0.0
 
 notary_fee: !!float 0.0
 
-deed_prep_fee: !!float 0.0
+seller_deed_prep_fee: !!float 0.0
 
 endorsement_fees: !!float 0.0
 

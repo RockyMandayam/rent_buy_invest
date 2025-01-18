@@ -52,7 +52,7 @@ class TestBuyConfig(TestConfig):
             "closing_protection_letter_fee",
             "survey_fee",
             "notary_fee",
-            "deed_prep_fee",
+            "seller_deed_prep_fee",
             "endorsement_fees",
             "annual_homeowners_insurance_fraction",
             "monthly_utilities",
@@ -342,7 +342,7 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["deed_prep_fee"],
+            ["seller_deed_prep_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_DEED_PREP_FEE,
         )
