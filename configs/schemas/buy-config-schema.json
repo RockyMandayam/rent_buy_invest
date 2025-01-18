@@ -127,6 +127,10 @@
       "description": "The seller's burden of the title search abstract fee as a fraction.",
       "type": "number"
     },
+    "title_courier_fee": {
+      "description": "The title company can charge this fee to quickly courier/deliver the requested information to all involved parties.",
+      "type": "number"
+    },
     "buyer_attorney_fee": {
       "description": "Buyer's attorney fee.",
       "type": "number"
@@ -245,6 +249,7 @@
     "seller_burden_of_title_search_fee",
     "title_search_abstract_fee",
     "seller_burden_of_title_search_abstract_fee",
+    "title_courier_fee",
     "buyer_attorney_fee",
     "seller_attorney_fee",
     "lenders_title_insurance_fraction",
