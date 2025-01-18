@@ -41,6 +41,7 @@ Some additional notes about the configs:
     - The HOA transfer fee can be paid by the seller or the buyer, but not split. However, this calculator has a 'seller_burden_of_hoa_transfer_fee' parameter in the buy config which lets you specify however you want to split it
     - The buyer usually pays for the home inspection. This calculator assumes the buyer pays for it.
     - The pest inspection can be paid by the buyer or seller, more often the seller. However, this calculator assumes the buyer pays for it
+    - 
 
 
 ## Installation & How to Run

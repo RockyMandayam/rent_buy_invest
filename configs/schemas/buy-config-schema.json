@@ -119,7 +119,7 @@
       "description": "The seller's burden of the title search fee as a fraction.",
       "type": "number"
     },
-    "attorney_fee": {
+    "buyer_attorney_fee": {
       "description": "Attorney fee.",
       "type": "number"
     },
@@ -235,7 +235,7 @@
     "seller_burden_of_escrow_fixed_fee",
     "title_search_fee",
     "seller_burden_of_title_search_fee_fraction",
-    "attorney_fee",
+    "buyer_attorney_fee",
     "closing_protection_letter_fee",
     "search_abstract_fee",
     "survey_fee",
