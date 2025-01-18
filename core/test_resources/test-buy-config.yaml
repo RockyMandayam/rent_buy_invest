@@ -68,6 +68,8 @@ title_search_abstract_fee: !!float 300.
 
 seller_burden_of_title_search_abstract_fee: !!float 0.0
 
+title_courier_fee: !!float 0.0
+
 buyer_attorney_fee: !!float 800.
 
 seller_attorney_fee: !!float 800.
