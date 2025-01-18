@@ -22,7 +22,7 @@
 - **`seller_burden_of_transfer_tax_fraction`** *(number, required)*: The fraction of the transfer tax burden is borne by the seller (the remaining is borne by the buyer).
 - **`recording_fee_fraction`** *(number, required)*: The tax charged by the county/state/etc. to legally record the property's deed and mortgage information. This field is expressed as fraction of sale price. The recording fee is often considered part of the title fees and therefore part of the 'closing costs'.
 - **`annual_property_tax_rate`** *(number, required)*: ANNUAL property tax rate (a fraction of the home's assessed value).
-- **`realtor_commission_fraction`** *(number, required)*: The buyer's realtor's commission as a fraction of sale price.
+- **`buyer_realtor_commission_fraction`** *(number, required)*: The buyer's realtor's commission as a fraction of sale price. This commission will get split between the real estate agent and the real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.
 - **`hoa_transfer_fee`** *(number, required)*: The fee to sell a home that is part of an HOA (Home Owners Association).
 - **`seller_burden_of_hoa_transfer_fee`** *(number, required)*: The seller's burden of the HOA transfer fee as a fraction of the fee.
 - **`home_inspection_cost`** *(number, required)*: The home inspection cost. The home inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a home inspection does NOT include a pest inspection.

@@ -42,7 +42,7 @@ annual_property_tax_rate: !!float 0.01
 
 ##### MISCELLANEOUS CLOSING COSTS
 
-realtor_commission_fraction: !!float 0.025
+buyer_realtor_commission_fraction: !!float 0.025
 
 hoa_transfer_fee: !!float 300.
 

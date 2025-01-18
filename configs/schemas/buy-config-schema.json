@@ -75,8 +75,8 @@
       "description": "ANNUAL property tax rate (a fraction of the home's assessed value).",
       "type": "number"
     },
-    "realtor_commission_fraction": {
-      "description": "The buyer's realtor's commission as a fraction of sale price.",
+    "buyer_realtor_commission_fraction": {
+      "description": "The buyer's realtor's commission as a fraction of sale price. This commission will get split between the real estate agent and the real estate broker (who the agent works for), if one exists - but the details aren't important here, so just think of it as one payment.",
       "type": "number"
     },
     "hoa_transfer_fee": {
@@ -216,7 +216,7 @@
     "seller_burden_of_transfer_tax_fraction",
     "recording_fee_fraction",
     "annual_property_tax_rate",
-    "realtor_commission_fraction",
+    "buyer_realtor_commission_fraction",
     "hoa_transfer_fee",
     "seller_burden_of_hoa_transfer_fee",
     "home_inspection_cost",
