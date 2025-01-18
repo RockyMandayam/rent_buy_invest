@@ -80,7 +80,7 @@ closing_protection_letter_fee: !!float 35.
 
 survey_fee: !!float 500.
 
-notary_fee: !!float 100.
+notary_fee: !!float 150.
 
 seller_deed_prep_fee: !!float 50.
 

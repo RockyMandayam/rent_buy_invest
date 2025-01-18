@@ -488,7 +488,6 @@ class BuyConfig(Config):
             + self.closing_protection_letter_fee
             + self.survey_fee
             + self.notary_fee
-            + self.seller_deed_prep_fee
             + self.endorsement_fees
         )
 
