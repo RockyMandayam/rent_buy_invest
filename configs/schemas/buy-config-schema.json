@@ -120,7 +120,11 @@
       "type": "number"
     },
     "buyer_attorney_fee": {
-      "description": "Attorney fee.",
+      "description": "Buyer's attorney fee.",
+      "type": "number"
+    },
+    "seller_attorney_fee": {
+      "description": "Seller's attorney fee.",
       "type": "number"
     },
     "closing_protection_letter_fee": {
@@ -236,6 +240,7 @@
     "title_search_fee",
     "seller_burden_of_title_search_fee_fraction",
     "buyer_attorney_fee",
+    "seller_attorney_fee",
     "closing_protection_letter_fee",
     "search_abstract_fee",
     "survey_fee",
