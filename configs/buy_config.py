@@ -173,10 +173,13 @@ class BuyConfig(Config):
             "seller_burden_of_escrow_fixed_fee"
         ]
         self.title_search_fee: float = kwargs["title_search_fee"]
-        self.seller_burden_of_title_search_fee_fraction: float = kwargs[
-            "seller_burden_of_title_search_fee_fraction"
+        self.seller_burden_of_title_search_fee: float = kwargs[
+            "seller_burden_of_title_search_fee"
         ]
         self.title_search_abstract_fee: float = kwargs["title_search_abstract_fee"]
+        self.seller_burden_of_title_search_abstract_fee: float = kwargs[
+            "seller_burden_of_title_search_abstract_fee"
+        ]
         self.buyer_attorney_fee: float = kwargs["buyer_attorney_fee"]
         self.seller_attorney_fee: float = kwargs["seller_attorney_fee"]
         self.closing_protection_letter_fee: float = kwargs[
@@ -299,12 +302,16 @@ class BuyConfig(Config):
         ), "seller_burden_of_escrow_fixed_fee must be between 0 and 1 inclusve."
         assert self.title_search_fee >= 0, "Title search fee must be non-negative."
         assert (
-            self.seller_burden_of_title_search_fee_fraction >= 0
-            and self.seller_burden_of_title_search_fee_fraction <= 1
+            self.seller_burden_of_title_search_fee >= 0
+            and self.seller_burden_of_title_search_fee <= 1
         ), "Seller burden fraction of title search fee must be between 0 and 1 inclusive"
         assert (
             self.title_search_abstract_fee >= 0
         ), "Search abstract fee must be non-negative."
+        assert (
+            self.seller_burden_of_title_search_abstract_fee >= 0
+            and self.seller_burden_of_title_search_abstract_fee <= 1
+        ), "seller_burden_of_title_search_abstract_fee must be between 0 and 1 inclusive."
         assert self.buyer_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert self.seller_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert (
@@ -471,9 +478,9 @@ class BuyConfig(Config):
             + self.pest_inspection_cost
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
             # fmt: off
-            + (1 - self.seller_burden_of_title_search_fee_fraction)
+            + (1 - self.seller_burden_of_title_search_fee)
                 * self.title_search_fee
-            + self.title_search_abstract_fee
+            + (1 - self.seller_burden_of_title_search_abstract_fee) * self.title_search_abstract_fee
             # fmt: on
             + self.buyer_attorney_fee
             + self.closing_protection_letter_fee

@@ -115,12 +115,16 @@
       "description": "Title search fee.",
       "type": "number"
     },
-    "seller_burden_of_title_search_fee_fraction": {
+    "seller_burden_of_title_search_fee": {
       "description": "The seller's burden of the title search fee as a fraction.",
       "type": "number"
     },
     "title_search_abstract_fee": {
       "description": "Search abstract fee. This may be included in the title search fee. Do NOT include that amount here. Only include here any amount not covered under other fees. This is often loosely considered part of 'title fees' or 'settlement fees'.",
+      "type": "number"
+    },
+    "seller_burden_of_title_search_abstract_fee": {
+      "description": "The seller's burden of the title search abstract fee as a fraction.",
       "type": "number"
     },
     "buyer_attorney_fee": {
@@ -238,8 +242,9 @@
     "escrow_fixed_fee",
     "seller_burden_of_escrow_fixed_fee",
     "title_search_fee",
-    "seller_burden_of_title_search_fee_fraction",
+    "seller_burden_of_title_search_fee",
     "title_search_abstract_fee",
+    "seller_burden_of_title_search_abstract_fee",
     "buyer_attorney_fee",
     "seller_attorney_fee",
     "closing_protection_letter_fee",
