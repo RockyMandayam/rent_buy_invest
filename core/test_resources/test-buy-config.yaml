@@ -62,7 +62,7 @@ seller_burden_of_escrow_fixed_fee: !!float 0.
 
 title_search_fee: !!float 100. 
 
-seller_burden_of_title_search_fee_fraction: !!float 1.
+seller_burden_of_title_search_fee: !!float 1.
 
 title_search_abstract_fee: !!float 300.
 

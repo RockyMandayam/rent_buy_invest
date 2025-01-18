@@ -42,7 +42,7 @@ class TestBuyConfig(TestConfig):
             "escrow_fixed_fee",
             "seller_burden_of_escrow_fixed_fee",
             "title_search_fee",
-            "seller_burden_of_title_search_fee_fraction",
+            "seller_burden_of_title_search_fee",
             "title_search_abstract_fee",
             "seller_burden_of_title_search_abstract_fee",
             "buyer_attorney_fee",
@@ -274,7 +274,7 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["seller_burden_of_title_search_fee_fraction"],
+            ["seller_burden_of_title_search_fee"],
             allow_negative=False,
             allow_greater_than_one=False,
         )
