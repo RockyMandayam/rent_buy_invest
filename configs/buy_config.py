@@ -176,12 +176,12 @@ class BuyConfig(Config):
         self.seller_burden_of_title_search_fee_fraction: float = kwargs[
             "seller_burden_of_title_search_fee_fraction"
         ]
+        self.title_search_abstract_fee: float = kwargs["title_search_abstract_fee"]
         self.buyer_attorney_fee: float = kwargs["buyer_attorney_fee"]
         self.seller_attorney_fee: float = kwargs["seller_attorney_fee"]
         self.closing_protection_letter_fee: float = kwargs[
             "closing_protection_letter_fee"
         ]
-        self.title_search_abstract_fee: float = kwargs["title_search_abstract_fee"]
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
         self.deed_prep_fee: float = kwargs["deed_prep_fee"]
@@ -302,14 +302,14 @@ class BuyConfig(Config):
             self.seller_burden_of_title_search_fee_fraction >= 0
             and self.seller_burden_of_title_search_fee_fraction <= 1
         ), "Seller burden fraction of title search fee must be between 0 and 1 inclusive"
+        assert (
+            self.title_search_abstract_fee >= 0
+        ), "Search abstract fee must be non-negative."
         assert self.buyer_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert self.seller_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert (
             self.closing_protection_letter_fee >= 0
         ), "Closing protection letter fee must be non-negative."
-        assert (
-            self.title_search_abstract_fee >= 0
-        ), "Search abstract fee must be non-negative."
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
         assert self.deed_prep_fee >= 0, "Dead prep fee must be non-negative."
@@ -401,14 +401,14 @@ class BuyConfig(Config):
         )
         self._validate_max_value("escrow_fixed_fee", BuyConfig.MAX_ESCROW_FIXED_FEE)
         self._validate_max_value("title_search_fee", BuyConfig.MAX_TITLE_SEARCH_FEE)
+        self._validate_max_value(
+            "title_search_abstract_fee", BuyConfig.MAX_SEARCH_ABSTRACT_FEE
+        )
         self._validate_max_value("buyer_attorney_fee", BuyConfig.MAX_ATTORNEY_FEE)
         self._validate_max_value("seller_attorney_fee", BuyConfig.MAX_ATTORNEY_FEE)
         self._validate_max_value(
             "closing_protection_letter_fee",
             BuyConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
-        )
-        self._validate_max_value(
-            "title_search_abstract_fee", BuyConfig.MAX_SEARCH_ABSTRACT_FEE
         )
         self._validate_max_value("survey_fee", BuyConfig.MAX_SURVEY_FEE)
         self._validate_max_value("notary_fee", BuyConfig.MAX_NOTARY_FEE)
@@ -473,10 +473,10 @@ class BuyConfig(Config):
             # fmt: off
             + (1 - self.seller_burden_of_title_search_fee_fraction)
                 * self.title_search_fee
+            + self.title_search_abstract_fee
             # fmt: on
             + self.buyer_attorney_fee
             + self.closing_protection_letter_fee
-            + self.title_search_abstract_fee
             + self.survey_fee
             + self.notary_fee
             + self.deed_prep_fee
