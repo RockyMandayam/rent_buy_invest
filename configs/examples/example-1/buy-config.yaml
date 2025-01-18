@@ -88,6 +88,8 @@ notary_fee: !!float 100.
 
 seller_deed_prep_fee: !!float 50.
 
+seller_natural_hazard_report_fee: !!float 100.
+
 ##### MISCELLANEOUS MONTHLY COSTS
 
 annual_homeowners_insurance_fraction: !!float 0.005
