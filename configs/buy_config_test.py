@@ -32,7 +32,7 @@ class TestBuyConfig(TestConfig):
             "seller_burden_of_transfer_tax_fraction",
             "recording_fee_fraction",
             "annual_property_tax_rate",
-            "realtor_commission_fraction",
+            "buyer_realtor_commission_fraction",
             "hoa_transfer_fee",
             "seller_burden_of_hoa_transfer_fee",
             "home_inspection_cost",
@@ -199,7 +199,7 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["realtor_commission_fraction"],
+            ["buyer_realtor_commission_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_REALTOR_COMMISSION_FRACTION,
         )
