@@ -45,7 +45,8 @@
 - **`survey_fee`** *(number, required)*: Survey fee, which surveys the boundaries of the property. This is often loosely considered part of 'settlement fees'.
 - **`notary_fee`** *(number, required)*: Notary fee. This is often loosely considered part of 'settlement fees'.
 - **`seller_deed_prep_fee`** *(number, required)*: Deed preparation fee. This is often loosely considered part of 'settlement fees'.
-- **`annual_homeowners_insurance_fraction`** *(number, required)*: ANNUAL cost of homeowners insurance as fraction of the assessed home value. This field depends a lot on the home, conditions, coverage, insurance, etc.
+- **`annual_homeowners_insurance_fraction`** *(number, required)*: ANNUAL cost of homeowners insurance as fraction of the assessed home value. Note that there is still a deductible. This field depends a lot on the home, conditions, coverage, insurance, etc.
+- **`annual_flood_insurance`** *(number, required)*: ANNUAL cost of flood insurance for the first year; note that flood insurance usually only covers up to $250,000, and there are still deductibles. This field depends a lot based on the specific home and area it's in.
 - **`monthly_utilities`** *(number, required)*: Monthly utilities for the first month.
 - **`annual_maintenance_cost_fraction`** *(number, required)*: ANNUAL maintenance cost as a fraction of the assessed home value (not sale price).
 - **`monthly_hoa_fees`** *(number, required)*: Monthly HOA (Home Owners Association) fees.

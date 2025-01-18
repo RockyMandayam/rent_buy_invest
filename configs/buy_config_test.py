@@ -56,6 +56,7 @@ class TestBuyConfig(TestConfig):
             "notary_fee",
             "seller_deed_prep_fee",
             "annual_homeowners_insurance_fraction",
+            "annual_flood_insurance",
             "monthly_utilities",
             "annual_maintenance_cost_fraction",
             "monthly_hoa_fees",
@@ -367,6 +368,13 @@ class TestBuyConfig(TestConfig):
             ["annual_homeowners_insurance_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ANNUAL_HOMEOWNERS_INSURANCE_FRACTION,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["annual_flood_insurance"],
+            allow_negative=False,
+            # TODO max value
         )
         check_float_field(
             BuyConfig,

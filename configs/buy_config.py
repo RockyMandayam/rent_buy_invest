@@ -199,6 +199,7 @@ class BuyConfig(Config):
         self.annual_homeowners_insurance_fraction: float = kwargs[
             "annual_homeowners_insurance_fraction"
         ]
+        self.annual_flood_insurance: float = kwargs["annual_flood_insurance"]
         self.monthly_utilities: float = kwargs["monthly_utilities"]
         self.annual_maintenance_cost_fraction: float = kwargs[
             "annual_maintenance_cost_fraction"
@@ -334,6 +335,9 @@ class BuyConfig(Config):
         assert (
             self.annual_homeowners_insurance_fraction >= 0
         ), "Annual homeowners insurance fraction must be non-negative."
+        assert (
+            self.annual_flood_insurance >= 0
+        ), "annual_flood_insurance must be non-negative."
         assert self.monthly_utilities >= 0, "Monthly utilities must be non-negative."
         assert (
             self.annual_maintenance_cost_fraction >= 0
@@ -539,9 +543,12 @@ class BuyConfig(Config):
         return (
             self.monthly_utilities
             + self.monthly_hoa_fees
-            + self.sale_price
-            * self.annual_homeowners_insurance_fraction
-            / MONTHS_PER_YEAR
+            + (
+                self.sale_price
+                * self.annual_homeowners_insurance_fraction
+                / MONTHS_PER_YEAR
+            )
+            + (self.annual_flood_insurance / MONTHS_PER_YEAR)
         )
 
     def get_inflation_related_monthly_costs(
