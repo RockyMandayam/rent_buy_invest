@@ -168,7 +168,11 @@
       "type": "number"
     },
     "annual_homeowners_insurance_fraction": {
-      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed home value. This field depends a lot on the home, conditions, coverage, insurance, etc.",
+      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed home value. Note that there is still a deductible. This field depends a lot on the home, conditions, coverage, insurance, etc.",
+      "type": "number"
+    },
+    "annual_flood_insurance": {
+      "description": "ANNUAL cost of flood insurance for the first year; note that flood insurance usually only covers up to $250,000, and there are still deductibles. This field depends a lot based on the specific home and area it's in.",
       "type": "number"
     },
     "monthly_utilities": {
@@ -260,6 +264,7 @@
     "notary_fee",
     "seller_deed_prep_fee",
     "annual_homeowners_insurance_fraction",
+    "annual_flood_insurance",
     "monthly_utilities",
     "annual_maintenance_cost_fraction",
     "monthly_hoa_fees",

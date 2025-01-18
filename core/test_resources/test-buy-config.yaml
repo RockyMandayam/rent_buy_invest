@@ -92,6 +92,8 @@ seller_deed_prep_fee: !!float 50.
 
 annual_homeowners_insurance_fraction: !!float 0.005
 
+annual_flood_insurance: !!float 0.0
+
 monthly_utilities: !!float 300.
 
 annual_maintenance_cost_fraction: !!float 0.02
