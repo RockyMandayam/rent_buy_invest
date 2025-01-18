@@ -34,6 +34,14 @@ Some additional notes about the configs:
     - Inflation related costs: utilities and HOA fees. These increase change according to `annual_inflation_rate`
     - Mortgage insurance: Mortgage insurance is calculated based on the initial loan amount
     - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the loan amount decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
+- Here is some info about typical home buying/selling costs, based on some quick online searching (all of these change depending on the specific buyer/seller, and when the market favors the buyer more, the seller is more likely to pay for some of the buyer's costs, and when the market favors the seller more, the buyer is more likely to pay for some of the seller's costs):
+    - Mortgage-related costs are paid by the buyer (e.g., mortgage processing fee, home appraisal cost); it's the buyer taking on the mortgage
+    - The buyer or seller can pay the recording fee, but it is usually the buyer. This calculator assumes it's the buyer.
+    - Often, the buyer and seller each have their own real estate agent. And often, each real estate agent works for a real estate broker (but the real estate agent can also be his/her own broker)
+    - The HOA transfer fee can be paid by the seller or the buyer, but not split. However, this calculator has a 'seller_burden_of_hoa_transfer_fee' parameter in the buy config which lets you specify however you want to split it
+    - The buyer usually pays for the home inspection. This calculator assumes the buyer pays for it.
+    - The pest inspection can be paid by the buyer or seller, more often the seller. However, this calculator assumes the buyer pays for it
+
 
 ## Installation & How to Run
 
