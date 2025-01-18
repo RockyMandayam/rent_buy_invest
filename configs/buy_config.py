@@ -155,7 +155,9 @@ class BuyConfig(Config):
         ]
         self.recording_fee_fraction: float = kwargs["recording_fee_fraction"]
         self.annual_property_tax_rate: float = kwargs["annual_property_tax_rate"]
-        self.buyer_realtor_commission_fraction: float = kwargs["buyer_realtor_commission_fraction"]
+        self.buyer_realtor_commission_fraction: float = kwargs[
+            "buyer_realtor_commission_fraction"
+        ]
         self.hoa_transfer_fee: float = kwargs["hoa_transfer_fee"]
         self.seller_burden_of_hoa_transfer_fee: float = kwargs[
             "seller_burden_of_hoa_transfer_fee"
