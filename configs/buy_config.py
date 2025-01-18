@@ -181,7 +181,7 @@ class BuyConfig(Config):
         self.closing_protection_letter_fee: float = kwargs[
             "closing_protection_letter_fee"
         ]
-        self.search_abstract_fee: float = kwargs["search_abstract_fee"]
+        self.title_search_abstract_fee: float = kwargs["title_search_abstract_fee"]
         self.survey_fee: float = kwargs["survey_fee"]
         self.notary_fee: float = kwargs["notary_fee"]
         self.deed_prep_fee: float = kwargs["deed_prep_fee"]
@@ -308,7 +308,7 @@ class BuyConfig(Config):
             self.closing_protection_letter_fee >= 0
         ), "Closing protection letter fee must be non-negative."
         assert (
-            self.search_abstract_fee >= 0
+            self.title_search_abstract_fee >= 0
         ), "Search abstract fee must be non-negative."
         assert self.survey_fee >= 0, "Survey fee must be non-negative."
         assert self.notary_fee >= 0, "Notary fee must be non-negative."
@@ -408,7 +408,7 @@ class BuyConfig(Config):
             BuyConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
         )
         self._validate_max_value(
-            "search_abstract_fee", BuyConfig.MAX_SEARCH_ABSTRACT_FEE
+            "title_search_abstract_fee", BuyConfig.MAX_SEARCH_ABSTRACT_FEE
         )
         self._validate_max_value("survey_fee", BuyConfig.MAX_SURVEY_FEE)
         self._validate_max_value("notary_fee", BuyConfig.MAX_NOTARY_FEE)
@@ -476,7 +476,7 @@ class BuyConfig(Config):
             # fmt: on
             + self.buyer_attorney_fee
             + self.closing_protection_letter_fee
-            + self.search_abstract_fee
+            + self.title_search_abstract_fee
             + self.survey_fee
             + self.notary_fee
             + self.deed_prep_fee

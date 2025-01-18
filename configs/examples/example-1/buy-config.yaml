@@ -70,7 +70,7 @@ seller_attorney_fee: !!float 800.
 
 closing_protection_letter_fee: !!float 35.
 
-search_abstract_fee: !!float 300.
+title_search_abstract_fee: !!float 300.
 
 survey_fee: !!float 500.
 

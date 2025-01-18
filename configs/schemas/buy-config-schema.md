@@ -36,7 +36,7 @@
 - **`buyer_attorney_fee`** *(number, required)*: Buyer's attorney fee.
 - **`seller_attorney_fee`** *(number, required)*: Seller's attorney fee.
 - **`closing_protection_letter_fee`** *(number, required)*: The closing protection letter (CPL) fee.
-- **`search_abstract_fee`** *(number, required)*: Search abstract fee. This may be included in the title search fee. Do NOT include that amount here. Only include here any amount not covered under other fees. This is often loosely considered part of 'title fees' or 'settlement fees'.
+- **`title_search_abstract_fee`** *(number, required)*: Search abstract fee. This may be included in the title search fee. Do NOT include that amount here. Only include here any amount not covered under other fees. This is often loosely considered part of 'title fees' or 'settlement fees'.
 - **`survey_fee`** *(number, required)*: Survey fee, which surveys the boundaries of the property. This is often loosely considered part of 'settlement fees'.
 - **`notary_fee`** *(number, required)*: Notary fee. This is often loosely considered part of 'settlement fees'.
 - **`deed_prep_fee`** *(number, required)*: Deed preparation fee. This is often loosely considered part of 'settlement fees'.
