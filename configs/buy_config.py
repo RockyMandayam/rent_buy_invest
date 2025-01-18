@@ -158,6 +158,9 @@ class BuyConfig(Config):
         self.buyer_realtor_commission_fraction: float = kwargs[
             "buyer_realtor_commission_fraction"
         ]
+        self.seller_realtor_commission_fraction: float = kwargs[
+            "seller_realtor_commission_fraction"
+        ]
         self.hoa_transfer_fee: float = kwargs["hoa_transfer_fee"]
         self.seller_burden_of_hoa_transfer_fee: float = kwargs[
             "seller_burden_of_hoa_transfer_fee"
@@ -267,7 +270,10 @@ class BuyConfig(Config):
         ), "Annual property tax rate must be non-negative."
         assert (
             self.buyer_realtor_commission_fraction >= 0
-        ), "Realtor commission fraction must be non-negative."
+        ), "Buyer ealtor commission fraction must be non-negative."
+        assert (
+            self.seller_realtor_commission_fraction >= 0
+        ), "Seller realtor commission fraction must be non-negative."
         assert self.hoa_transfer_fee >= 0, "HOA transfer fee must be non-negative."
         assert (
             self.seller_burden_of_hoa_transfer_fee >= 0
@@ -368,6 +374,10 @@ class BuyConfig(Config):
         )
         self._validate_max_value(
             "buyer_realtor_commission_fraction",
+            BuyConfig.MAX_REALTOR_COMMISSION_FRACTION,
+        )
+        self._validate_max_value(
+            "seller_realtor_commission_fraction",
             BuyConfig.MAX_REALTOR_COMMISSION_FRACTION,
         )
         self._validate_max_value("hoa_transfer_fee", BuyConfig.MAX_HOA_TRANSFER_FEE)
