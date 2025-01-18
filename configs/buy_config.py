@@ -149,6 +149,7 @@ class BuyConfig(Config):
         ]
         self.home_appraisal_cost: float = kwargs["home_appraisal_cost"]
         self.credit_report_fee: float = kwargs["credit_report_fee"]
+        self.flood_certification_fee: float = kwargs["flood_certification_fee"]
         self.transfer_tax_fraction: float = kwargs["transfer_tax_fraction"]
         self.seller_burden_of_transfer_tax_fraction: float = kwargs[
             "seller_burden_of_transfer_tax_fraction"
@@ -171,7 +172,6 @@ class BuyConfig(Config):
         self.seller_burden_of_escrow_fixed_fee: float = kwargs[
             "seller_burden_of_escrow_fixed_fee"
         ]
-        self.flood_certification_fee: float = kwargs["flood_certification_fee"]
         self.title_search_fee: float = kwargs["title_search_fee"]
         self.seller_burden_of_title_search_fee_fraction: float = kwargs[
             "seller_burden_of_title_search_fee_fraction"
@@ -259,6 +259,9 @@ class BuyConfig(Config):
         ), "Home appraisal cost must be non-negative."
         assert self.credit_report_fee >= 0, "Credit report fee must be non-negative."
         assert (
+            self.flood_certification_fee >= 0
+        ), "Flood certification fee must be non-negative."
+        assert (
             self.transfer_tax_fraction >= 0
         ), "Transfer tax fraction must be non-negative."
         assert (
@@ -293,9 +296,6 @@ class BuyConfig(Config):
             self.seller_burden_of_escrow_fixed_fee >= 0
             and self.seller_burden_of_escrow_fixed_fee <= 1
         ), "seller_burden_of_escrow_fixed_fee must be between 0 and 1 inclusve."
-        assert (
-            self.flood_certification_fee >= 0
-        ), "Flood certification fee must be non-negative."
         assert self.title_search_fee >= 0, "Title search fee must be non-negative."
         assert (
             self.seller_burden_of_title_search_fee_fraction >= 0
@@ -370,6 +370,9 @@ class BuyConfig(Config):
         )
         self._validate_max_value("credit_report_fee", BuyConfig.MAX_CREDIT_REPORT_FEE)
         self._validate_max_value(
+            "flood_certification_fee", BuyConfig.MAX_FLOOD_CERTIFICATION_FEE
+        )
+        self._validate_max_value(
             "transfer_tax_fraction", BuyConfig.MAX_TRANSFER_TAX_FRACTION
         )
         self._validate_max_value(
@@ -395,9 +398,6 @@ class BuyConfig(Config):
             "pest_inspection_cost", BuyConfig.MAX_PEST_INSPECTION_COST
         )
         self._validate_max_value("escrow_fixed_fee", BuyConfig.MAX_ESCROW_FIXED_FEE)
-        self._validate_max_value(
-            "flood_certification_fee", BuyConfig.MAX_FLOOD_CERTIFICATION_FEE
-        )
         self._validate_max_value("title_search_fee", BuyConfig.MAX_TITLE_SEARCH_FEE)
         self._validate_max_value("attorney_fee", BuyConfig.MAX_ATTORNEY_FEE)
         self._validate_max_value(
@@ -455,6 +455,7 @@ class BuyConfig(Config):
             # fmt: on
             + self.home_appraisal_cost
             + self.credit_report_fee
+            + self.flood_certification_fee
             # fmt: off
             + (1 - self.seller_burden_of_transfer_tax_fraction)
                 * self.transfer_tax_fraction
@@ -466,7 +467,6 @@ class BuyConfig(Config):
             + self.home_inspection_cost
             + self.pest_inspection_cost
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
-            + self.flood_certification_fee
             # fmt: off
             + (1 - self.seller_burden_of_title_search_fee_fraction)
                 * self.title_search_fee

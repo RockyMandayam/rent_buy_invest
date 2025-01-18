@@ -59,6 +59,10 @@
       "description": "Credit report fee charged by lender to do a credit check",
       "type": "number"
     },
+    "flood_certification_fee": {
+      "description": "Flood certification fee.",
+      "type": "number"
+    },
     "transfer_tax_fraction": {
       "description": "Transfer tax as a fraction of the sale price. Note that there are often multiple transfer taxes (e.g., state and county). This field is the sum of all such transfer taxes. Transfer tax is a one-time tax per home purchase.",
       "type": "number"
@@ -105,10 +109,6 @@
     },
     "seller_burden_of_escrow_fixed_fee": {
       "description": "The seller's burden of the escrow fixed fee.",
-      "type": "number"
-    },
-    "flood_certification_fee": {
-      "description": "Flood certification fee.",
       "type": "number"
     },
     "title_search_fee": {
@@ -220,6 +220,7 @@
     "mortgage_discount_points_fee_fraction",
     "home_appraisal_cost",
     "credit_report_fee",
+    "flood_certification_fee",
     "transfer_tax_fraction",
     "seller_burden_of_transfer_tax_fraction",
     "recording_fee_fraction",
@@ -232,7 +233,6 @@
     "pest_inspection_cost",
     "escrow_fixed_fee",
     "seller_burden_of_escrow_fixed_fee",
-    "flood_certification_fee",
     "title_search_fee",
     "seller_burden_of_title_search_fee_fraction",
     "attorney_fee",
