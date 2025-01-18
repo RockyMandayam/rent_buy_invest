@@ -18,6 +18,7 @@
 - **`mortgage_discount_points_fee_fraction`** *(number, required)*: Mortgage discount points (a.k.a. mortgage points) are a kind of fee you can pay upfront to lower your mortgage interest rate. The FINAL mortgage interest rate should be given above (regardless of how that rate was gotten). If you used discount points to achieve that rate, that final rate should be given here as a fraction of the loan amount. Discount point payments are often thought of as prepaid interest.
 - **`home_appraisal_cost`** *(number, required)*: Home appraisal cost. Lenders often require a home appraisal. The buyer often pays for this up-front, regardless of whether the sale actually goes through.
 - **`credit_report_fee`** *(number, required)*: Credit report fee charged by lender to do a credit check.
+- **`flood_certification_fee`** *(number, required)*: Flood certification fee.
 - **`transfer_tax_fraction`** *(number, required)*: Transfer tax as a fraction of the sale price. Note that there are often multiple transfer taxes (e.g., state and county). This field is the sum of all such transfer taxes. Transfer tax is a one-time tax per home purchase.
 - **`seller_burden_of_transfer_tax_fraction`** *(number, required)*: The fraction of the transfer tax burden is borne by the seller (the remaining is borne by the buyer).
 - **`recording_fee_fraction`** *(number, required)*: The tax charged by the county/state/etc. to legally record the property's deed and mortgage information. This field is expressed as fraction of sale price. The recording fee is often considered part of the title fees and therefore part of the 'closing costs'.
@@ -30,7 +31,6 @@
 - **`pest_inspection_cost`** *(number, required)*: The pest inspection cost (note that the home inspection probably does not include pest inspection).
 - **`escrow_fixed_fee`** *(number, required)*: Escrow fixed fee. I don't think there is a basic price-based fee except for specific line items, e.g., flood certification fee.
 - **`seller_burden_of_escrow_fixed_fee`** *(number, required)*: The seller's burden of the escrow fixed fee.
-- **`flood_certification_fee`** *(number, required)*: Flood certification fee.
 - **`title_search_fee`** *(number, required)*: Title search fee.
 - **`seller_burden_of_title_search_fee_fraction`** *(number, required)*: The seller's burden of the title search fee as a fraction.
 - **`attorney_fee`** *(number, required)*: Attorney fee.

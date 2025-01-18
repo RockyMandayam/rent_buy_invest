@@ -28,6 +28,7 @@ class TestBuyConfig(TestConfig):
             "mortgage_discount_points_fee_fraction",
             "home_appraisal_cost",
             "credit_report_fee",
+            "flood_certification_fee",
             "transfer_tax_fraction",
             "seller_burden_of_transfer_tax_fraction",
             "recording_fee_fraction",
@@ -40,7 +41,6 @@ class TestBuyConfig(TestConfig):
             "pest_inspection_cost",
             "escrow_fixed_fee",
             "seller_burden_of_escrow_fixed_fee",
-            "flood_certification_fee",
             "title_search_fee",
             "seller_burden_of_title_search_fee_fraction",
             "attorney_fee",
@@ -173,6 +173,13 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
+            ["flood_certification_fee"],
+            allow_negative=False,
+            max_value=BuyConfig.MAX_FLOOD_CERTIFICATION_FEE,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
             ["transfer_tax_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_TRANSFER_TAX_FRACTION,
@@ -254,13 +261,6 @@ class TestBuyConfig(TestConfig):
             allow_negative=False,
             allow_greater_than_one=False,
             # TODO max value
-        )
-        check_float_field(
-            BuyConfig,
-            config_kwargs,
-            ["flood_certification_fee"],
-            allow_negative=False,
-            max_value=BuyConfig.MAX_FLOOD_CERTIFICATION_FEE,
         )
         check_float_field(
             BuyConfig,
