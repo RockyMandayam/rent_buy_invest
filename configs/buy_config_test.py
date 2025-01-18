@@ -49,11 +49,11 @@ class TestBuyConfig(TestConfig):
             "seller_attorney_fee",
             "lenders_title_insurance_fraction",
             "owners_title_insurance_fraction",
+            "endorsement_fees",
             "closing_protection_letter_fee",
             "survey_fee",
             "notary_fee",
             "seller_deed_prep_fee",
-            "endorsement_fees",
             "annual_homeowners_insurance_fraction",
             "monthly_utilities",
             "annual_maintenance_cost_fraction",
@@ -321,6 +321,13 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
+            ["endorsement_fees"],
+            allow_negative=False,
+            max_value=BuyConfig.MAX_ENDORSEMENT_FEES,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
             ["closing_protection_letter_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_CLOSING_PROTECTION_LETTER_FEE,
@@ -345,13 +352,6 @@ class TestBuyConfig(TestConfig):
             ["seller_deed_prep_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_DEED_PREP_FEE,
-        )
-        check_float_field(
-            BuyConfig,
-            config_kwargs,
-            ["endorsement_fees"],
-            allow_negative=False,
-            max_value=BuyConfig.MAX_ENDORSEMENT_FEES,
         )
         check_float_field(
             BuyConfig,
