@@ -177,6 +177,9 @@ class BuyConfig(Config):
             "seller_burden_of_title_search_fee_fraction"
         ]
         self.title_search_abstract_fee: float = kwargs["title_search_abstract_fee"]
+        self.seller_burden_of_title_search_abstract_fee: float = kwargs[
+            "seller_burden_of_title_search_abstract_fee"
+        ]
         self.buyer_attorney_fee: float = kwargs["buyer_attorney_fee"]
         self.seller_attorney_fee: float = kwargs["seller_attorney_fee"]
         self.closing_protection_letter_fee: float = kwargs[
@@ -305,6 +308,10 @@ class BuyConfig(Config):
         assert (
             self.title_search_abstract_fee >= 0
         ), "Search abstract fee must be non-negative."
+        assert (
+            self.seller_burden_of_title_search_abstract_fee >= 0
+            and self.seller_burden_of_title_search_abstract_fee <= 1
+        ), "seller_burden_of_title_search_abstract_fee must be between 0 and 1 inclusive."
         assert self.buyer_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert self.seller_attorney_fee >= 0, "Attorney fee must be non-negative."
         assert (
@@ -473,7 +480,7 @@ class BuyConfig(Config):
             # fmt: off
             + (1 - self.seller_burden_of_title_search_fee_fraction)
                 * self.title_search_fee
-            + self.title_search_abstract_fee
+            + (1 - self.seller_burden_of_title_search_abstract_fee) * self.title_search_abstract_fee
             # fmt: on
             + self.buyer_attorney_fee
             + self.closing_protection_letter_fee
