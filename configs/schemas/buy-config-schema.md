@@ -33,7 +33,7 @@
 - **`seller_burden_of_escrow_fixed_fee`** *(number, required)*: The seller's burden of the escrow fixed fee.
 - **`title_search_fee`** *(number, required)*: Title search fee.
 - **`seller_burden_of_title_search_fee_fraction`** *(number, required)*: The seller's burden of the title search fee as a fraction.
-- **`attorney_fee`** *(number, required)*: Attorney fee.
+- **`buyer_attorney_fee`** *(number, required)*: Attorney fee.
 - **`closing_protection_letter_fee`** *(number, required)*: The closing protection letter (CPL) fee.
 - **`search_abstract_fee`** *(number, required)*: Search abstract fee. This may be included in the title search fee. Do NOT include that amount here. Only include here any amount not covered under other fees. This is often loosely considered part of 'title fees' or 'settlement fees'.
 - **`survey_fee`** *(number, required)*: Survey fee, which surveys the boundaries of the property. This is often loosely considered part of 'settlement fees'.
