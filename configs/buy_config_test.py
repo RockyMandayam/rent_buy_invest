@@ -39,6 +39,7 @@ class TestBuyConfig(TestConfig):
             "home_inspection_cost",
             "pest_inspection_cost",
             "escrow_fixed_fee",
+            "seller_burden_of_escrow_fixed_fee",
             "flood_certification_fee",
             "title_search_fee",
             "seller_burden_of_title_search_fee_fraction",
@@ -245,6 +246,14 @@ class TestBuyConfig(TestConfig):
             ["escrow_fixed_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ESCROW_FIXED_FEE,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["seller_burden_of_escrow_fixed_fee"],
+            allow_negative=False,
+            allow_greater_than_one=False,
+            # TODO max value
         )
         check_float_field(
             BuyConfig,

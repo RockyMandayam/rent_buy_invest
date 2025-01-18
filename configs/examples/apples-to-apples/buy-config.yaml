@@ -56,6 +56,8 @@ pest_inspection_cost: !!float 0.0
 
 escrow_fixed_fee: !!float 0.0
 
+seller_burden_of_escrow_fixed_fee: !!float 0.5
+
 flood_certification_fee: !!float 0.0
 
 title_search_fee: !!float 0.0
