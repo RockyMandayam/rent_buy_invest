@@ -35,6 +35,7 @@ Some additional notes about the configs:
     - Mortgage insurance: Mortgage insurance is calculated based on the initial loan amount
     - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the loan amount decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
 - Here is some info about typical home buying/selling costs, based on some quick online searching (all of these change depending on the specific buyer/seller, and when the market favors the buyer more, the seller is more likely to pay for some of the buyer's costs, and when the market favors the seller more, the buyer is more likely to pay for some of the seller's costs):
+    - Unless otherwise stated in the yaml schema, a cost in the buy config is assumed to be paid by the buyer
     - Mortgage-related costs are paid by the buyer (e.g., mortgage processing fee, home appraisal cost); it's the buyer taking on the mortgage
     - The buyer or seller can pay the recording fee, but it is usually the buyer. This calculator assumes it's the buyer.
     - Often, the buyer and seller each have their own real estate agent. And often, each real estate agent works for a real estate broker (but the real estate agent can also be his/her own broker)
