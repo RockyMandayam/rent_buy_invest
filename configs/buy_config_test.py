@@ -44,6 +44,7 @@ class TestBuyConfig(TestConfig):
             "title_search_fee",
             "seller_burden_of_title_search_fee_fraction",
             "buyer_attorney_fee",
+            "seller_attorney_fee",
             "closing_protection_letter_fee",
             "search_abstract_fee",
             "survey_fee",
@@ -280,6 +281,13 @@ class TestBuyConfig(TestConfig):
             BuyConfig,
             config_kwargs,
             ["buyer_attorney_fee"],
+            allow_negative=False,
+            max_value=BuyConfig.MAX_ATTORNEY_FEE,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["seller_attorney_fee"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ATTORNEY_FEE,
         )
