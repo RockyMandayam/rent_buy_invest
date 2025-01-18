@@ -155,7 +155,7 @@
       "description": "Notary fee. This is often loosely considered part of 'settlement fees'.",
       "type": "number"
     },
-    "deed_prep_fee": {
+    "seller_deed_prep_fee": {
       "description": "Deed preparation fee. This is often loosely considered part of 'settlement fees'.",
       "type": "number"
     },
@@ -252,7 +252,7 @@
     "closing_protection_letter_fee",
     "survey_fee",
     "notary_fee",
-    "deed_prep_fee",
+    "seller_deed_prep_fee",
     "endorsement_fees",
     "annual_homeowners_insurance_fraction",
     "monthly_utilities",
