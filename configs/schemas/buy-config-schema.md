@@ -29,6 +29,7 @@
 - **`seller_burden_of_hoa_transfer_fee`** *(number, required)*: The seller's burden of the HOA transfer fee as a fraction of the fee.
 - **`home_inspection_cost`** *(number, required)*: The home inspection cost. The home inspection should include at least the following types: general, foundation, plumbing, septic tank, termite, mold, and chimney. Typically a home inspection does NOT include a pest inspection.
 - **`pest_inspection_cost`** *(number, required)*: The pest inspection cost (note that the home inspection probably does not include pest inspection).
+- **`seller_one_time_home_warranty`** *(number, required)*: The seller will often get home warranty during the time the home is on the market (in case any appliances break during that time) and for some period of time (often one year) after the sale (a gesture of goodwill to the buyer it seems, in case appliances break). This field should include the cost of all this as a one-time cost when selling a home.
 - **`escrow_fixed_fee`** *(number, required)*: Escrow fixed fee. I don't think there is a basic price-based fee except for specific line items, e.g., flood certification fee.
 - **`seller_burden_of_escrow_fixed_fee`** *(number, required)*: The seller's burden of the escrow fixed fee.
 - **`title_search_fee`** *(number, required)*: Title search fee.

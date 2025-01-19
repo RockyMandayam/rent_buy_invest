@@ -56,6 +56,8 @@ home_inspection_cost: !!float 500.0
 
 pest_inspection_cost: !!float 0.0
 
+seller_one_time_home_warranty: !!float 600.
+
 escrow_fixed_fee: !!float 0.0
 
 seller_burden_of_escrow_fixed_fee: !!float 0.5

@@ -168,6 +168,9 @@ class BuyConfig(Config):
         ]
         self.home_inspection_cost: float = kwargs["home_inspection_cost"]
         self.pest_inspection_cost: float = kwargs["pest_inspection_cost"]
+        self.seller_one_time_home_warranty: float = kwargs[
+            "seller_one_time_home_warranty"
+        ]
         self.escrow_fixed_fee: float = kwargs["escrow_fixed_fee"]
         self.seller_burden_of_escrow_fixed_fee: float = kwargs[
             "seller_burden_of_escrow_fixed_fee"
@@ -300,6 +303,9 @@ class BuyConfig(Config):
         assert (
             self.pest_inspection_cost >= 0
         ), "Pest inspection cost must be non-negative."
+        assert (
+            self.seller_one_time_home_warranty >= 0
+        ), "seller_one_time_home_warranty must be non-negative."
         assert self.escrow_fixed_fee >= 0, "Escrow fixed fee must be non-negative."
         assert (
             self.seller_burden_of_escrow_fixed_fee >= 0
