@@ -39,6 +39,7 @@ class TestBuyConfig(TestConfig):
             "seller_burden_of_hoa_transfer_fee",
             "home_inspection_cost",
             "pest_inspection_cost",
+            "seller_one_time_home_warranty",
             "escrow_fixed_fee",
             "seller_burden_of_escrow_fixed_fee",
             "title_search_fee",
@@ -251,6 +252,13 @@ class TestBuyConfig(TestConfig):
             ["pest_inspection_cost"],
             allow_negative=False,
             max_value=BuyConfig.MAX_PEST_INSPECTION_COST,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["seller_one_time_home_warranty"],
+            allow_negative=False,
+            # TODO max value
         )
         check_float_field(
             BuyConfig,

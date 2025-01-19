@@ -103,6 +103,10 @@
       "description": "The pest inspection cost (note that the home inspection probably does not include pest inspection).",
       "type": "number"
     },
+    "seller_one_time_home_warranty": {
+      "description": "The seller will often get home warranty during the time the home is on the market (in case any appliances break during that time) and for some period of time (often one year) after the sale (a gesture of goodwill to the buyer it seems, in case appliances break). This field should include the cost of all this as a one-time cost when selling a home.",
+      "type": "number"
+    },
     "escrow_fixed_fee": {
       "description": "Escrow fixed fee. I don't think there is a basic price-based fee except for specific line items, e.g., flood certification fee.",
       "type": "number"
@@ -251,6 +255,7 @@
     "seller_burden_of_hoa_transfer_fee",
     "home_inspection_cost",
     "pest_inspection_cost",
+    "seller_one_time_home_warranty",
     "escrow_fixed_fee",
     "seller_burden_of_escrow_fixed_fee",
     "title_search_fee",
