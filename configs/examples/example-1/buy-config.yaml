@@ -102,6 +102,8 @@ monthly_utilities: !!float 300.
 
 annual_maintenance_cost_fraction: !!float 0.02
 
+annual_home_warranty: !!float 600.
+
 monthly_hoa_fees: !!float 250.
 
 ##### RENTAL INCOME RELATED COSTS

@@ -191,6 +191,10 @@
       "description": "ANNUAL maintenance cost as a fraction of the assessed home value (not sale price).",
       "type": "number"
     },
+    "annual_home_warranty": {
+      "description": "ANNUAL home warranty cost (this covers some problems with some appliances like refrigerators, HVAC, etc.).",
+      "type": "number"
+    },
     "monthly_hoa_fees": {
       "description": "Monthly HOA (Home Owners Association) fees.",
       "type": "number"
@@ -277,6 +281,7 @@
     "annual_flood_insurance",
     "monthly_utilities",
     "annual_maintenance_cost_fraction",
+    "annual_home_warranty",
     "monthly_hoa_fees",
     "rental_income_config"
   ]
