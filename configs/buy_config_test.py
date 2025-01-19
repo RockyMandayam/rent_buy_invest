@@ -61,6 +61,7 @@ class TestBuyConfig(TestConfig):
             "annual_flood_insurance",
             "monthly_utilities",
             "annual_maintenance_cost_fraction",
+            "annual_home_warranty",
             "monthly_hoa_fees",
             "rental_income_config",
             ("rental_income_config", "annual_management_cost_fraction"),
@@ -405,6 +406,13 @@ class TestBuyConfig(TestConfig):
             ["annual_maintenance_cost_fraction"],
             allow_negative=False,
             max_value=BuyConfig.MAX_ANNUAL_MAINTENANCE_COST_FRACTION,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["annual_home_warranty"],
+            allow_negative=False,
+            # TODO max limit
         )
         check_float_field(
             BuyConfig,

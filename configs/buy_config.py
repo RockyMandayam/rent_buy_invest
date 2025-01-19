@@ -210,6 +210,7 @@ class BuyConfig(Config):
         self.annual_maintenance_cost_fraction: float = kwargs[
             "annual_maintenance_cost_fraction"
         ]
+        self.annual_home_warranty: float = kwargs["annual_home_warranty"]
         self.monthly_hoa_fees: float = kwargs["monthly_hoa_fees"]
         # TODO this seems wrong
         rental_income_config_kwargs = kwargs["rental_income_config"]
@@ -354,6 +355,9 @@ class BuyConfig(Config):
         assert (
             self.annual_maintenance_cost_fraction >= 0
         ), "Annual maintenance cost fraction must be non-negative."
+        assert (
+            self.annual_home_warranty >= 0
+        ), "annual_home_warranty must be non-negative."
         assert self.monthly_hoa_fees >= 0, "Monthly HOA fees must be non-negative."
         self._validate_max_value(
             "annual_assessed_value_inflation_rate",
@@ -561,6 +565,7 @@ class BuyConfig(Config):
                 / MONTHS_PER_YEAR
             )
             + (self.annual_flood_insurance / MONTHS_PER_YEAR)
+            + (self.annual_home_warranty / MONTHS_PER_YEAR)
         )
 
     def get_inflation_related_monthly_costs(
