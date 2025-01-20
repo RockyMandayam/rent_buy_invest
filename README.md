@@ -8,6 +8,7 @@ This is a tool for helping determine whether to rent vs buy a home. The main fin
 
 Some additional notes about the configs:
 - You can set the start date to any time, but this calculator is not meant to indicate that the results here would match what happened historically. This calculator is just a limited approximator using the customs/laws as of around 2024/2025.
+- This calculator assumes there is no prepayment penalty on the mortgage (which is relevant for when you sell the home before the mortgage is paid off).
 - There is a mortgage interest tax deduction. To get this deduction, you need to itemize your deductions instead of taking the standard deduction. This script assumes you will itemize your deductions. Although deductions are calculated annually, for convenience sake, it's done monthly in these calculations.
     - See IRS 2024 Publication 936 for details
 - Typically, discount points which are paid upfront to reduce the interest rate on the mortgage can also be deducted from taxes if it is a primary home and not a commercial development. There are some finer details, but by and large, you can deduct discount points from your taxes if they are computed as a fraction of the principal balance and appear clearly as points on your settlement. Discount point payments are often thought of as some kind of prepaid interest.
