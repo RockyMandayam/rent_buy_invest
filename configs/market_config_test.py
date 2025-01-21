@@ -78,7 +78,7 @@ class TestMarketConfig(TestConfig):
             with pytest.raises(AssertionError):
                 MarketConfig(**invalid_kwargs)
 
-    def test_get_income_tax(self) -> None:
+    def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
             TestMarketConfig.MARKET_CONFIG.get_income_tax(-1)
         assert TestMarketConfig.MARKET_CONFIG.get_income_tax(0) == pytest.approx(0)

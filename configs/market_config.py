@@ -100,7 +100,7 @@ class MarketConfig(Config):
                 lower_limit = upper_limit
             assert False
 
-        def _get_income_tax(self, income: float, deduction: float = 0) -> float:
+        def _get_tax(self, income: float, deduction: float = 0) -> float:
             """Calculates tax owed given income.
 
             Args:
@@ -176,7 +176,7 @@ class MarketConfig(Config):
         """
         assert income >= 0, "Income must be non-negative"
         assert deduction >= 0, "Deduction must be non-negative"
-        return self.tax_brackets._get_income_tax(income, deduction)
+        return self.tax_brackets._get_tax(income, deduction)
 
     def get_marginal_income_tax_rate(self, income) -> float:
         assert income >= 0
