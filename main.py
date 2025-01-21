@@ -119,21 +119,6 @@ def main() -> None:
     projection = calculator.calculate()
     _write_output_xlsx_df(output_dir, "projection.xlsx", projection, num_header_rows=2)
 
-    # at the end, compare only post-tax values
-    # buy side: need to sell house, and investments
-    # rent side: need to sell investments
-
-    revenue_from_selling_investments_if_buying = projection[
-        ("Buy", "Invested (Pre-Tax)")
-    ].iloc[-1]
-    # posttax_revenue_from_selling_investments_if_buying = ...
-    # revenue_from_selling_home = sale_price - costs - loan_amount
-    # posttax_revenue_from_selling_home = ...
-    revenue_from_selling_investments_if_renting = projection[
-        ("Rent", "Invested (Pre-Tax)")
-    ].iloc[-1]
-    # posttax_revenue_from_selling_investments_if_renting = ...
-
 
 if __name__ == "__main__":
     main()
