@@ -21,6 +21,9 @@ class TestMarketConfig(TestConfig):
             ("tax_brackets", "tax_brackets"),
             ("tax_brackets", "tax_brackets", 0, "upper_limit"),
             ("tax_brackets", "tax_brackets", 0, "tax_rate"),
+            ("tax_brackets", "long_term_capital_gains_tax_brackets"),
+            ("tax_brackets", "long_term_capital_gains_tax_brackets", 0, "upper_limit"),
+            ("tax_brackets", "long_term_capital_gains_tax_brackets", 0, "tax_rate"),
         ]
         self._test_inputs_with_invalid_schema(MarketConfig, attributes)
 
@@ -33,53 +36,56 @@ class TestMarketConfig(TestConfig):
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
         )
-        num_brackets = len(config_kwargs["tax_brackets"]["tax_brackets"])
-        # for all non-highest brackets, check upper limit and tax rate
-        for bracket_index in range(num_brackets - 1):
+        for tax_type in ("tax_brackets", "long_term_capital_gains_tax_brackets"):
+            num_brackets = len(config_kwargs["tax_brackets"][tax_type])
+            # for all non-highest brackets, check upper limit and tax rate
+            for bracket_index in range(num_brackets - 1):
+                check_float_field(
+                    MarketConfig,
+                    config_kwargs,
+                    ["tax_brackets", tax_type, bracket_index, "upper_limit"],
+                    allow_negative=False,
+                    allow_zero=False,
+                )
+                check_float_field(
+                    MarketConfig,
+                    config_kwargs,
+                    ["tax_brackets", tax_type, bracket_index, "tax_rate"],
+                    allow_negative=False,
+                    allow_greater_than_one=False,
+                )
+            # for highest bracket, upper limit is infinity, and check tax rate in the same way
+            invalid_kwargs = copy.deepcopy(config_kwargs)
+            invalid_kwargs["tax_brackets"][tax_type].pop()
+            with pytest.raises(AssertionError):
+                MarketConfig(**invalid_kwargs)
             check_float_field(
                 MarketConfig,
                 config_kwargs,
-                ["tax_brackets", "tax_brackets", bracket_index, "upper_limit"],
+                ["tax_brackets", tax_type, bracket_index, "tax_rate"],
                 allow_negative=False,
-                allow_zero=False,
             )
-            check_float_field(
-                MarketConfig,
-                config_kwargs,
-                ["tax_brackets", "tax_brackets", bracket_index, "tax_rate"],
-                allow_negative=False,
-                allow_greater_than_one=False,
-            )
-        # for highest bracket, upper limit is infinity, and check tax rate in the same way
-        invalid_kwargs = copy.deepcopy(config_kwargs)
-        invalid_kwargs["tax_brackets"]["tax_brackets"].pop()
-        with pytest.raises(AssertionError):
-            MarketConfig(**invalid_kwargs)
-        check_float_field(
-            MarketConfig,
-            config_kwargs,
-            ["tax_brackets", "tax_brackets", bracket_index, "tax_rate"],
-            allow_negative=False,
-        )
 
-        # non-increasing upper_limit should cause error
-        invalid_kwargs = copy.deepcopy(config_kwargs)
-        invalid_kwargs["tax_brackets"]["tax_brackets"][1]["upper_limit"] = 44625
-        with pytest.raises(AssertionError):
-            MarketConfig(**invalid_kwargs)
+            # non-increasing upper_limit should cause error
+            invalid_kwargs = copy.deepcopy(config_kwargs)
+            invalid_kwargs["tax_brackets"][tax_type][1]["upper_limit"] = 44625
+            with pytest.raises(AssertionError):
+                MarketConfig(**invalid_kwargs)
 
-        # test regressive tax brackets
-        invalid_kwargs["tax_brackets"]["tax_brackets"][1]["tax_rate"] = 0.0
-        invalid_kwargs["validate_non_regressive_tax_brackets"] = True
-        with pytest.raises(AssertionError):
-            MarketConfig(**invalid_kwargs)
+            # test regressive tax brackets
+            invalid_kwargs["tax_brackets"][tax_type][1]["tax_rate"] = 0.0
+            invalid_kwargs["validate_non_regressive_tax_brackets"] = True
+            with pytest.raises(AssertionError):
+                MarketConfig(**invalid_kwargs)
 
     def test_get_income_tax(self) -> None:
         with pytest.raises(AssertionError):
-            TestMarketConfig.MARKET_CONFIG.get_tax(-1)
-        assert TestMarketConfig.MARKET_CONFIG.get_tax(0) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_tax(44625) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_tax(500000) == pytest.approx(68691.25)
+            TestMarketConfig.MARKET_CONFIG.get_income_tax(-1)
+        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(0) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(44625) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(500000) == pytest.approx(
+            68691.25
+        )
 
     def test_get_pretax_monthly_wealth(self) -> None:
         with pytest.raises(AssertionError):
