@@ -91,7 +91,7 @@ class MarketConfig(Config):
                     prev_tax_rate = bracket["tax_rate"]
                 upper_limit = bracket["upper_limit"]
 
-        def _get_marginal_income_tax_rate(self, income: float) -> float:
+        def _get_marginal_tax_rate(self, income: float) -> float:
             lower_limit = 0
             for bracket in self.tax_brackets:
                 upper_limit = bracket["upper_limit"]
@@ -180,7 +180,7 @@ class MarketConfig(Config):
 
     def get_marginal_income_tax_rate(self, income) -> float:
         assert income >= 0
-        return self.tax_brackets._get_marginal_income_tax_rate(income)
+        return self.tax_brackets._get_marginal_tax_rate(income)
 
     def get_income_tax_savings_from_deduction(
         self, income: float, deduction: float
