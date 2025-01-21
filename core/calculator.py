@@ -78,11 +78,11 @@ class Calculator:
 
         # Need to get post-tax rental incomes
         # TODO this is approximate logic, doesn't consider income putting you across multiple marginal rates
-        marginal_tax_rate = self.market_config.get_marginal_tax_rate(
+        marginal_income_tax_rate = self.market_config.get_marginal_income_tax_rate(
             self.personal_config.income
         )
         home_monthly_rental_incomes = [
-            (1 - marginal_tax_rate) * inc for inc in home_monthly_rental_incomes
+            (1 - marginal_income_tax_rate) * inc for inc in home_monthly_rental_incomes
         ]
 
         # Some renting costs/gains can be calculated independently at once

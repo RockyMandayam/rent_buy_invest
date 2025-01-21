@@ -11,3 +11,14 @@ tax_brackets:
     -
       upper_limit: !!float .inf
       tax_rate: !!float 0.2
+  long_term_capital_gains_tax_brackets:
+    -
+      upper_limit: !!float 44625.
+      tax_rate: !!float 0.
+    -
+      upper_limit: !!float 492300.
+      tax_rate: !!float 0.10
+    -
+      upper_limit: !!float .inf
+      tax_rate: !!float 0.15
+

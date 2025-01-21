@@ -15,7 +15,9 @@ class MarketConfig(Config):
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
-        self.tax_brackets: A TaxBrackets object
+        self.tax_brackets: A TaxBrackets object representing income tax rates (which are also short term capital gains tax rates)
+        self.long_term_capital_gains_tax_brackets: A TaxBrackets object representing long term capital gains tax rates
+
     """
 
     MAX_MARKET_RATE_OF_RETURN = 0.5
@@ -98,7 +100,7 @@ class MarketConfig(Config):
                 lower_limit = upper_limit
             assert False
 
-        def _get_income_tax(self, income: float, deduction: float = 0) -> float:
+        def _get_tax(self, income: float, deduction: float = 0) -> float:
             """Calculates tax owed given income.
 
             Args:
@@ -126,7 +128,7 @@ class MarketConfig(Config):
     def __init__(
         self,
         market_rate_of_return: float,
-        tax_brackets: list[dict[str, float]],
+        tax_brackets: dict[str, dict],
         validate_non_regressive_tax_brackets: bool = DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS,
     ) -> None:
         """Initializes the class.
@@ -137,6 +139,12 @@ class MarketConfig(Config):
         self.market_rate_of_return: float = market_rate_of_return
         self.tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
             tax_brackets["tax_brackets"], validate_non_regressive_tax_brackets
+        )
+        self.long_term_capital_gains_tax_brackets: MarketConfig.TaxBrackets = (
+            MarketConfig.TaxBrackets(
+                tax_brackets["long_term_capital_gains_tax_brackets"],
+                validate_non_regressive_tax_brackets,
+            )
         )
         self._validate()
 
@@ -153,8 +161,11 @@ class MarketConfig(Config):
             self.market_rate_of_return <= MarketConfig.MAX_MARKET_RATE_OF_RETURN
         ), "Please set a reasonable market rate of return (at most 0.5)"
         assert self.tax_brackets is not None, "Tax brackets must not be null or empty."
+        assert (
+            self.long_term_capital_gains_tax_brackets is not None
+        ), "long_term_capital_gains_tax_brackets must not be null or empty"
 
-    def get_tax(self, income: float, deduction: float = 0) -> float:
+    def get_income_tax(self, income: float, deduction: float = 0) -> float:
         """Calculates tax owed given income.
 
         Args:
@@ -165,9 +176,9 @@ class MarketConfig(Config):
         """
         assert income >= 0, "Income must be non-negative"
         assert deduction >= 0, "Deduction must be non-negative"
-        return self.tax_brackets._get_income_tax(income, deduction)
+        return self.tax_brackets._get_tax(income, deduction)
 
-    def get_marginal_tax_rate(self, income) -> float:
+    def get_marginal_income_tax_rate(self, income) -> float:
         assert income >= 0
         return self.tax_brackets._get_marginal_tax_rate(income)
 
@@ -184,9 +195,9 @@ class MarketConfig(Config):
         """
         assert income >= 0, "Income must be non-negative"
         assert deduction >= 0, "Deduction must be non-negative"
-        original_tax = self.get_tax(income)
-        modified_tax = self.get_tax(income, deduction)
-        return original_tax - modified_tax
+        original_income_tax = self.get_income_tax(income)
+        modified_income_tax = self.get_income_tax(income, deduction)
+        return original_income_tax - modified_income_tax
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
         """Return the pretax wealth in the market at the BEGINNING of each month
