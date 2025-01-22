@@ -85,7 +85,7 @@ def main() -> None:
 
     # load configs
     experiment_config = ExperimentConfig.parse(args.experiment_config)
-    num_months = experiment_config.num_months
+    num_years = experiment_config.num_years
     market_config = experiment_config.market_config
     personal_config = experiment_config.personal_config
     rent_config = experiment_config.rent_config
@@ -112,7 +112,7 @@ def main() -> None:
         rent_config,
         market_config,
         personal_config,
-        num_months,
+        num_years,
         start_date,
         initial_state,
     )

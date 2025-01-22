@@ -50,7 +50,7 @@ class Calculator:
         rent_config: RentConfig,
         market_config: MarketConfig,
         personal_config: PersonalConfig,
-        num_months: int,
+        num_years: int,
         start_date: datetime.date,
         initial_state: InitialState,
     ) -> None:
@@ -58,32 +58,32 @@ class Calculator:
         self.rent_config: RentConfig = rent_config
         self.market_config: MarketConfig = market_config
         self.personal_config: PersonalConfig = personal_config
-        self.num_months: int = num_months
+        self.num_years: int = num_years
         self.start_date: datetime.date = start_date
         self.initial_state: InitialState = initial_state
 
     def calculate(self) -> pd.DataFrame:
+        num_months = self.num_years * MONTHS_PER_YEAR
+
         # Some housing costs/gains can be calculated independently at once
-        home_values = self.buy_config.get_monthly_home_values(self.num_months)
+        home_values = self.buy_config.get_monthly_home_values(num_months)
         home_monthly_costs_related_to_home_value = (
-            self.buy_config.get_home_value_related_monthly_costs(self.num_months)
+            self.buy_config.get_home_value_related_monthly_costs(num_months)
         )
         home_monthly_costs_related_to_inflation = (
             self.buy_config.get_inflation_related_monthly_costs(
-                self.rent_config.annual_rent_inflation_rate, self.num_months
+                self.rent_config.annual_rent_inflation_rate, num_months
             )
         )
         home_monthly_rental_incomes = self.buy_config.get_monthly_rental_incomes(
-            self.num_months
+            num_months
         )
 
         # Projected ordinary income (used only for tax projection purposes)
-        ordinary_incomes = self.personal_config.get_ordinary_incomes(self.num_months)
+        ordinary_incomes = self.personal_config.get_ordinary_incomes(num_months)
 
         # Some renting costs/gains can be calculated independently at once
-        rent_monthly_costs = self.rent_config.get_monthly_costs_of_renting(
-            self.num_months
-        )
+        rent_monthly_costs = self.rent_config.get_monthly_costs_of_renting(num_months)
 
         # The remaining housing and rental costs/gains are calculated in the loop
         # which projects forward month by month
@@ -111,7 +111,7 @@ class Calculator:
         )
 
         buy_one_off_costs = []
-        for month in range(self.num_months + 1):
+        for month in range(num_months + 1):
             buy_one_off_cost = 0
 
             loan_amounts.append(loan_amount)
@@ -296,7 +296,7 @@ class Calculator:
         }
         rows = []
         date = self.start_date
-        for _ in range(self.num_months + 1):
+        for _ in range(num_months + 1):
             rows.append(date.strftime("%b %d, %Y"))
             date = increment_month(date)
         return to_df(cols, rows, multi_col=True)

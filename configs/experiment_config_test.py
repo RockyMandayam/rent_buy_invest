@@ -21,7 +21,7 @@ class TestExperimentConfig(TestConfig):
 
     def test_inputs_with_invalid_schema(self) -> None:
         attributes = [
-            "num_months",
+            "num_years",
             "market_config_path",
             "rent_config_path",
             "buy_config_path",
@@ -34,10 +34,10 @@ class TestExperimentConfig(TestConfig):
         check_float_field(
             ExperimentConfig,
             test_config_kwargs,
-            ["num_months"],
+            ["num_years"],
             allow_negative=False,
             allow_zero=False,
-            max_value=ExperimentConfig.MAX_NUM_MONTHS,
+            max_value=ExperimentConfig.MAX_NUM_YEARS,
         )
         check_filepath_field(
             ExperimentConfig,
