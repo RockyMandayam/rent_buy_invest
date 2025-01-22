@@ -1,6 +1,13 @@
 import datetime
+from collections.abc import Iterable
 
 MONTHS_PER_YEAR: int = 12
+
+
+def avg(seq: Iterable[float]) -> float:
+    if not seq:
+        return 0
+    return sum(seq) / len(seq)
 
 
 def get_equivalent_monthly_compound_rate(annual_compound_rate: float) -> float:

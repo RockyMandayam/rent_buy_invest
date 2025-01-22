@@ -37,7 +37,7 @@ class InitialState:
         buy_upfront_one_time_cost -= discount_points_deduction_savings
         assert (
             rent_upfront_one_time_cost <= buy_upfront_one_time_cost
-        ), "Renting should not have a larger upfront one-time cost than buying a home."
+        ), f"The upfront one-time cost for renting (${rent_upfront_one_time_cost}) must not be larger than for buying (${buy_upfront_one_time_cost})."
         home_equity_if_buying = buy_config.down_payment
         invested_if_renting = (
             buy_upfront_one_time_cost
