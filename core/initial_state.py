@@ -29,10 +29,8 @@ class InitialState:
             buy_config.mortgage_discount_points_fee_fraction
             * buy_config.initial_loan_amount
         )
-        discount_points_deduction_savings = (
-            market_config.get_income_tax_savings_from_deduction(
-                personal_config.ordinary_income, discount_points_payment
-            )
+        discount_points_deduction_savings = market_config.get_tax(
+            personal_config.ordinary_income, discount_points_payment
         )
         buy_upfront_one_time_cost -= discount_points_deduction_savings
         assert (

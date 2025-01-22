@@ -83,12 +83,10 @@ class TestMarketConfig(TestConfig):
 
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
-            TestMarketConfig.MARKET_CONFIG.get_income_tax(-1)
-        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(0) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(44625) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(500000) == pytest.approx(
-            68691.25
-        )
+            TestMarketConfig.MARKET_CONFIG.get_tax(-1)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(0) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(44625) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(500000) == pytest.approx(68691.25)
 
     def test_get_pretax_monthly_wealth(self) -> None:
         with pytest.raises(AssertionError):

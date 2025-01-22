@@ -100,7 +100,7 @@ class MarketConfig(Config):
                 lower_limit = upper_limit
             assert False
 
-        def _get_tax(self, income: float, deduction: float = 0) -> float:
+        def _get_tax(self, income: float) -> float:
             """Calculates tax owed given income.
 
             Args:
@@ -111,8 +111,6 @@ class MarketConfig(Config):
             """
             tax = 0
             lower_limit = 0
-            deduction = min(deduction, income)
-            income -= deduction
             for bracket in self.tax_brackets:
                 if income < lower_limit:
                     break
@@ -170,18 +168,25 @@ class MarketConfig(Config):
             self.long_term_capital_gains_tax_brackets is not None
         ), "long_term_capital_gains_tax_brackets must not be null or empty"
 
-    def get_income_tax(self, income: float, deduction: float = 0) -> float:
+    def get_tax(
+        self, ordinary_income: float, ordinary_income_deduction: float = 0
+    ) -> float:
         """Calculates tax owed given income.
 
         Args:
-            income: non-negative income
+            ordinary_income: non-negative ordinary_income
 
         Returns:
             tax: non-negative tax owed
         """
-        assert income >= 0, "Income must be non-negative"
-        assert deduction >= 0, "Deduction must be non-negative"
-        return self.ordinary_income_tax_brackets._get_tax(income, deduction)
+        assert ordinary_income >= 0, "Ordinary income must be non-negative"
+        assert (
+            ordinary_income_deduction >= 0
+        ), "Ordinary income deduction must be non-negative"
+        # cannot deduct more than income
+        ordinary_income_deduction = min(ordinary_income_deduction, ordinary_income)
+        ordinary_income -= ordinary_income_deduction
+        return self.ordinary_income_tax_brackets._get_tax(ordinary_income)
 
     def get_marginal_income_tax_rate(self, income) -> float:
         assert income >= 0
@@ -200,8 +205,8 @@ class MarketConfig(Config):
         """
         assert income >= 0, "Income must be non-negative"
         assert deduction >= 0, "Deduction must be non-negative"
-        original_income_tax = self.get_income_tax(income)
-        modified_income_tax = self.get_income_tax(income, deduction)
+        original_income_tax = self.get_tax(income)
+        modified_income_tax = self.get_tax(income, deduction)
         return original_income_tax - modified_income_tax
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
