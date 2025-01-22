@@ -8,7 +8,11 @@ from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.data_utils import to_df
-from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, increment_month
+
+# isort: off
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg, increment_month
+
+# isort: on
 
 # PMI means Private Mortgage Insurance, and this is the mortgage insurance you'd get for a conventional
 # (i.e., non-FHA) loan.
@@ -128,7 +132,13 @@ class Calculator:
                 2,
             )
             mortgage_interests.append(mortgage_interest)
-            if mortgage_interest:
+            # mortgage interest tax deduction savings
+            # only do it at the year boundary
+            if month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1):
+                mortgage_interest_for_the_year = sum(
+                    mortgage_interests[-MONTHS_PER_YEAR:]
+                )
+                avg_loan_amount = avg(loan_amounts[-MONTHS_PER_YEAR:])
                 # ordinary income tax savings due to mortgage interest deduction
                 # with this formula, if the loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
                 # but if the loan amount is larger than that, you only get a "prorated" deduction
@@ -141,7 +151,9 @@ class Calculator:
                 )
                 mortgage_interest_deduction_saving = deductible_fraction_of_interest * (
                     self.market_config.get_income_tax_savings_from_deduction(
-                        ordinary_incomes[month], mortgage_interest
+                        # income should be same every month within a year
+                        ordinary_incomes[month],
+                        mortgage_interest_for_the_year,
                     )
                 )
             else:
