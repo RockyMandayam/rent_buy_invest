@@ -17,8 +17,8 @@ class TestPersonalConfig(TestConfig):
     def test_inputs_with_invalid_schema(self) -> None:
         # check null fields
         attributes = [
-            "income",
-            "income_growth_rate",
+            "ordinary_income",
+            "ordinary_income_growth_rate",
             "years_till_retirement",
         ]
         self._test_inputs_with_invalid_schema(PersonalConfig, attributes)
@@ -29,13 +29,13 @@ class TestPersonalConfig(TestConfig):
         check_float_field(
             PersonalConfig,
             config_kwargs,
-            ["income"],
+            ["ordinary_income"],
             allow_negative=False,
         )
         check_float_field(
             PersonalConfig,
             config_kwargs,
-            ["income_growth_rate"],
+            ["ordinary_income_growth_rate"],
             min_value=-1,
         )
         check_float_field(

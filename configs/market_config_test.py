@@ -18,9 +18,9 @@ class TestMarketConfig(TestConfig):
         attributes = [
             "market_rate_of_return",
             "tax_brackets",
-            ("tax_brackets", "tax_brackets"),
-            ("tax_brackets", "tax_brackets", 0, "upper_limit"),
-            ("tax_brackets", "tax_brackets", 0, "tax_rate"),
+            ("tax_brackets", "ordinary_income_tax_brackets"),
+            ("tax_brackets", "ordinary_income_tax_brackets", 0, "upper_limit"),
+            ("tax_brackets", "ordinary_income_tax_brackets", 0, "tax_rate"),
             ("tax_brackets", "long_term_capital_gains_tax_brackets"),
             ("tax_brackets", "long_term_capital_gains_tax_brackets", 0, "upper_limit"),
             ("tax_brackets", "long_term_capital_gains_tax_brackets", 0, "tax_rate"),
@@ -36,7 +36,10 @@ class TestMarketConfig(TestConfig):
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
         )
-        for tax_type in ("tax_brackets", "long_term_capital_gains_tax_brackets"):
+        for tax_type in (
+            "ordinary_income_tax_brackets",
+            "long_term_capital_gains_tax_brackets",
+        ):
             num_brackets = len(config_kwargs["tax_brackets"][tax_type])
             # for all non-highest brackets, check upper limit and tax rate
             for bracket_index in range(num_brackets - 1):
@@ -80,12 +83,10 @@ class TestMarketConfig(TestConfig):
 
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
-            TestMarketConfig.MARKET_CONFIG.get_income_tax(-1)
-        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(0) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(44625) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_income_tax(500000) == pytest.approx(
-            68691.25
-        )
+            TestMarketConfig.MARKET_CONFIG.get_tax(-1)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(0) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(44625) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(500000) == pytest.approx(68691.25)
 
     def test_get_pretax_monthly_wealth(self) -> None:
         with pytest.raises(AssertionError):
