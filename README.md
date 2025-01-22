@@ -7,7 +7,9 @@ Calculates the long-term financial pros and cons of decisions related to renting
 This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
 
 Some additional notes about the configs:
-- You can set the start date to any time, but this calculator is not meant to indicate that the results here would match what happened historically. This calculator is just a limited approximator using the customs/laws as of around 2024/2025.
+- You can set the start date to any time, but:
+    - This calculator is not meant to indicate that the results here would match what happened historically. This calculator is just a limited approximator using the customs/laws as of around 2024/2025.
+    - For ease of calculation, the start date will be taken to be the start of the tax year, and any other fiscal years (for loans, etc.)
 - This calculator assumes there is no prepayment penalty on the mortgage (which is relevant for when you sell the home before the mortgage is paid off).
 - There is a mortgage interest tax deduction. To get this deduction, you need to itemize your deductions instead of taking the standard deduction. This script assumes you will itemize your deductions. Although deductions are calculated annually, for convenience sake, it's done monthly in these calculations.
     - See IRS 2024 Publication 936 for details
