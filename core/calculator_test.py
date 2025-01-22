@@ -22,7 +22,7 @@ class TestCalculator:
             EXPERIMENT_CONFIG.rent_config,
             EXPERIMENT_CONFIG.market_config,
             EXPERIMENT_CONFIG.personal_config,
-            EXPERIMENT_CONFIG.num_months,
+            EXPERIMENT_CONFIG.num_years,
             EXPERIMENT_CONFIG.start_date,
             InitialState.from_configs(
                 EXPERIMENT_CONFIG.buy_config,
@@ -65,7 +65,7 @@ class TestCalculator:
                 == pytest.approx(first_month_monthly_mortgage_total_payment, abs=0.01)
                 # if it is off by 0.5 cents every payment due to rounding...
                 or monthly_mortgage_total_payment
-                <= EXPERIMENT_CONFIG.num_months * 0.005
+                <= EXPERIMENT_CONFIG.num_years * MONTHS_PER_YEAR * 0.005
             )
 
             loan_amount = row["Buy"]["Loan Amount"]

@@ -14,7 +14,7 @@ class ExperimentConfig(Config):
         schema_path (str): Experiment config schema path
 
     Instance Attributes:
-        num_months (int): Number of months to run the projection for
+        num_years (int): Number of years to run the projection for
         market_config (MarketConfig): MarketConfig
         rent_config (RentConfig): RentConfig.
         buy_config (BuyConfig): BuyConfig
@@ -22,7 +22,7 @@ class ExperimentConfig(Config):
         start_date: (datetime.datetime): Start date of the projection
     """
 
-    MAX_NUM_MONTHS = 3600
+    MAX_NUM_YEARS = 300
 
     @classmethod
     def schema_path(cls) -> str:
@@ -30,7 +30,7 @@ class ExperimentConfig(Config):
 
     def __init__(
         self,
-        num_months: int,
+        num_years: int,
         market_config_path: str,
         rent_config_path: str,
         buy_config_path: str,
@@ -51,7 +51,7 @@ class ExperimentConfig(Config):
         still be created. Of course, I can implement __init__ to just raise an
         Exception, but this approach seems bad.
         """
-        self.num_months: int = num_months
+        self.num_years: int = num_years
         self.market_config: MarketConfig = MarketConfig.parse(market_config_path)
         self.rent_config: RentConfig = RentConfig.parse(rent_config_path)
         self.buy_config: BuyConfig = BuyConfig.parse(buy_config_path)
@@ -68,8 +68,8 @@ class ExperimentConfig(Config):
             AssertionError: If any experiment configs are invalid
         """
         assert (
-            self.num_months > 0 and self.num_months <= ExperimentConfig.MAX_NUM_MONTHS
-        ), f"Number of months must be positive and at most {ExperimentConfig.MAX_NUM_MONTHS}."
+            self.num_years > 0 and self.num_years <= ExperimentConfig.MAX_NUM_YEARS
+        ), f"Number of months must be positive and at most {ExperimentConfig.MAX_NUM_YEARS}."
         assert isinstance(
             self.start_date, datetime.date
         ), f"Must pass in valid start date in 'YYYY-MM-DD' format with no time (only date); received {self.start_date}"

@@ -3,8 +3,8 @@
   "description": "Configuration for one 'experiment'.",
   "type": "object",
   "properties": {
-    "num_months": {
-      "description": "The number of months to run the calculations for (max of 2400).",
+    "num_years": {
+      "description": "The number of years to run the calculations for (max of 200).",
       "type": "integer"
     },
     "market_config_path": {
@@ -28,7 +28,7 @@
     }
   },
   "required": [
-    "num_months",
+    "num_years",
     "market_config_path",
     "rent_config_path",
     "buy_config_path",
