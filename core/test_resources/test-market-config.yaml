@@ -1,7 +1,7 @@
 market_rate_of_return: !!float 0.07
 
 tax_brackets:
-  income_tax_brackets:
+  ordinary_income_tax_brackets:
     -
       upper_limit: !!float 44625.
       tax_rate: !!float 0.

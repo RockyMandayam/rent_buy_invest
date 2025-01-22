@@ -18,9 +18,9 @@ class TestMarketConfig(TestConfig):
         attributes = [
             "market_rate_of_return",
             "tax_brackets",
-            ("tax_brackets", "income_tax_brackets"),
-            ("tax_brackets", "income_tax_brackets", 0, "upper_limit"),
-            ("tax_brackets", "income_tax_brackets", 0, "tax_rate"),
+            ("tax_brackets", "ordinary_income_tax_brackets"),
+            ("tax_brackets", "ordinary_income_tax_brackets", 0, "upper_limit"),
+            ("tax_brackets", "ordinary_income_tax_brackets", 0, "tax_rate"),
             ("tax_brackets", "long_term_capital_gains_tax_brackets"),
             ("tax_brackets", "long_term_capital_gains_tax_brackets", 0, "upper_limit"),
             ("tax_brackets", "long_term_capital_gains_tax_brackets", 0, "tax_rate"),
@@ -36,7 +36,10 @@ class TestMarketConfig(TestConfig):
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
         )
-        for tax_type in ("income_tax_brackets", "long_term_capital_gains_tax_brackets"):
+        for tax_type in (
+            "ordinary_income_tax_brackets",
+            "long_term_capital_gains_tax_brackets",
+        ):
             num_brackets = len(config_kwargs["tax_brackets"][tax_type])
             # for all non-highest brackets, check upper limit and tax rate
             for bracket_index in range(num_brackets - 1):

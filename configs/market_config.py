@@ -15,7 +15,7 @@ class MarketConfig(Config):
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
-        self.income_tax_brackets: A TaxBrackets object representing income tax rates (which are also short term capital gains tax rates)
+        self.ordinary_income_tax_brackets: A TaxBrackets object representing income tax rates (which are also short term capital gains tax rates)
         self.long_term_capital_gains_tax_brackets: A TaxBrackets object representing long term capital gains tax rates
 
     """
@@ -137,8 +137,11 @@ class MarketConfig(Config):
         in Config.
         """
         self.market_rate_of_return: float = market_rate_of_return
-        self.income_tax_brackets: MarketConfig.TaxBrackets = MarketConfig.TaxBrackets(
-            tax_brackets["income_tax_brackets"], validate_non_regressive_tax_brackets
+        self.ordinary_income_tax_brackets: MarketConfig.TaxBrackets = (
+            MarketConfig.TaxBrackets(
+                tax_brackets["ordinary_income_tax_brackets"],
+                validate_non_regressive_tax_brackets,
+            )
         )
         self.long_term_capital_gains_tax_brackets: MarketConfig.TaxBrackets = (
             MarketConfig.TaxBrackets(
@@ -161,7 +164,7 @@ class MarketConfig(Config):
             self.market_rate_of_return <= MarketConfig.MAX_MARKET_RATE_OF_RETURN
         ), "Please set a reasonable market rate of return (at most 0.5)"
         assert (
-            self.income_tax_brackets is not None
+            self.ordinary_income_tax_brackets is not None
         ), "Income tax brackets must not be null or empty."
         assert (
             self.long_term_capital_gains_tax_brackets is not None
@@ -178,11 +181,11 @@ class MarketConfig(Config):
         """
         assert income >= 0, "Income must be non-negative"
         assert deduction >= 0, "Deduction must be non-negative"
-        return self.income_tax_brackets._get_tax(income, deduction)
+        return self.ordinary_income_tax_brackets._get_tax(income, deduction)
 
     def get_marginal_income_tax_rate(self, income) -> float:
         assert income >= 0
-        return self.income_tax_brackets._get_marginal_tax_rate(income)
+        return self.ordinary_income_tax_brackets._get_marginal_tax_rate(income)
 
     def get_income_tax_savings_from_deduction(
         self, income: float, deduction: float
