@@ -15,6 +15,7 @@ class MarketConfig(Config):
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
+        # TODO more tax stuff (e.g., standard exemption, net investment income tax, payroll tax, etc.)
         self.ordinary_income_tax_brackets: A TaxBrackets object representing ordinary income tax rates (which are also the tax rates used for short term capital gains and some other types of unearned income)
         self.long_term_capital_gains_tax_brackets: A TaxBrackets object representing long term capital gains tax rates
 
@@ -188,9 +189,19 @@ class MarketConfig(Config):
         ordinary_income -= ordinary_income_deduction
         return self.ordinary_income_tax_brackets._get_tax(ordinary_income)
 
-    def get_marginal_income_tax_rate(self, income) -> float:
-        assert income >= 0
-        return self.ordinary_income_tax_brackets._get_marginal_tax_rate(income)
+    def get_tax_for_additional_income(
+        self, base_ordinary_income: float, additional_ordinary_income: float
+    ) -> float:
+        assert base_ordinary_income >= 0, "Base ordinary income must be non-negative"
+        assert (
+            additional_ordinary_income >= 0
+        ), "Additional ordinary income must be non-negative"
+        base_tax = self.get_tax(base_ordinary_income)
+        tax_with_additional_income = self.get_tax(
+            base_ordinary_income + additional_ordinary_income
+        )
+        # TODO just noticed here that values are not rounded...
+        return tax_with_additional_income - base_tax
 
     def get_income_tax_savings_from_deduction(
         self, income: float, deduction: float
