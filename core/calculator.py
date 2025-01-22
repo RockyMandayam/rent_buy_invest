@@ -73,13 +73,13 @@ class Calculator:
             self.num_months
         )
 
-        # Projected incomes (used only for tax projection purposes)
-        incomes = self.personal_config.get_incomes(self.num_months)
+        # Projected ordinary income (used only for tax projection purposes)
+        ordinary_incomes = self.personal_config.get_ordinary_incomes(self.num_months)
 
         # Need to get post-tax rental incomes
         # TODO this is approximate logic, doesn't consider income putting you across multiple marginal rates
         marginal_income_tax_rate = self.market_config.get_marginal_income_tax_rate(
-            self.personal_config.income
+            self.personal_config.ordinary_income
         )
         home_monthly_rental_incomes = [
             (1 - marginal_income_tax_rate) * inc for inc in home_monthly_rental_incomes
@@ -129,7 +129,7 @@ class Calculator:
             )
             mortgage_interests.append(mortgage_interest)
             if mortgage_interest:
-                # income tax savings due to mortgage interest deduction
+                # ordinary income tax savings due to mortgage interest deduction
                 # with this formula, if the loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
                 # but if the loan amount is larger than that, you only get a "prorated" deduction
                 deductible_fraction_of_interest = (
@@ -141,7 +141,7 @@ class Calculator:
                 )
                 mortgage_interest_deduction_saving = deductible_fraction_of_interest * (
                     self.market_config.get_income_tax_savings_from_deduction(
-                        incomes[month], mortgage_interest
+                        ordinary_incomes[month], mortgage_interest
                     )
                 )
             else:

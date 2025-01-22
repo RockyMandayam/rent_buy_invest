@@ -15,7 +15,7 @@ class MarketConfig(Config):
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the
             market, as a decimal
-        self.ordinary_income_tax_brackets: A TaxBrackets object representing income tax rates (which are also short term capital gains tax rates)
+        self.ordinary_income_tax_brackets: A TaxBrackets object representing ordinary income tax rates (which are also the tax rates used for short term capital gains and some other types of unearned income)
         self.long_term_capital_gains_tax_brackets: A TaxBrackets object representing long term capital gains tax rates
 
     """
@@ -33,7 +33,7 @@ class MarketConfig(Config):
             self.tax_brackets (list[dict[str, float]]): A list of tax brackets,
                 where each bracket contains two keys, "upper_limit" and "tax_rate".
                 "tax_rate" is the marginal tax rate of that bracket. "upper_limit"
-                is the upper income limit of that bracket (beyond that limit, the
+                is the upper limit of that bracket (beyond that limit, the
                 next tax bracket begins). This list is ordered from lowest tax
                 bracket to highest tax bracket. The highest tax bracket will have
                 an upper limit of infinity.
@@ -165,7 +165,7 @@ class MarketConfig(Config):
         ), "Please set a reasonable market rate of return (at most 0.5)"
         assert (
             self.ordinary_income_tax_brackets is not None
-        ), "Income tax brackets must not be null or empty."
+        ), "Ordinary income tax brackets must not be null or empty."
         assert (
             self.long_term_capital_gains_tax_brackets is not None
         ), "long_term_capital_gains_tax_brackets must not be null or empty"
