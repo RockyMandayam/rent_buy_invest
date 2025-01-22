@@ -5,6 +5,16 @@ import pytest
 from rent_buy_invest.utils import math_utils
 
 
+def test_avg() -> None:
+    assert math_utils.avg([]) == 0
+    assert math_utils.avg([0]) == 0
+    assert math_utils.avg([0, 0]) == 0
+    assert math_utils.avg([1, -1]) == 0
+    assert math_utils.avg(range(1, 4)) == 2
+    assert math_utils.avg(range(4)) == 1.5
+    assert math_utils.avg([3, 0, 1, 0]) == 1
+
+
 def test_get_equivalent_monthly_compound_rate() -> None:
     annual_compound_rate = 4095  # unrealistic example, just trying with a nice int
     actual = math_utils.get_equivalent_monthly_compound_rate(annual_compound_rate)
