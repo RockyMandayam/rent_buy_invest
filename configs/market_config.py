@@ -189,7 +189,7 @@ class MarketConfig(Config):
         ordinary_income -= ordinary_income_deduction
         return self.ordinary_income_tax_brackets._get_tax(ordinary_income)
 
-    def get_tax_for_additional_income(
+    def get_additional_tax_from_additional_income(
         self, base_ordinary_income: float, additional_ordinary_income: float
     ) -> float:
         assert base_ordinary_income >= 0, "Base ordinary income must be non-negative"
