@@ -92,36 +92,55 @@ class MarketConfig(Config):
                     prev_tax_rate = bracket["tax_rate"]
                 upper_limit = bracket["upper_limit"]
 
-        def _get_marginal_tax_rate(self, income: float) -> float:
-            lower_limit = 0
-            for bracket in self.tax_brackets:
-                upper_limit = bracket["upper_limit"]
-                if income >= lower_limit and income <= upper_limit:
-                    return bracket["tax_rate"]
-                lower_limit = upper_limit
-            assert False
-
-        def _get_tax(self, income: float) -> float:
+        def _get_tax(self, income: float, offset: float = 0) -> float:
             """Calculates tax owed given income.
 
             Args:
                 income: non-negative income
+                offset: an offset to "start calculating" from
+                    - Usefor for calculating one tax "on top of" another (e.g., capital gains on top of income)
+                    - The way the income tax and the capital gains tax work is:
+                        - First calculate the income tax as normal using the income tax brackets
+                        - Then, using the income as the "offset", add the capital gains amount from that offset to the capital gains tax brackets
+                        - E.g.:
+                            - Suppose you have $100k income and $20k capital gains tax
+                            - Suppose the tax brackets are:
+                                - Income tax: 10% up to $50k, 20% for the rest
+                                - Capital gains tax: 0% up to $10k, 5% for the rest
+                            - Income = $100k = $50k + $50k. Income tax is 10% of $50k plus 20% of $50k = 0.1*50k + 0.2*50k = 15k
+                            - Capital gains = $20k = $10k + $10k. Capital gains tax STARTS at the 100k, so you pay 5% for $20k (the 100k to 120k range basically)
 
             Returns:
                 tax: non-negative tax owed
             """
+            # this is the range that is taxed
+            taxable_range_lower_limit = offset
+            taxable_range_upper_limit = offset + income
+
+            # iterate through brackets and add up taxes owed on each bracket
             tax = 0
-            lower_limit = 0
+            bracket_lower_limit = 0
             for bracket in self.tax_brackets:
-                if income < lower_limit:
+                bracket_upper_limit = bracket["upper_limit"]
+                # skip if bracket is below taxable range
+                if bracket_upper_limit < taxable_range_lower_limit:
+                    continue
+                # stop if bracket is fully above taxable range
+                if taxable_range_upper_limit < bracket_lower_limit:
                     break
                 tax_rate = bracket["tax_rate"]
-                upper_limit = bracket["upper_limit"]
-                if income <= upper_limit:
-                    tax += tax_rate * (income - lower_limit)
+                # if bracket covers the top and end of taxable range, calculate fractional tax on that last portion and end
+                if taxable_range_upper_limit <= bracket_upper_limit:
+                    tax += tax_rate * (
+                        taxable_range_upper_limit - max(bracket_lower_limit, offset)
+                    )
                     break
-                tax += tax_rate * (upper_limit - lower_limit)
-                lower_limit = upper_limit
+                # otherwise, add up tax for this bracket, potentially startinot not at the lower limit due to the offset
+                tax += tax_rate * (
+                    bracket_upper_limit
+                    - max(bracket_lower_limit, taxable_range_lower_limit)
+                )
+                bracket_lower_limit = bracket_upper_limit
             return tax
 
     def __init__(
@@ -170,7 +189,11 @@ class MarketConfig(Config):
         ), "long_term_capital_gains_tax_brackets must not be null or empty"
 
     def get_tax(
-        self, ordinary_income: float, ordinary_income_deduction: float = 0
+        self,
+        ordinary_income: float,
+        ordinary_income_deduction: float = 0,
+        long_term_capital_gains: float = 0,
+        long_term_capital_gains_deduction: float = 0,
     ) -> float:
         """Calculates tax owed given income.
 
@@ -184,10 +207,27 @@ class MarketConfig(Config):
         assert (
             ordinary_income_deduction >= 0
         ), "Ordinary income deduction must be non-negative"
-        # cannot deduct more than income
+        assert long_term_capital_gains >= 0, "Capital gains must be non-negative"
+        assert (
+            long_term_capital_gains_deduction >= 0
+        ), "Capital gains deduction must be non-negative"
+        # subtract deductions - cannot deduct more than income
         ordinary_income_deduction = min(ordinary_income_deduction, ordinary_income)
         ordinary_income -= ordinary_income_deduction
-        return self.ordinary_income_tax_brackets._get_tax(ordinary_income)
+        long_term_capital_gains_deduction = min(
+            long_term_capital_gains_deduction, long_term_capital_gains
+        )
+        long_term_capital_gains -= long_term_capital_gains_deduction
+        # calculate taxes
+        ordinary_income_tax = self.ordinary_income_tax_brackets._get_tax(
+            ordinary_income
+        )
+        long_term_capital_gains_tax = (
+            self.long_term_capital_gains_tax_brackets._get_tax(
+                long_term_capital_gains, ordinary_income
+            )
+        )
+        return ordinary_income_tax + long_term_capital_gains_tax
 
     def get_additional_tax_from_additional_income(
         self, base_ordinary_income: float, additional_ordinary_income: float
