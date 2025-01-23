@@ -125,6 +125,7 @@ class RentConfig(Config):
         Raises:
             AssertionError: If num_months is not positive
         """
+        assert num_months > 0
         return math_utils.project_growth(
             self._get_first_monthly_cost(),
             self.annual_rent_inflation_rate,

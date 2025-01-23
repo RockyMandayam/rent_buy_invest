@@ -298,6 +298,7 @@ class MarketConfig(Config):
         Raises:
             AssertionError: If the principal is negative or num_months is not positive
         """
+        assert num_months > 0
         assert principal >= 0, "Principal invested must be non-negative."
         return math_utils.project_growth(
             principal=principal,

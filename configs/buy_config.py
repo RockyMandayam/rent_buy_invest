@@ -111,6 +111,7 @@ class BuyConfig(Config):
                 ), f"Please set '{attr_name}' to something reasonable (at most {max_value})"
 
         def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
+            assert num_months > 0
             if self.rental_income_waiting_period_months >= num_months:
                 return [0 for _ in range(num_months)]
             period_of_no_rental_income = [
@@ -566,6 +567,7 @@ class BuyConfig(Config):
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_monthly_home_values(self, num_months: int):
+        assert num_months > 0
         return project_growth(
             principal=self.sale_price,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
@@ -591,6 +593,7 @@ class BuyConfig(Config):
         )
 
     def get_home_value_related_monthly_costs(self, num_months: int) -> float:
+        assert num_months > 0
         return project_growth(
             principal=self._get_first_home_value_related_monthly_costs(),
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
@@ -614,6 +617,7 @@ class BuyConfig(Config):
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
     ) -> list[float]:
+        assert num_months > 0
         return project_growth(
             principal=self._get_first_inflation_related_monthly_cost(),
             annual_growth_rate=annual_inflation_rate,

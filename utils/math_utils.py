@@ -32,7 +32,7 @@ def project_growth(
         AssertionError: If principal is negative or num_months is not positive
     """
     assert principal >= 0, "Principal must be non-negative."
-    assert num_months > 0, "Number of months must be positive."
+    assert num_months >= 0, "Number of months must be non-negative."
     if compound_monthly:
         equivalent_monthly_rate = get_equivalent_monthly_compound_rate(
             annual_growth_rate
