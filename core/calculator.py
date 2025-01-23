@@ -141,10 +141,12 @@ class Calculator:
                         loan_amount,
                     )
                 )
+                annual_income = sum(
+                    ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
+                )
                 mortgage_interest_deduction_saving = deductible_fraction_of_interest * (
                     self.market_config.get_income_tax_savings_from_deduction(
-                        # income should be same every month within a year
-                        ordinary_incomes[month],
+                        annual_income,
                         mortgage_interest_for_the_year,
                     )
                 )
