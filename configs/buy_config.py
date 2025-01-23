@@ -110,6 +110,31 @@ class BuyConfig(Config):
                     attr_val <= max_value
                 ), f"Please set '{attr_name}' to something reasonable (at most {max_value})"
 
+        def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
+            if self.rental_income_waiting_period_months >= num_months:
+                return [0 for _ in range(num_months)]
+            period_of_no_rental_income = [
+                0 for _ in range(self.rental_income_waiting_period_months)
+            ]
+            if self.rental_income_waiting_period_months == 0:
+                first_month_rent_after_waiting = self.monthly_rental_income
+            else:
+                first_month_rent_after_waiting = project_growth(
+                    principal=self.monthly_rental_income,
+                    annual_growth_rate=self.rental_income_annual_inflation_rate,
+                    # I want the most up-to-date rental price even if it doesn't coincide with a year boundary
+                    compound_monthly=True,
+                    num_months=self.rental_income_waiting_period_months,
+                )[-1]
+            first_month_rent_after_waiting *= self.occupancy_rate
+            period_of_rental_income = project_growth(
+                principal=first_month_rent_after_waiting,
+                annual_growth_rate=self.rental_income_annual_inflation_rate,
+                compound_monthly=False,
+                num_months=(num_months - self.rental_income_waiting_period_months),
+            )
+            return period_of_no_rental_income + period_of_rental_income
+
     @classmethod
     def schema_path(cls) -> str:
         return "rent_buy_invest/configs/schemas/buy-config-schema.json"
@@ -255,6 +280,7 @@ class BuyConfig(Config):
         assert (
             self.annual_mortgage_insurance_fraction >= 0
         ), "Annual mortgage insurance fraction must be non-negative."
+        assert not (self.is_fha_loan and self.rental_income_config)
         assert (
             self.mortgage_origination_points_fee_fraction >= 0
         ), "Mortgage original points fee fraction must be non-negative."
@@ -532,11 +558,12 @@ class BuyConfig(Config):
         )
 
     def _get_first_home_value_related_monthly_costs(self) -> float:
-        management_cost_fraction = (
-            self.rental_income_config.annual_management_cost_fraction
-            if self.rental_income_config
-            else 0
-        )
+        if self.rental_income_config:
+            management_cost_fraction = (
+                self.rental_income_config.annual_management_cost_fraction
+            )
+        else:
+            management_cost_fraction = 0
         return (
             self.sale_price
             * (
@@ -579,34 +606,7 @@ class BuyConfig(Config):
         )
 
     def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
-        if self.rental_income_config.rental_income_waiting_period_months >= num_months:
-            return [0 for _ in range(num_months)]
-        period_of_no_rental_income = [
-            0
-            for _ in range(
-                self.rental_income_config.rental_income_waiting_period_months
-            )
-        ]
-        if self.rental_income_config.rental_income_waiting_period_months == 0:
-            first_month_rent_after_waiting = (
-                self.rental_income_config.monthly_rental_income
-            )
+        if self.rental_income_config:
+            return self.rental_income_config.get_monthly_rental_incomes(num_months)
         else:
-            first_month_rent_after_waiting = project_growth(
-                principal=self.rental_income_config.monthly_rental_income,
-                annual_growth_rate=self.rental_income_config.rental_income_annual_inflation_rate,
-                # I want the most up-to-date rental price even if it doesn't coincide with a year boundary
-                compound_monthly=True,
-                num_months=self.rental_income_config.rental_income_waiting_period_months,
-            )[-1]
-        first_month_rent_after_waiting *= self.rental_income_config.occupancy_rate
-        period_of_rental_income = project_growth(
-            principal=first_month_rent_after_waiting,
-            annual_growth_rate=self.rental_income_config.rental_income_annual_inflation_rate,
-            compound_monthly=False,
-            num_months=(
-                num_months
-                - self.rental_income_config.rental_income_waiting_period_months
-            ),
-        )
-        return period_of_no_rental_income + period_of_rental_income
+            return [0 for _ in range(num_months)]

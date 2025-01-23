@@ -202,8 +202,10 @@ class Calculator:
                 annual_rental_income = sum(
                     home_monthly_rental_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
                 )
-                rental_income_tax = self.market_config.get_tax_for_additional_income(
-                    annual_ordinary_income, annual_rental_income
+                rental_income_tax = (
+                    self.market_config.get_additional_tax_from_additional_income(
+                        annual_ordinary_income, annual_rental_income
+                    )
                 )
             else:
                 rental_income_tax = 0
