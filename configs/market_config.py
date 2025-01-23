@@ -92,15 +92,6 @@ class MarketConfig(Config):
                     prev_tax_rate = bracket["tax_rate"]
                 upper_limit = bracket["upper_limit"]
 
-        def _get_marginal_tax_rate(self, income: float) -> float:
-            lower_limit = 0
-            for bracket in self.tax_brackets:
-                upper_limit = bracket["upper_limit"]
-                if income >= lower_limit and income <= upper_limit:
-                    return bracket["tax_rate"]
-                lower_limit = upper_limit
-            assert False
-
         def _get_tax(self, income: float) -> float:
             """Calculates tax owed given income.
 
