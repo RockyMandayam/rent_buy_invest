@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import jsonschema
 import pytest
 
@@ -452,6 +454,30 @@ class TestBuyConfig(TestConfig):
             config_kwargs,
             ["rental_income_config", "occupancy_rate"],
             allow_greater_than_one=False,
+        )
+
+    def test_get_monthly_rental_incomes(self) -> None:
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        with pytest.raises(AssertionError):
+            buy_config_copy.get_monthly_rental_incomes(0)
+        # TODO since I now do personal or investment use but not both, I don't need a waiting period!
+        # no rental income for the first 24 months (waiting period)
+        assert buy_config_copy.get_monthly_rental_incomes(1) == [0, 0]
+        assert buy_config_copy.get_monthly_rental_incomes(23) == [0 for _ in range(24)]
+        # average rental income after waiting period, accounting for occupancy rate
+        rental_income = round(0.6 * 1000 * (1 + 0.02) ** 2, 2)
+        assert buy_config_copy.get_monthly_rental_incomes(24) == pytest.approx(
+            [0 for _ in range(24)] + [rental_income]
+        )
+        # rental income should only increase annually
+        assert buy_config_copy.get_monthly_rental_incomes(35) == pytest.approx(
+            [0 for _ in range(24)] + [rental_income for _ in range(12)]
+        )
+        next_year_rental_income = round(rental_income * (1 + 0.02), 2)
+        assert buy_config_copy.get_monthly_rental_incomes(36) == pytest.approx(
+            [0 for _ in range(24)]
+            + [rental_income for _ in range(12)]
+            + [next_year_rental_income]
         )
 
     def test_get_monthly_mortgage_payment(self) -> None:

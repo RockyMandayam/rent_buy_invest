@@ -115,7 +115,8 @@ class RentConfig(Config):
             + self.monthly_parking_fee
         )
 
-    def get_monthly_costs_of_renting(self, num_months: int) -> float:
+    def get_monthly_costs_of_renting(self, num_months: int) -> list[float]:
+        assert num_months > 0
         """Return the monthly cost of renting each month for num_months months.
 
         Returns:

@@ -112,8 +112,8 @@ class BuyConfig(Config):
 
         def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
             assert num_months > 0
-            if self.rental_income_waiting_period_months >= num_months:
-                return [0 for _ in range(num_months)]
+            if self.rental_income_waiting_period_months > num_months:
+                return [0 for _ in range(num_months + 1)]
             period_of_no_rental_income = [
                 0 for _ in range(self.rental_income_waiting_period_months)
             ]
@@ -626,6 +626,7 @@ class BuyConfig(Config):
         )
 
     def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
+        assert num_months > 0
         if self.rental_income_config:
             return self.rental_income_config.get_monthly_rental_incomes(num_months)
         else:
