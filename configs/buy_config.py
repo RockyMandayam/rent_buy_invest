@@ -280,6 +280,7 @@ class BuyConfig(Config):
         assert (
             self.annual_mortgage_insurance_fraction >= 0
         ), "Annual mortgage insurance fraction must be non-negative."
+        assert not (self.is_fha_loan and self.rental_income_config)
         assert (
             self.mortgage_origination_points_fee_fraction >= 0
         ), "Mortgage original points fee fraction must be non-negative."
