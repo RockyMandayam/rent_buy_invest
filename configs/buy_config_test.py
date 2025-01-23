@@ -10,6 +10,8 @@ from rent_buy_invest.utils import io_utils
 
 
 class TestBuyConfig(TestConfig):
+    """Tests BuyConfig and its nested class RentalIncomeConfig"""
+
     TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
     BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
@@ -478,6 +480,17 @@ class TestBuyConfig(TestConfig):
             [0 for _ in range(24)]
             + [rental_income for _ in range(12)]
             + [next_year_rental_income]
+        )
+
+    def test_get_initial_loan_fraction(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.initial_loan_fraction == pytest.approx(0.8)
+
+    def test_down_payment(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.down_payment == pytest.approx(0.2 * 500000)
+
+    def test_get_initial_loan_amount(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.initial_loan_amount == pytest.approx(
+            0.8 * 500000
         )
 
     def test_get_monthly_mortgage_payment(self) -> None:
