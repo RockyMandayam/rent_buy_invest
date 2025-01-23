@@ -1,5 +1,7 @@
 # rent_buy_invest
 
+NOTE: THIS IS NOT FINANCIAL ADVICE
+
 ## Overview
 
 Calculates the long-term financial pros and cons of decisions related to renting a home, buying a home, and investing in the stock market.
