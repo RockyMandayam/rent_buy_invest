@@ -151,6 +151,7 @@ def main() -> None:
     # get cap gains on home
     # don't want to separately find tax for investments and home, since they don't contribute "proportionally"
     # due to tax bracketing. Find total cap gains, then calculate tax
+    loan_amount = projection[("Buy", "Loan Amount")].iloc[-1]
     final_home_price = projection[("Buy", "Home Value")].iloc[-1]
     initial_home_price = projection[("Buy", "Home Value")].iloc[0]
     # some selling costs are immediately deductible from capital gains
@@ -183,9 +184,9 @@ def main() -> None:
     cap_gains_tax_if_buying = (
         income_and_cap_gains_tax_if_buying - only_income_tax_if_buying
     )
-    # TODO what if you have mortgage left, what is cap gains?
     wealth_if_buying = (
-        final_investments_if_buying
+        -loan_amount
+        + final_investments_if_buying
         + (final_home_price - deductible_selling_costs - nondeductible_selling_costs)
         - cap_gains_tax_if_buying
     )
@@ -212,6 +213,7 @@ def main() -> None:
     _write_output_xlsx_df(
         output_dir, "final_state.xlsx", final_state.get_df(), num_header_rows=1
     )
+    # TODO tax brackets should also be inflation indexed...
 
 
 if __name__ == "__main__":
