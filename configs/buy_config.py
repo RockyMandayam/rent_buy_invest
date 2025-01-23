@@ -235,6 +235,7 @@ class BuyConfig(Config):
         self.annual_maintenance_cost_fraction: float = kwargs[
             "annual_maintenance_cost_fraction"
         ]
+        # TODO add a home improvement cost, and then deduct it from capital gains taxes when selling
         self.annual_home_warranty: float = kwargs["annual_home_warranty"]
         self.monthly_hoa_fees: float = kwargs["monthly_hoa_fees"]
         # TODO this seems wrong
@@ -499,7 +500,23 @@ class BuyConfig(Config):
     def initial_loan_amount(self):
         return self.initial_loan_fraction * self.sale_price
 
-    def get_upfront_one_time_cost(self):
+    def get_part_of_basis_upfront_one_time_cost(self) -> float:
+        return (
+            # fmt: off
+            (1 - self.seller_burden_of_transfer_tax_fraction)
+                * self.transfer_tax_fraction
+                * self.sale_price
+            # fmt: on
+            + (self.recording_fee_fraction * self.sale_price)
+            + (1 - self.seller_burden_of_title_search_fee) * self.title_search_fee
+            + (1 - self.seller_burden_of_title_search_abstract_fee)
+            * self.title_search_abstract_fee
+            + self.buyer_attorney_fee
+            + self.survey_fee
+            + self.notary_fee
+        )
+
+    def get_not_part_of_basis_upfront_one_time_cost(self) -> float:
         return (
             # fmt: off
             self.mortgage_origination_points_fee_fraction
@@ -514,30 +531,29 @@ class BuyConfig(Config):
             + self.home_appraisal_cost
             + self.credit_report_fee
             + self.flood_certification_fee
-            # fmt: off
-            + (1 - self.seller_burden_of_transfer_tax_fraction)
-                * self.transfer_tax_fraction
-                * self.sale_price
-            # fmt: on
-            + (self.recording_fee_fraction * self.sale_price)
+            # I can't find any specific line from the IRS that says buyer realtor commission is or isn't part of cost basis
             + (self.buyer_realtor_commission_fraction * self.sale_price)
+            # I can't find any specific line from the IRS that says buyer HOA transfer fee is or isn't part of cost basis
             + (1 - self.seller_burden_of_hoa_transfer_fee) * self.hoa_transfer_fee
             + self.home_inspection_cost
             + self.pest_inspection_cost
+            # seems like this is not part of the cost basis...
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
             # fmt: off
-            + (1 - self.seller_burden_of_title_search_fee)
-                * self.title_search_fee
-            + (1 - self.seller_burden_of_title_search_abstract_fee) * self.title_search_abstract_fee
+            # not sure about title courier fee, seems like it's not a part of theh cost basis
             + self.title_courier_fee
             # fmt: on
-            + self.buyer_attorney_fee
             + self.lenders_title_insurance_fraction * self.initial_loan_amount
             + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.endorsement_fees
+            # not sure about this one either
             + self.closing_protection_letter_fee
-            + self.survey_fee
-            + self.notary_fee
+        )
+
+    def get_upfront_one_time_cost(self) -> float:
+        return (
+            self.get_part_of_basis_upfront_one_time_cost()
+            + self.get_not_part_of_basis_upfront_one_time_cost()
         )
 
     def get_monthly_mortgage_payment(self):
@@ -610,3 +626,26 @@ class BuyConfig(Config):
             return self.rental_income_config.get_monthly_rental_incomes(num_months)
         else:
             return [0 for _ in range(num_months)]
+
+    def get_deductible_selling_costs(self, sale_price: float) -> float:
+        return (
+            self.seller_realtor_commission_fraction * sale_price
+            + self.seller_burden_of_escrow_fixed_fee * self.escrow_fixed_fee
+            + self.seller_burden_of_title_search_fee * self.title_search_fee
+            + self.seller_burden_of_title_search_abstract_fee
+            * self.title_search_abstract_fee
+            + self.seller_attorney_fee
+            + self.seller_deed_prep_fee
+        )
+
+    def get_nondeductible_selling_costs(self, sale_price: float) -> float:
+        # NOTE use sale_price not self.sale_price, as we are talking about the FINAL sale price when you sell
+        # the home after owning it, not when you first buy it
+        return (
+            self.seller_burden_of_transfer_tax_fraction
+            * self.transfer_tax_fraction
+            * sale_price
+            + self.seller_burden_of_hoa_transfer_fee * self.hoa_transfer_fee
+            + self.seller_one_time_home_warranty
+            + self.seller_natural_hazard_report_fee
+        )
