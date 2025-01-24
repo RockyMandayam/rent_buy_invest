@@ -547,6 +547,7 @@ class BuyConfig(Config):
             # seems like this is not part of the cost basis...
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
             + self.lenders_title_insurance_fraction * self.initial_loan_amount
+            # unclear to me if endorsement fees can be added to the cost basis...
             + self.endorsement_fees
             # not sure about this one either
             + self.closing_protection_letter_fee
