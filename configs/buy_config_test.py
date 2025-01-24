@@ -503,6 +503,7 @@ class TestBuyConfig(TestConfig):
                 + 1 * 300
                 + 0
                 + 800
+                + 0.01 * 400000
                 + 500
                 + 150
             )

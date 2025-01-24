@@ -518,6 +518,7 @@ class BuyConfig(Config):
             + self.title_courier_fee
             # fmt: on
             + self.buyer_attorney_fee
+            + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.survey_fee
             + self.notary_fee
         )
@@ -546,7 +547,6 @@ class BuyConfig(Config):
             # seems like this is not part of the cost basis...
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
             + self.lenders_title_insurance_fraction * self.initial_loan_amount
-            + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.endorsement_fees
             # not sure about this one either
             + self.closing_protection_letter_fee
