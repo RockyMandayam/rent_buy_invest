@@ -510,8 +510,13 @@ class BuyConfig(Config):
             # fmt: on
             + (self.recording_fee_fraction * self.sale_price)
             + (1 - self.seller_burden_of_title_search_fee) * self.title_search_fee
+            # fmt: off
             + (1 - self.seller_burden_of_title_search_abstract_fee)
-            * self.title_search_abstract_fee
+                * self.title_search_abstract_fee
+            # fmt: on
+            # fmt: off
+            + self.title_courier_fee
+            # fmt: on
             + self.buyer_attorney_fee
             + self.survey_fee
             + self.notary_fee
@@ -540,10 +545,6 @@ class BuyConfig(Config):
             + self.pest_inspection_cost
             # seems like this is not part of the cost basis...
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
-            # fmt: off
-            # not sure about title courier fee, seems like it's not a part of theh cost basis
-            + self.title_courier_fee
-            # fmt: on
             + self.lenders_title_insurance_fraction * self.initial_loan_amount
             + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.endorsement_fees

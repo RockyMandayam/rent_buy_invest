@@ -493,6 +493,21 @@ class TestBuyConfig(TestConfig):
             0.8 * 500000
         )
 
+    def test_get_part_of_basis_upfront_one_time_cost(self) -> None:
+        assert (
+            TestBuyConfig.BUY_CONFIG.get_part_of_basis_upfront_one_time_cost()
+            == pytest.approx(
+                0.1 * 0.0011 * 500000
+                + 0.03 * 500000
+                + 0 * 100
+                + 1 * 300
+                + 0
+                + 800
+                + 500
+                + 150
+            )
+        )
+
     def test_get_monthly_mortgage_payment(self) -> None:
         # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
         # Mortgage term is 360 months
