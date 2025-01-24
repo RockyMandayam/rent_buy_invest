@@ -111,8 +111,9 @@ class BuyConfig(Config):
                 ), f"Please set '{attr_name}' to something reasonable (at most {max_value})"
 
         def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
-            if self.rental_income_waiting_period_months >= num_months:
-                return [0 for _ in range(num_months)]
+            assert num_months > 0
+            if self.rental_income_waiting_period_months > num_months:
+                return [0 for _ in range(num_months + 1)]
             period_of_no_rental_income = [
                 0 for _ in range(self.rental_income_waiting_period_months)
             ]
@@ -509,9 +510,15 @@ class BuyConfig(Config):
             # fmt: on
             + (self.recording_fee_fraction * self.sale_price)
             + (1 - self.seller_burden_of_title_search_fee) * self.title_search_fee
+            # fmt: off
             + (1 - self.seller_burden_of_title_search_abstract_fee)
-            * self.title_search_abstract_fee
+                * self.title_search_abstract_fee
+            # fmt: on
+            # fmt: off
+            + self.title_courier_fee
+            # fmt: on
             + self.buyer_attorney_fee
+            + self.owners_title_insurance_fraction * self.initial_loan_amount
             + self.survey_fee
             + self.notary_fee
         )
@@ -539,12 +546,8 @@ class BuyConfig(Config):
             + self.pest_inspection_cost
             # seems like this is not part of the cost basis...
             + (1 - self.seller_burden_of_escrow_fixed_fee) * self.escrow_fixed_fee
-            # fmt: off
-            # not sure about title courier fee, seems like it's not a part of theh cost basis
-            + self.title_courier_fee
-            # fmt: on
             + self.lenders_title_insurance_fraction * self.initial_loan_amount
-            + self.owners_title_insurance_fraction * self.initial_loan_amount
+            # unclear to me if endorsement fees can be added to the cost basis...
             + self.endorsement_fees
             # not sure about this one either
             + self.closing_protection_letter_fee
@@ -560,12 +563,15 @@ class BuyConfig(Config):
         # https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:geo-series-notation/v/geometric-series-sum-to-figure-out-mortgage-payments
         # NOTE mortgages typically use the annual rate divided by MONTHS_PER_YEAR
         # as opposed to using the "equivalent" monthly compound rate
+        if not self.mortgage_annual_interest_rate:
+            return round(self.initial_loan_amount / self.mortgage_term_months, 2)
         i = self.mortgage_annual_interest_rate / MONTHS_PER_YEAR
         r = 1 / (1 + i)
         L = self.initial_loan_amount
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
     def get_monthly_home_values(self, num_months: int):
+        assert num_months > 0
         return project_growth(
             principal=self.sale_price,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
@@ -591,6 +597,7 @@ class BuyConfig(Config):
         )
 
     def get_home_value_related_monthly_costs(self, num_months: int) -> float:
+        assert num_months > 0
         return project_growth(
             principal=self._get_first_home_value_related_monthly_costs(),
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
@@ -614,6 +621,7 @@ class BuyConfig(Config):
     def get_inflation_related_monthly_costs(
         self, annual_inflation_rate: float, num_months: int
     ) -> list[float]:
+        assert num_months > 0
         return project_growth(
             principal=self._get_first_inflation_related_monthly_cost(),
             annual_growth_rate=annual_inflation_rate,
@@ -622,6 +630,7 @@ class BuyConfig(Config):
         )
 
     def get_monthly_rental_incomes(self, num_months: int) -> list[float]:
+        assert num_months > 0
         if self.rental_income_config:
             return self.rental_income_config.get_monthly_rental_incomes(num_months)
         else:

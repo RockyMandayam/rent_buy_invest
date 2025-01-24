@@ -115,7 +115,8 @@ class RentConfig(Config):
             + self.monthly_parking_fee
         )
 
-    def get_monthly_costs_of_renting(self, num_months: int) -> float:
+    def get_monthly_costs_of_renting(self, num_months: int) -> list[float]:
+        assert num_months > 0
         """Return the monthly cost of renting each month for num_months months.
 
         Returns:
@@ -125,6 +126,7 @@ class RentConfig(Config):
         Raises:
             AssertionError: If num_months is not positive
         """
+        assert num_months > 0
         return math_utils.project_growth(
             self._get_first_monthly_cost(),
             self.annual_rent_inflation_rate,

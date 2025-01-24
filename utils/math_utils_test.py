@@ -1,4 +1,5 @@
 import datetime
+from contextlib import nullcontext
 
 import pytest
 
@@ -27,23 +28,20 @@ def test_get_equivalent_monthly_compound_rate() -> None:
 
 
 def test_project_growth() -> None:
-    # test negative principal
-    principal = -1
+    # test that negative principal and/or negative num_months fails, and all else works
     annual_growth_rate = 1.07
     compound_monthly = True
-    num_months = 1
-    with pytest.raises(AssertionError):
-        math_utils.project_growth(
-            principal, annual_growth_rate, compound_monthly, num_months
-        )
-
-    # test negative num_months
-    principal = 0
-    num_months = 0
-    with pytest.raises(AssertionError):
-        math_utils.project_growth(
-            principal, annual_growth_rate, compound_monthly, num_months
-        )
+    for principal in (-1, 0, 1):
+        for num_months in (-1, 0, 1):
+            if principal < 0 or num_months < 0:
+                context = pytest.raises(AssertionError)
+            else:
+                context = nullcontext()
+            with context:
+                # with pytest.raises(AssertionError):
+                math_utils.project_growth(
+                    principal, annual_growth_rate, compound_monthly, num_months
+                )
 
     # test compounding annually
     principal = 1000

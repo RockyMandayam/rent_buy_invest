@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import jsonschema
 import pytest
 
@@ -8,6 +10,8 @@ from rent_buy_invest.utils import io_utils
 
 
 class TestBuyConfig(TestConfig):
+    """Tests BuyConfig and its nested class RentalIncomeConfig"""
+
     TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
     BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
 
@@ -454,40 +458,107 @@ class TestBuyConfig(TestConfig):
             allow_greater_than_one=False,
         )
 
+    def test_get_monthly_rental_incomes(self) -> None:
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        with pytest.raises(AssertionError):
+            buy_config_copy.get_monthly_rental_incomes(0)
+        # TODO since I now do personal or investment use but not both, I don't need a waiting period!
+        # no rental income for the first 24 months (waiting period)
+        assert buy_config_copy.get_monthly_rental_incomes(1) == [0, 0]
+        assert buy_config_copy.get_monthly_rental_incomes(23) == [0 for _ in range(24)]
+        # average rental income after waiting period, accounting for occupancy rate
+        rental_income = round(0.6 * 1000 * (1 + 0.02) ** 2, 2)
+        assert buy_config_copy.get_monthly_rental_incomes(24) == pytest.approx(
+            [0 for _ in range(24)] + [rental_income]
+        )
+        # rental income should only increase annually
+        assert buy_config_copy.get_monthly_rental_incomes(35) == pytest.approx(
+            [0 for _ in range(24)] + [rental_income for _ in range(12)]
+        )
+        next_year_rental_income = round(rental_income * (1 + 0.02), 2)
+        assert buy_config_copy.get_monthly_rental_incomes(36) == pytest.approx(
+            [0 for _ in range(24)]
+            + [rental_income for _ in range(12)]
+            + [next_year_rental_income]
+        )
+
+    def test_get_initial_loan_fraction(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.initial_loan_fraction == pytest.approx(0.8)
+
+    def test_down_payment(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.down_payment == pytest.approx(0.2 * 500000)
+
+    def test_get_initial_loan_amount(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.initial_loan_amount == pytest.approx(
+            0.8 * 500000
+        )
+
+    def test_get_part_of_basis_upfront_one_time_cost(self) -> None:
+        assert (
+            TestBuyConfig.BUY_CONFIG.get_part_of_basis_upfront_one_time_cost()
+            == pytest.approx(
+                0.1 * 0.0011 * 500000
+                + 0.03 * 500000
+                + 0 * 100
+                + 1 * 300
+                + 0
+                + 800
+                + 0.01 * 400000
+                + 500
+                + 150
+            )
+        )
+
+    def test_get_not_part_of_basis_upfront_one_time_cost(self) -> None:
+        assert (
+            TestBuyConfig.BUY_CONFIG.get_not_part_of_basis_upfront_one_time_cost()
+            == pytest.approx(
+                0.015 * 400000
+                + 300
+                + 500
+                + 0.005 * 400000
+                + 500
+                + 50
+                + 20
+                + 0.025 * 500000
+                + 0 * 300
+                + 500
+                + 500
+                + 1 * 500
+                + 0.02 * 400000
+                + 150
+                + 35
+            )
+        )
+
+    def test_get_upfront_one_time_cost(self) -> None:
+        assert (
+            TestBuyConfig.BUY_CONFIG.get_upfront_one_time_cost()
+            == TestBuyConfig.BUY_CONFIG.get_part_of_basis_upfront_one_time_cost()
+            + TestBuyConfig.BUY_CONFIG.get_not_part_of_basis_upfront_one_time_cost()
+        )
+
     def test_get_monthly_mortgage_payment(self) -> None:
-        # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
-        # Mortgage term is 360 months
-        # Annual interest rate is 0.06
+        # check the numbers in the test example
         actual = TestBuyConfig.BUY_CONFIG.get_monthly_mortgage_payment()
         expected = 2398.20
         assert actual == expected
 
-    def test_get_upfront_one_time_cost(self) -> None:
-        actual = TestBuyConfig.BUY_CONFIG.get_upfront_one_time_cost()
-        expected = (
-            0.015 * 400000
-            + 300
-            + 500
-            + 0.005 * 400000
-            + 500
-            + 50
-            + (1 - 0.9) * 0.0011 * 500000
-            + (0.03 * 500000)
-            + (0.025 * 500000)
-            + (1 - 1.0) * 300
-            + 500
-            + 500
-            + 500
-            + 20
-            + (1 - 1) * 100
-            + 800
-            + 35
-            + 300
-            + 500
-            + 100
-            + 50
-            + 0.02 * 400000
-            + 0.01 * 400000
-            + 150
+        # if the term is 1 month, the whole principal plus one month of interest is the first and final payment
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config_copy.mortgage_term_months = 1
+        actual = buy_config_copy.get_monthly_mortgage_payment()
+        expected = 400000 + 0.06 / 12 * 400000
+        assert actual == expected
+        buy_config_copy.mortgage_term_months  # reset to old value before continuing test
+
+        # if 0% interest, the monthly mortgage payment should just be the principal divided by the number of payments
+        buy_config_copy.mortgage_annual_interest_rate = 0
+        actual = buy_config_copy.get_monthly_mortgage_payment()
+        expected = round(
+            buy_config_copy.initial_loan_amount / buy_config_copy.mortgage_term_months,
+            2,
         )
         assert actual == expected
+
+    # TODO test the rest of BuyConfig

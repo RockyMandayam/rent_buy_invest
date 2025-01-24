@@ -64,6 +64,7 @@ class PersonalConfig(Config):
         )
 
     def get_ordinary_incomes(self, num_months: int) -> list[float]:
+        assert num_months > 0
         first_month_ordinary_income = self.ordinary_income / math_utils.MONTHS_PER_YEAR
         months_till_retirement = self.years_till_retirement * math_utils.MONTHS_PER_YEAR
         if months_till_retirement >= num_months:
