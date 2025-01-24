@@ -560,3 +560,5 @@ class TestBuyConfig(TestConfig):
             2,
         )
         assert actual == expected
+
+    # TODO test the rest of BuyConfig
