@@ -539,11 +539,26 @@ class TestBuyConfig(TestConfig):
         )
 
     def test_get_monthly_mortgage_payment(self) -> None:
-        # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
-        # Mortgage term is 360 months
-        # Annual interest rate is 0.06
+        # check the numbers in the test example
         actual = TestBuyConfig.BUY_CONFIG.get_monthly_mortgage_payment()
         expected = 2398.20
+        assert actual == expected
+
+        # if the term is 1 month, the whole principal plus one month of interest is the first and final payment
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config_copy.mortgage_term_months = 1
+        actual = buy_config_copy.get_monthly_mortgage_payment()
+        expected = 400000 + 0.06 / 12 * 400000
+        assert actual == expected
+        buy_config_copy.mortgage_term_months  # reset to old value before continuing test
+
+        # if 0% interest, the monthly mortgage payment should just be the principal divided by the number of payments
+        buy_config_copy.mortgage_annual_interest_rate = 0
+        actual = buy_config_copy.get_monthly_mortgage_payment()
+        expected = round(
+            buy_config_copy.initial_loan_amount / buy_config_copy.mortgage_term_months,
+            2,
+        )
         assert actual == expected
 
     def test_get_upfront_one_time_cost(self) -> None:

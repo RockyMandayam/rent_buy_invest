@@ -563,6 +563,8 @@ class BuyConfig(Config):
         # https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:geo-series-notation/v/geometric-series-sum-to-figure-out-mortgage-payments
         # NOTE mortgages typically use the annual rate divided by MONTHS_PER_YEAR
         # as opposed to using the "equivalent" monthly compound rate
+        if not self.mortgage_annual_interest_rate:
+            return round(self.initial_loan_amount / self.mortgage_term_months, 2)
         i = self.mortgage_annual_interest_rate / MONTHS_PER_YEAR
         r = 1 / (1 + i)
         L = self.initial_loan_amount
