@@ -531,6 +531,13 @@ class TestBuyConfig(TestConfig):
             )
         )
 
+    def test_get_upfront_one_time_cost(self) -> None:
+        assert (
+            TestBuyConfig.BUY_CONFIG.get_upfront_one_time_cost()
+            == TestBuyConfig.BUY_CONFIG.get_part_of_basis_upfront_one_time_cost()
+            + TestBuyConfig.BUY_CONFIG.get_not_part_of_basis_upfront_one_time_cost()
+        )
+
     def test_get_monthly_mortgage_payment(self) -> None:
         # Sale price is $500,000. Down payment is 20%. So initial loan amount is $400,000
         # Mortgage term is 360 months
