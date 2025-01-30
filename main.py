@@ -60,13 +60,13 @@ def main() -> None:
     # initialize experiment writer
     experiment_writer = ExperimentWriter(args.experiment_name)
     # dump configs in output dir (to keep record of configs)
-    experiment_writer.write_output_yaml("configs.yaml", experiment_config)
+    experiment_writer.write_yaml("configs.yaml", experiment_config)
     # calculate initial state
     initial_state = InitialState.from_configs(
         buy_config, rent_config, market_config, personal_config
     )
     # dump initial state
-    experiment_writer.write_output_xlsx_df(
+    experiment_writer.write_xlsx_df(
         "initial_state.xlsx", initial_state.get_df(), num_header_rows=1
     )
 
@@ -81,9 +81,7 @@ def main() -> None:
         initial_state,
     )
     projection = calculator.calculate()
-    experiment_writer.write_output_xlsx_df(
-        "projection.xlsx", projection, num_header_rows=2
-    )
+    experiment_writer.write_xlsx_df("projection.xlsx", projection, num_header_rows=2)
 
     # TODO handle short term gain too?
     assert num_years > 1
@@ -172,7 +170,7 @@ def main() -> None:
     final_state = FinalState(
         wealth_if_renting=wealth_if_renting, wealth_if_buying=wealth_if_buying
     )
-    experiment_writer.write_output_xlsx_df(
+    experiment_writer.write_xlsx_df(
         "final_state.xlsx", final_state.get_df(), num_header_rows=1
     )
     # TODO tax brackets should also be inflation indexed...

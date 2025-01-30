@@ -42,13 +42,11 @@ class ExperimentWriter:
         )
         io_utils.make_dirs(self._output_dir)
 
-    def write_output_yaml(self, filename: str, obj: Any) -> None:
+    def write_yaml(self, filename: str, obj: Any) -> None:
         path = os.path.join(self._output_dir, filename)
         io_utils.write_yaml(path, obj)
 
-    def write_output_xlsx_df(
-        self, filename: str, df: pd.DataFrame, num_header_rows=0
-    ) -> None:
+    def write_xlsx_df(self, filename: str, df: pd.DataFrame, num_header_rows=0) -> None:
         # TODO move some of this to io_utils xlsx writing method... and make some of this parametrizable or auto-set
         path = os.path.join(self._output_dir, filename)
         io_utils.write_xlsx_df(path, df)
