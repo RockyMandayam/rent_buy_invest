@@ -27,7 +27,7 @@ class ExperimentWriter:
                 If not provided, ExperimentWriter.DEFAULT_OUTPUT_DIR_PROJECT_PATH is used
         """
         assert all(
-            c.isalpha() or c.isdigit() or c in "_-" for c in args.experiment_name
+            c.isalpha() or c.isdigit() or c in "_-" for c in experiment_name
         ), f"Provide an experiment name which only contains characters, digits, underscores, and/or dashes; received '{experiment_name}'"
         timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         output_dir_project_path = (
