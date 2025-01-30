@@ -21,15 +21,16 @@ def project_growth(
     num_months: int,
     round_to_cent: bool = True,
 ) -> list[float]:
-    """Given a principal (starting amount) and an annual growth rate, return
-    the value at the beginning of each month for num_months months, and a final
-    value representing the value at the end of num_months months.
+    """Given a principal (starting amount) and an annual growth rate, return a
+    list containing the projected fund amount at the beginning of each month for
+    num_months+1 months (the extra month is there to present the final amount after
+    num_months months).
 
     Returns:
         list[float]: monthly value in dollars
 
     Raises:
-        AssertionError: If principal is negative or num_months is not positive
+        AssertionError: If principal or num_months is negative
     """
     assert principal >= 0, "Principal must be non-negative."
     assert num_months >= 0, "Number of months must be non-negative."
@@ -51,15 +52,13 @@ def project_growth(
     return monthly_values
 
 
-def month_to_year_month(month: int) -> tuple[int]:
-    """Convert 0-indexed month to (1-indexed year, 1-indexed month).
-    E.g., 11 becomes (0,12) and 12 becomes (1, 1).
-    """
-    assert month >= 0, "Month must be non-negative."
-    return month // MONTHS_PER_YEAR + 1, month % MONTHS_PER_YEAR + 1
-
-
 def increment_month(date: datetime.date) -> datetime.date:
+    """Given a datetime date, return a datetime date with the month incremented;
+    if a year boundary is crossed, the year is appropriately incremented
+
+    NOTE: The date is set to the 28 of the month since Feb has 28 days and the callers of
+    this function do not care about the day, only the month.
+    """
     # not using dateutils b/c don't want to depend on it just for this one function
     year, month = date.year, date.month
     month += 1

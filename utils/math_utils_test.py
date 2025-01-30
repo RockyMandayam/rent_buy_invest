@@ -38,7 +38,6 @@ def test_project_growth() -> None:
             else:
                 context = nullcontext()
             with context:
-                # with pytest.raises(AssertionError):
                 math_utils.project_growth(
                     principal, annual_growth_rate, compound_monthly, num_months
                 )
@@ -83,13 +82,6 @@ def test_project_growth() -> None:
         principal * (1 + equivalent_monthly_rate) ** m for m in range(num_months + 1)
     ]
     assert actual == pytest.approx(expected)
-
-
-def test_month_to_year_month() -> None:
-    with pytest.raises(AssertionError):
-        math_utils.month_to_year_month(-1)
-    assert math_utils.month_to_year_month(0) == (1, 1)
-    assert math_utils.month_to_year_month(13) == (2, 2)
 
 
 def test_increment_month() -> None:

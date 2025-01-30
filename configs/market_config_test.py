@@ -17,6 +17,7 @@ class TestMarketConfig(TestConfig):
     def test_inputs_with_invalid_schema(self) -> None:
         attributes = [
             "market_rate_of_return",
+            "tax_brackets_inflation",
             "tax_brackets",
             ("tax_brackets", "ordinary_income_tax_brackets"),
             ("tax_brackets", "ordinary_income_tax_brackets", 0, "upper_limit"),
@@ -35,6 +36,13 @@ class TestMarketConfig(TestConfig):
             config_kwargs,
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
+        )
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["tax_brackets_inflation"],
+            allow_negative=False,
+            # TODO max value
         )
         for tax_type in (
             "ordinary_income_tax_brackets",
@@ -83,10 +91,12 @@ class TestMarketConfig(TestConfig):
 
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
-            TestMarketConfig.MARKET_CONFIG.get_tax(-1)
-        assert TestMarketConfig.MARKET_CONFIG.get_tax(0) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_tax(44625) == pytest.approx(0)
-        assert TestMarketConfig.MARKET_CONFIG.get_tax(500000) == pytest.approx(68691.25)
+            TestMarketConfig.MARKET_CONFIG.get_tax(0, -1)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(0, 0) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(0, 44625) == pytest.approx(0)
+        assert TestMarketConfig.MARKET_CONFIG.get_tax(0, 500000) == pytest.approx(
+            68691.25
+        )
 
     def test_get_pretax_monthly_wealth(self) -> None:
         with pytest.raises(AssertionError):

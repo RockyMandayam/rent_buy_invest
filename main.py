@@ -10,10 +10,9 @@ from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.final_state import FinalState
 from rent_buy_invest.core.initial_state import InitialState
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io.experiment_writer import ExperimentWriter
+from rent_buy_invest.utils.io_utils import RentBuyInvestFileOpener
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
-
-OVERALL_OUTPUT_DIR = "rent_buy_invest/out/"
 
 PRIMARY_HOME_CAP_GAINS_EXEMPTION = 250000
 
@@ -40,45 +39,7 @@ def _get_args() -> argparse.Namespace:
     ), "Experiment config file must end in '.yaml' or '.yml'"
     if not args.experiment_name:
         args.experiment_name = "unnamed_experiment"
-    assert all(
-        c.isalpha() or c.isdigit() or c in "_-" for c in args.experiment_name
-    ), f"Provide an experiment name which only contains characters, digits, underscores, and/or dashes; received '{args.experiment_name}'"
     return args
-
-
-def _make_output_dir(experiment_name: str) -> str:
-    timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    output_dir = os.path.join(OVERALL_OUTPUT_DIR, experiment_name, timestamp_str)
-    io_utils.make_dirs(output_dir)
-    return output_dir
-
-
-def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
-    path = os.path.join(output_dir, filename)
-    io_utils.write_yaml(path, obj)
-
-
-def _write_output_xlsx_df(
-    output_dir: str, filename: str, df: pd.DataFrame, num_header_rows=0
-) -> None:
-    path = os.path.join(output_dir, filename)
-    io_utils.write_xlsx_df(path, df)
-    wb = openpyxl.load_workbook(path)
-    ws = wb["Sheet1"]
-    ws.column_dimensions["A"].width = 15
-    ws.freeze_panes = f"B{num_header_rows+1}"
-    max_num_cols_with_data = 14
-    for i in range(max_num_cols_with_data):
-        col_name = chr(ord("B") + i)
-        # ws.column_dimensions[col_name].number_format = "$#,##0.00"
-        ws.column_dimensions[col_name].width = 18
-        for header_row in range(1, num_header_rows + 1):
-            ws[f"{col_name}{header_row}"].alignment = openpyxl.styles.Alignment(
-                horizontal="left"
-            )
-        for cell in ws[col_name]:
-            cell.number_format = "$#,##0.00"
-    wb.save(path)
 
 
 def main() -> None:
@@ -96,18 +57,17 @@ def main() -> None:
     buy_config = experiment_config.buy_config
     start_date = experiment_config.start_date
 
-    # create output dir
-    output_dir = _make_output_dir(args.experiment_name)
-
+    # initialize experiment writer
+    experiment_writer = ExperimentWriter(args.experiment_name)
     # dump configs in output dir (to keep record of configs)
-    _write_output_yaml(output_dir, "configs.yaml", experiment_config)
-
+    experiment_writer.write_yaml("configs.yaml", experiment_config)
     # calculate initial state
     initial_state = InitialState.from_configs(
         buy_config, rent_config, market_config, personal_config
     )
-    _write_output_xlsx_df(
-        output_dir, "initial_state.xlsx", initial_state.get_df(), num_header_rows=1
+    # dump initial state
+    experiment_writer.write_xlsx_df(
+        "initial_state.xlsx", initial_state.get_df(), num_header_rows=1
     )
 
     # project forward in time
@@ -121,7 +81,7 @@ def main() -> None:
         initial_state,
     )
     projection = calculator.calculate()
-    _write_output_xlsx_df(output_dir, "projection.xlsx", projection, num_header_rows=2)
+    experiment_writer.write_xlsx_df("projection.xlsx", projection, num_header_rows=2)
 
     # TODO handle short term gain too?
     assert num_years > 1
@@ -176,11 +136,15 @@ def main() -> None:
         cap_gains_from_selling_investments_if_buying + cap_gains_from_selling_home
     )
     # TODO create classes/methods for this
+    num_months = num_years * MONTHS_PER_YEAR
     income_and_cap_gains_tax_if_buying = market_config.get_tax(
+        num_months + 1,
         ordinary_income=annual_income,
         long_term_capital_gains=total_cap_gains_if_buying,
     )
-    only_income_tax_if_buying = market_config.get_tax(ordinary_income=annual_income)
+    only_income_tax_if_buying = market_config.get_tax(
+        num_months + 1, ordinary_income=annual_income
+    )
     cap_gains_tax_if_buying = (
         income_and_cap_gains_tax_if_buying - only_income_tax_if_buying
     )
@@ -199,10 +163,13 @@ def main() -> None:
     )
     total_cap_gains_if_renting = cap_gains_from_selling_investments_if_renting
     income_and_cap_gains_tax_if_renting = market_config.get_tax(
+        num_months + 1,
         ordinary_income=annual_income,
         long_term_capital_gains=total_cap_gains_if_renting,
     )
-    only_income_tax_if_renting = market_config.get_tax(ordinary_income=annual_income)
+    only_income_tax_if_renting = market_config.get_tax(
+        num_months + 1, ordinary_income=annual_income
+    )
     cap_gains_tax_if_renting = (
         income_and_cap_gains_tax_if_renting - only_income_tax_if_renting
     )
@@ -210,10 +177,9 @@ def main() -> None:
     final_state = FinalState(
         wealth_if_renting=wealth_if_renting, wealth_if_buying=wealth_if_buying
     )
-    _write_output_xlsx_df(
-        output_dir, "final_state.xlsx", final_state.get_df(), num_header_rows=1
+    experiment_writer.write_xlsx_df(
+        "final_state.xlsx", final_state.get_df(), num_header_rows=1
     )
-    # TODO tax brackets should also be inflation indexed...
 
 
 if __name__ == "__main__":
