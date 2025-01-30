@@ -30,9 +30,11 @@ def get_abs_path(project_path: str) -> str:
 
 
 class RentBuyInvestFileOpener:
-    """File opener that takes in project path (relative eto rent_buy_invest).
+    """File opener that takes in project path (relative eto rent_buy_invest) and
+    automatically handles making any directories in the path.
 
-    The default python open() function requires an absolute path.
+    The default python open() function requires an absolute path and fails if
+    directories in the path do not exist.
     """
 
     def __init__(self, project_path: str, mode: str) -> None:
