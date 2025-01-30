@@ -136,11 +136,15 @@ def main() -> None:
         cap_gains_from_selling_investments_if_buying + cap_gains_from_selling_home
     )
     # TODO create classes/methods for this
+    num_months = num_years * MONTHS_PER_YEAR
     income_and_cap_gains_tax_if_buying = market_config.get_tax(
+        num_months + 1,
         ordinary_income=annual_income,
         long_term_capital_gains=total_cap_gains_if_buying,
     )
-    only_income_tax_if_buying = market_config.get_tax(ordinary_income=annual_income)
+    only_income_tax_if_buying = market_config.get_tax(
+        num_months + 1, ordinary_income=annual_income
+    )
     cap_gains_tax_if_buying = (
         income_and_cap_gains_tax_if_buying - only_income_tax_if_buying
     )
@@ -159,10 +163,13 @@ def main() -> None:
     )
     total_cap_gains_if_renting = cap_gains_from_selling_investments_if_renting
     income_and_cap_gains_tax_if_renting = market_config.get_tax(
+        num_months + 1,
         ordinary_income=annual_income,
         long_term_capital_gains=total_cap_gains_if_renting,
     )
-    only_income_tax_if_renting = market_config.get_tax(ordinary_income=annual_income)
+    only_income_tax_if_renting = market_config.get_tax(
+        num_months + 1, ordinary_income=annual_income
+    )
     cap_gains_tax_if_renting = (
         income_and_cap_gains_tax_if_renting - only_income_tax_if_renting
     )

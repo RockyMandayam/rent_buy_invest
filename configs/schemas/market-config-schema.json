@@ -7,6 +7,10 @@
       "description": "ANNUAL rate of return in the market, as a fraction",
       "type": "number"
     },
+    "tax_brackets_inflation": {
+      "description": "Rate at which the tax bracket limits inflate (by government policy)",
+      "type": "number"
+    },
     "tax_brackets": {
       "description": "Tax brackets",
       "type": "object",
@@ -51,5 +55,5 @@
       "required": ["ordinary_income_tax_brackets", "long_term_capital_gains_tax_brackets"]
     }
   },
-  "required": ["market_rate_of_return", "tax_brackets"]
+  "required": ["market_rate_of_return", "tax_brackets_inflation", "tax_brackets"]
 }

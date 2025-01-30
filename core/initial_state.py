@@ -33,7 +33,7 @@ class InitialState:
         )
         discount_points_deduction_savings = (
             market_config.get_income_tax_savings_from_deduction(
-                personal_config.ordinary_income, discount_points_fee
+                0, personal_config.ordinary_income, discount_points_fee
             )
         )
         buy_upfront_one_time_cost -= discount_points_deduction_savings

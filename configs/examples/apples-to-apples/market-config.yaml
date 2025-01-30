@@ -1,5 +1,7 @@
 market_rate_of_return: !!float 0.07
 
+tax_brackets_inflation: !!float 0.02
+
 tax_brackets:
   ordinary_income_tax_brackets:
     -

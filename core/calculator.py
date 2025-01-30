@@ -146,6 +146,7 @@ class Calculator:
                 )
                 mortgage_interest_deduction_saving = deductible_fraction_of_interest * (
                     self.market_config.get_income_tax_savings_from_deduction(
+                        month,
                         annual_income,
                         mortgage_interest_for_the_year,
                     )
@@ -206,7 +207,7 @@ class Calculator:
                 )
                 rental_income_tax = (
                     self.market_config.get_additional_tax_from_additional_income(
-                        annual_ordinary_income, annual_rental_income
+                        month, annual_ordinary_income, annual_rental_income
                     )
                 )
             else:

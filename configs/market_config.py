@@ -13,8 +13,8 @@ class MarketConfig(Config):
         schema_path (str): Market config schema path
 
     Instance Attributes:
-        self.market_rate_of_return: ANNUAL rate of return in the
-            market, as a decimal
+        self.market_rate_of_return: ANNUAL rate of return in the market, as a decimal
+        self.tax_brackets_inflation: Rate at which the tax bracket limits inflate (by government policy)
         # TODO more tax stuff (e.g., standard exemption, net investment income tax, payroll tax, etc.)
         self.ordinary_income_tax_brackets: A TaxBrackets object representing ordinary income tax rates (which are also the tax rates used for short term capital gains and some other types of unearned income)
         self.long_term_capital_gains_tax_brackets: A TaxBrackets object representing long term capital gains tax rates
@@ -92,6 +92,19 @@ class MarketConfig(Config):
                     prev_tax_rate = bracket["tax_rate"]
                 upper_limit = bracket["upper_limit"]
 
+        def get_inflated(self, inflation_factor: float) -> "MarketConfig.TaxBrackets":
+            inflated_tax_brackets = [
+                {
+                    "upper_limit": bracket["upper_limit"] * inflation_factor,
+                    "tax_rate": bracket["tax_rate"],
+                }
+                for bracket in self.tax_brackets
+            ]
+            return MarketConfig.TaxBrackets(
+                tax_brackets=inflated_tax_brackets,
+                validate_non_regressive_tax_brackets=self.validate_non_regressive_tax_brackets,
+            )
+
         def _get_tax(self, income: float, offset: float = 0) -> float:
             """Calculates tax owed given income.
 
@@ -146,6 +159,7 @@ class MarketConfig(Config):
     def __init__(
         self,
         market_rate_of_return: float,
+        tax_brackets_inflation: float,
         tax_brackets: dict[str, dict],
         validate_non_regressive_tax_brackets: bool = DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS,
     ) -> None:
@@ -155,6 +169,7 @@ class MarketConfig(Config):
         in Config.
         """
         self.market_rate_of_return: float = market_rate_of_return
+        self.tax_brackets_inflation: float = tax_brackets_inflation
         self.ordinary_income_tax_brackets: MarketConfig.TaxBrackets = (
             MarketConfig.TaxBrackets(
                 tax_brackets["ordinary_income_tax_brackets"],
@@ -178,6 +193,12 @@ class MarketConfig(Config):
         assert math.isfinite(
             self.market_rate_of_return
         ), "Market rate of return must not be NaN, infinity, or negative infinity."
+        assert math.isfinite(
+            self.tax_brackets_inflation
+        ), "tax_brackets_inflation must not be NaN, infinity, or negative infinity"
+        assert (
+            self.tax_brackets_inflation >= 0
+        ), "tax_brackets_inflation must be non-negative."
         assert (
             self.market_rate_of_return <= MarketConfig.MAX_MARKET_RATE_OF_RETURN
         ), "Please set a reasonable market rate of return (at most 0.5)"
@@ -190,6 +211,7 @@ class MarketConfig(Config):
 
     def get_tax(
         self,
+        month: int,
         ordinary_income: float,
         ordinary_income_deduction: float = 0,
         long_term_capital_gains: float = 0,
@@ -203,6 +225,7 @@ class MarketConfig(Config):
         Returns:
             tax: non-negative tax owed
         """
+        assert month >= 0, "Month must be non-negative"
         assert ordinary_income >= 0, "Ordinary income must be non-negative"
         assert (
             ordinary_income_deduction >= 0
@@ -218,33 +241,43 @@ class MarketConfig(Config):
             long_term_capital_gains_deduction, long_term_capital_gains
         )
         long_term_capital_gains -= long_term_capital_gains_deduction
+        # get current tax brackets (inflated yearly)
+        year = month // math_utils.MONTHS_PER_YEAR
+        inflation_factor = (1 + self.tax_brackets_inflation) ** year
+        current_ordinary_income_tax_brackets = (
+            self.ordinary_income_tax_brackets.get_inflated(inflation_factor)
+        )
+        current_long_term_capital_gains_tax_brackets = (
+            self.long_term_capital_gains_tax_brackets.get_inflated(inflation_factor)
+        )
         # calculate taxes
-        ordinary_income_tax = self.ordinary_income_tax_brackets._get_tax(
+        ordinary_income_tax = current_ordinary_income_tax_brackets._get_tax(
             ordinary_income
         )
         long_term_capital_gains_tax = (
-            self.long_term_capital_gains_tax_brackets._get_tax(
+            current_long_term_capital_gains_tax_brackets._get_tax(
                 long_term_capital_gains, ordinary_income
             )
         )
         return ordinary_income_tax + long_term_capital_gains_tax
 
     def get_additional_tax_from_additional_income(
-        self, base_ordinary_income: float, additional_ordinary_income: float
+        self, month: int, base_ordinary_income: float, additional_ordinary_income: float
     ) -> float:
+        assert month >= 0, "Month must be non-negative"
         assert base_ordinary_income >= 0, "Base ordinary income must be non-negative"
         assert (
             additional_ordinary_income >= 0
         ), "Additional ordinary income must be non-negative"
-        base_tax = self.get_tax(base_ordinary_income)
+        base_tax = self.get_tax(month, base_ordinary_income)
         tax_with_additional_income = self.get_tax(
-            base_ordinary_income + additional_ordinary_income
+            month, base_ordinary_income + additional_ordinary_income
         )
         # TODO just noticed here that values are not rounded...
         return tax_with_additional_income - base_tax
 
     def get_income_tax_savings_from_deduction(
-        self, income: float, deduction: float
+        self, month: int, income: float, deduction: float
     ) -> float:
         """Calculates income tax savings due to deduction at the given original income.
 
@@ -254,10 +287,11 @@ class MarketConfig(Config):
         Returns:
             tax: non-negative tax owed
         """
+        assert month >= 0, "Month must be non-negative"
         assert income >= 0, "Income must be non-negative"
         assert deduction >= 0, "Deduction must be non-negative"
-        original_income_tax = self.get_tax(income)
-        modified_income_tax = self.get_tax(income, deduction)
+        original_income_tax = self.get_tax(month, income)
+        modified_income_tax = self.get_tax(month, income, deduction)
         return original_income_tax - modified_income_tax
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
