@@ -22,10 +22,13 @@ class ExperimentWriter:
         """Initialize ExperimentWriter
 
         Args:
-            experiment_name: Name of the experiment, must be alphanumeric
+            experiment_name: Name of the experiment; it must contain only alphanumeric characters, "_", and "-"
             output_dir_project_path: Optional output dir path relative to folder containing rent_buy_invest.
                 If not provided, ExperimentWriter.DEFAULT_OUTPUT_DIR_PROJECT_PATH is used
         """
+        assert all(
+            c.isalpha() or c.isdigit() or c in "_-" for c in args.experiment_name
+        ), f"Provide an experiment name which only contains characters, digits, underscores, and/or dashes; received '{experiment_name}'"
         timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         output_dir_project_path = (
             output_dir_project_path

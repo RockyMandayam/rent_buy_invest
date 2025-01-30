@@ -39,9 +39,6 @@ def _get_args() -> argparse.Namespace:
     ), "Experiment config file must end in '.yaml' or '.yml'"
     if not args.experiment_name:
         args.experiment_name = "unnamed_experiment"
-    assert all(
-        c.isalpha() or c.isdigit() or c in "_-" for c in args.experiment_name
-    ), f"Provide an experiment name which only contains characters, digits, underscores, and/or dashes; received '{args.experiment_name}'"
     return args
 
 
