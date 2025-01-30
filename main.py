@@ -180,7 +180,6 @@ def main() -> None:
     experiment_writer.write_xlsx_df(
         "final_state.xlsx", final_state.get_df(), num_header_rows=1
     )
-    # TODO tax brackets should also be inflation indexed...
 
 
 if __name__ == "__main__":
