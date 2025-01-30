@@ -21,15 +21,16 @@ def project_growth(
     num_months: int,
     round_to_cent: bool = True,
 ) -> list[float]:
-    """Given a principal (starting amount) and an annual growth rate, return
-    the value at the beginning of each month for num_months months, and a final
-    value representing the value at the end of num_months months.
+    """Given a principal (starting amount) and an annual growth rate, return a
+    list containing the projected fund amount at the beginning of each month for
+    num_months+1 months (the extra month is there to present the final amount after
+    num_months months).
 
     Returns:
         list[float]: monthly value in dollars
 
     Raises:
-        AssertionError: If principal is negative or num_months is not positive
+        AssertionError: If principal or num_months is negative
     """
     assert principal >= 0, "Principal must be non-negative."
     assert num_months >= 0, "Number of months must be non-negative."
