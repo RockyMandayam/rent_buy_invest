@@ -52,14 +52,6 @@ def project_growth(
     return monthly_values
 
 
-def month_to_year_month(month: int) -> tuple[int]:
-    """Convert 0-indexed month to (1-indexed year, 1-indexed month).
-    E.g., 11 becomes (0,12) and 12 becomes (1, 1).
-    """
-    assert month >= 0, "Month must be non-negative."
-    return month // MONTHS_PER_YEAR + 1, month % MONTHS_PER_YEAR + 1
-
-
 def increment_month(date: datetime.date) -> datetime.date:
     # not using dateutils b/c don't want to depend on it just for this one function
     year, month = date.year, date.month

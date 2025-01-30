@@ -85,13 +85,6 @@ def test_project_growth() -> None:
     assert actual == pytest.approx(expected)
 
 
-def test_month_to_year_month() -> None:
-    with pytest.raises(AssertionError):
-        math_utils.month_to_year_month(-1)
-    assert math_utils.month_to_year_month(0) == (1, 1)
-    assert math_utils.month_to_year_month(13) == (2, 2)
-
-
 def test_increment_month() -> None:
     date = datetime.datetime.strptime("2020-09-03", "%Y-%m-%d")
     act = math_utils.increment_month(date)
