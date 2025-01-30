@@ -53,6 +53,12 @@ def project_growth(
 
 
 def increment_month(date: datetime.date) -> datetime.date:
+    """Given a datetime date, return a datetime date with the month incremented;
+    if a year boundary is crossed, the year is appropriately incremented
+
+    NOTE: The date is set to the 28 of the month since Feb has 28 days and the callers of
+    this function do not care about the day, only the month.
+    """
     # not using dateutils b/c don't want to depend on it just for this one function
     year, month = date.year, date.month
     month += 1
