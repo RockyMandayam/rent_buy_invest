@@ -61,6 +61,7 @@ def _write_output_yaml(output_dir: str, filename: str, obj: Any) -> None:
 def _write_output_xlsx_df(
     output_dir: str, filename: str, df: pd.DataFrame, num_header_rows=0
 ) -> None:
+    # TODO move some of this to io_utils xlsx writing method... and make some of this parametrizable or auto-set
     path = os.path.join(output_dir, filename)
     io_utils.write_xlsx_df(path, df)
     wb = openpyxl.load_workbook(path)
