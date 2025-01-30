@@ -38,7 +38,6 @@ def test_project_growth() -> None:
             else:
                 context = nullcontext()
             with context:
-                # with pytest.raises(AssertionError):
                 math_utils.project_growth(
                     principal, annual_growth_rate, compound_monthly, num_months
                 )
