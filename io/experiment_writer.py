@@ -14,12 +14,28 @@ class ExperimentWriter:
     Attributes:
         _output_dir (str): The output directory for the experiment"""
 
-    OUTPUT_DIR_PROJECT_PATH: str = "rent_buy_invest/out/"
+    DEFAULT_OUTPUT_DIR_PROJECT_PATH: str = "rent_buy_invest/out/"
 
-    def __init__(self, experiment_name: str) -> None:
+    def __init__(
+        self, experiment_name: str, output_dir_project_path: str | None = None
+    ) -> None:
+        """Initialize ExperimentWriter
+
+        Args:
+            experiment_name: Name of the experiment, must be alphanumeric
+            output_dir_project_path: Optional output dir path relative to folder containing rent_buy_invest.
+                If not provided, ExperimentWriter.DEFAULT_OUTPUT_DIR_PROJECT_PATH is used
+        """
         timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        output_dir_project_path = (
+            output_dir_project_path
+            if output_dir_project_path
+            else ExperimentWriter.DEFAULT_OUTPUT_DIR_PROJECT_PATH
+        )
         self._output_dir = os.path.join(
-            ExperimentWriter.OUTPUT_DIR_PROJECT_PATH, experiment_name, timestamp_str
+            ExperimentWriter.DEFAULT_OUTPUT_DIR_PROJECT_PATH,
+            experiment_name,
+            timestamp_str,
         )
         io_utils.make_dirs(self._output_dir)
 
