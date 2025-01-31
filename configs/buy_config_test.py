@@ -680,9 +680,15 @@ class TestBuyConfig(TestConfig):
         assert actual == pytest.approx(expected)
 
     def test_get_deductible_selling_costs(self) -> None:
-        sale_price = 600000
+        sale_price = 600000  # arbitrary
         actual = TestBuyConfig.BUY_CONFIG.get_deductible_selling_costs(sale_price)
         expected = 0.025 * sale_price + 0 * 500 + 1 * 100 + 0 * 300 + 800 + 50
+        assert actual == pytest.approx(expected)
+
+    def test_get_nondeductible_selling_costs(self) -> None:
+        sale_price = 800000  # arbitrary
+        actual = TestBuyConfig.BUY_CONFIG.get_nondeductible_selling_costs(sale_price)
+        expected = 0.9 * 0.0011 * sale_price + 1 * 300 + 600 + 100
         assert actual == pytest.approx(expected)
 
     # TODO test the rest of BuyConfig
