@@ -6,7 +6,7 @@ import pytest
 from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 

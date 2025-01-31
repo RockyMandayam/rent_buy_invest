@@ -11,7 +11,7 @@ from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.final_state import FinalState
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.io.experiment_writer import ExperimentWriter
-from rent_buy_invest.utils.io_utils import RentBuyInvestFileOpener
+from rent_buy_invest.io.io_utils import RentBuyInvestFileOpener
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 PRIMARY_HOME_CAP_GAINS_EXEMPTION = 250000

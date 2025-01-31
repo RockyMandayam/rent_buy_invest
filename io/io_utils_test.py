@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 
 TEST_YAML_PATH = "rent_buy_invest/utils/test_resources/simple-yaml.yaml"
 TEST_JSON_PATH = "rent_buy_invest/utils/test_resources/simple-json.json"
