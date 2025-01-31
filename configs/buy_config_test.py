@@ -7,6 +7,7 @@ from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
 from rent_buy_invest.io import io_utils
+from rent_buy_invest.utils.math_utils import project_growth
 
 
 class TestBuyConfig(TestConfig):
@@ -560,5 +561,18 @@ class TestBuyConfig(TestConfig):
             2,
         )
         assert actual == expected
+
+    def test_get_monthly_home_values(self) -> None:
+        with pytest.raises(AssertionError):
+            TestBuyConfig.BUY_CONFIG.get_monthly_home_values(0)
+        num_months = 100
+        actual = TestBuyConfig.BUY_CONFIG.get_monthly_home_values(num_months)
+        expected = project_growth(
+            principal=TestBuyConfig.BUY_CONFIG.sale_price,
+            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
+            compound_monthly=True,
+            num_months=num_months,
+        )
+        assert actual == pytest.approx(expected)
 
     # TODO test the rest of BuyConfig
