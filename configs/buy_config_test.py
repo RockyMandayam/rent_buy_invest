@@ -690,5 +690,3 @@ class TestBuyConfig(TestConfig):
         actual = TestBuyConfig.BUY_CONFIG.get_nondeductible_selling_costs(sale_price)
         expected = 0.9 * 0.0011 * sale_price + 1 * 300 + 600 + 100
         assert actual == pytest.approx(expected)
-
-    # TODO test the rest of BuyConfig
