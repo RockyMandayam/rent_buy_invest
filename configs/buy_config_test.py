@@ -675,7 +675,7 @@ class TestBuyConfig(TestConfig):
             # 12 months of rent
             + [monthly_rent_after_22_months for _ in range(34 - 22)]
             # 1st month of next year
-            + [monthly_rent_after_22_months]
+            + [monthly_rent_after_34_months]
         )
         # expected[22] = monthly_rent_after_22_months
         # expected[23] = monthly_rent_after_22_months
