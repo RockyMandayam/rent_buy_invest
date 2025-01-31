@@ -5,7 +5,7 @@ import jsonschema
 import pytest
 
 from rent_buy_invest.configs.config import Config
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 
 
 class TestConfig:

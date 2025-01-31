@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import jsonschema
 
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 
 
 class Config(ABC):

@@ -1,6 +1,7 @@
 import pandas as pd
 
-from rent_buy_invest.utils import data_utils, io_utils
+from rent_buy_invest.io import io_utils
+from rent_buy_invest.utils import data_utils
 
 COLS = {
     "Category 1: ints": [0, 1, 2],

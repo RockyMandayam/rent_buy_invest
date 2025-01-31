@@ -5,7 +5,7 @@ from typing import Any
 import openpyxl
 import pandas as pd
 
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 
 
 class ExperimentWriter:

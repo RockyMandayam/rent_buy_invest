@@ -7,7 +7,7 @@ from rent_buy_invest.configs.utils_for_testing import (
 )
 
 # isort: on
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 
 
 def test_check_float_field() -> None:

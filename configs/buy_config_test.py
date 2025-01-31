@@ -6,7 +6,7 @@ import pytest
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
-from rent_buy_invest.utils import io_utils
+from rent_buy_invest.io import io_utils
 
 
 class TestBuyConfig(TestConfig):
