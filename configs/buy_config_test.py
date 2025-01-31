@@ -8,6 +8,15 @@ from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
 from rent_buy_invest.io import io_utils
 
+# isort: off
+from rent_buy_invest.utils.math_utils import (
+    MONTHS_PER_YEAR,
+    get_equivalent_monthly_compound_rate,
+    project_growth,
+)
+
+# isort: on
+
 
 class TestBuyConfig(TestConfig):
     """Tests BuyConfig and its nested class RentalIncomeConfig"""
@@ -561,4 +570,130 @@ class TestBuyConfig(TestConfig):
         )
         assert actual == expected
 
-    # TODO test the rest of BuyConfig
+    def test_get_monthly_home_values(self) -> None:
+        with pytest.raises(AssertionError):
+            TestBuyConfig.BUY_CONFIG.get_monthly_home_values(0)
+
+        num_months = 100  # arbitrary number
+        actual = TestBuyConfig.BUY_CONFIG.get_monthly_home_values(num_months)
+        expected = project_growth(
+            principal=TestBuyConfig.BUY_CONFIG.sale_price,
+            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
+            compound_monthly=True,
+            num_months=num_months,
+        )
+        assert actual == pytest.approx(expected)
+
+    def test_get_home_value_related_monthly_costs(self) -> None:
+        with pytest.raises(AssertionError):
+            TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(0)
+
+        num_months = 1000  # arbitrary number
+        actual = TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(
+            num_months
+        )
+        first_home_value_related_monthly_costs = (
+            TestBuyConfig.BUY_CONFIG.sale_price
+            * (
+                TestBuyConfig.BUY_CONFIG.annual_property_tax_rate
+                + TestBuyConfig.BUY_CONFIG.annual_maintenance_cost_fraction
+                + TestBuyConfig.BUY_CONFIG.rental_income_config.annual_management_cost_fraction
+            )
+            / MONTHS_PER_YEAR
+        )
+        expected = project_growth(
+            principal=first_home_value_related_monthly_costs,
+            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
+            compound_monthly=False,
+            num_months=num_months,
+        )
+        assert actual == pytest.approx(expected)
+
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config_copy.rental_income_config = None
+        actual = buy_config_copy.get_home_value_related_monthly_costs(num_months)
+        first_home_value_related_monthly_costs = (
+            # no rental cost this time
+            buy_config_copy.sale_price
+            * (
+                buy_config_copy.annual_property_tax_rate
+                + buy_config_copy.annual_maintenance_cost_fraction
+            )
+            / MONTHS_PER_YEAR
+        )
+        expected = project_growth(
+            principal=first_home_value_related_monthly_costs,
+            annual_growth_rate=buy_config_copy.annual_assessed_value_inflation_rate,
+            compound_monthly=False,
+            num_months=num_months,
+        )
+        assert actual == pytest.approx(expected)
+
+    # TODO get_inflation_related_monthly_costs
+
+    def test_get_monthly_rental_incomes(self) -> None:
+        with pytest.raises(AssertionError):
+            TestBuyConfig.BUY_CONFIG.get_monthly_rental_incomes(0)
+
+        # no income for rental waiting period
+        num_months = 23
+        actual = TestBuyConfig.BUY_CONFIG.get_monthly_rental_incomes(num_months)
+        expected = [0 for _ in range(24)]
+        assert actual == expected
+
+        # test rental waiting period boundary
+        num_months = 24
+        actual = TestBuyConfig.BUY_CONFIG.get_monthly_rental_incomes(num_months)
+        third_year_monthly_rent = (
+            TestBuyConfig.BUY_CONFIG.rental_income_config.monthly_rental_income
+            * TestBuyConfig.BUY_CONFIG.rental_income_config.occupancy_rate
+            * (
+                1
+                + TestBuyConfig.BUY_CONFIG.rental_income_config.rental_income_annual_inflation_rate
+            )
+            ** 2
+        )
+        expected.append(third_year_monthly_rent)
+        assert actual == pytest.approx(expected)
+
+        # test when rental waiting period boundary does not coincide with
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config_copy.rental_income_config.rental_income_waiting_period_months = 22
+        num_months = 34
+        actual = buy_config_copy.get_monthly_rental_incomes(num_months)
+        rent_equivalent_monthly_inflation = get_equivalent_monthly_compound_rate(
+            buy_config_copy.rental_income_config.rental_income_annual_inflation_rate
+        )
+        monthly_rent_after_22_months = round(
+            buy_config_copy.rental_income_config.monthly_rental_income
+            * buy_config_copy.rental_income_config.occupancy_rate
+            * (1 + rent_equivalent_monthly_inflation) ** 22,
+            2,
+        )
+        monthly_rent_after_34_months = round(
+            buy_config_copy.rental_income_config.monthly_rental_income
+            * buy_config_copy.rental_income_config.occupancy_rate
+            * (1 + rent_equivalent_monthly_inflation) ** 34,
+            2,
+        )
+        expected = (
+            # waiting period
+            [0 for _ in range(22)]
+            # 12 months of rent
+            + [monthly_rent_after_22_months for _ in range(34 - 22)]
+            # 1st month of next year
+            + [monthly_rent_after_34_months]
+        )
+        assert actual == pytest.approx(expected)
+
+    def test_get_deductible_selling_costs(self) -> None:
+        sale_price = 600000  # arbitrary
+        actual = TestBuyConfig.BUY_CONFIG.get_deductible_selling_costs(sale_price)
+        expected = 0.025 * sale_price + 0 * 500 + 1 * 100 + 0 * 300 + 800 + 50
+        assert actual == pytest.approx(expected)
+
+    def test_get_nondeductible_selling_costs(self) -> None:
+        sale_price = 800000  # arbitrary
+        actual = TestBuyConfig.BUY_CONFIG.get_nondeductible_selling_costs(sale_price)
+        expected = 0.9 * 0.0011 * sale_price + 1 * 300 + 600 + 100
+        assert actual == pytest.approx(expected)

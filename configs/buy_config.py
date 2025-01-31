@@ -559,7 +559,7 @@ class BuyConfig(Config):
             + self.get_not_part_of_basis_upfront_one_time_cost()
         )
 
-    def get_monthly_mortgage_payment(self):
+    def get_monthly_mortgage_payment(self) -> float:
         # https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:series/x9e81a4f98389efdf:geo-series-notation/v/geometric-series-sum-to-figure-out-mortgage-payments
         # NOTE mortgages typically use the annual rate divided by MONTHS_PER_YEAR
         # as opposed to using the "equivalent" monthly compound rate
@@ -570,7 +570,7 @@ class BuyConfig(Config):
         L = self.initial_loan_amount
         return round(L * (1 - r) / (r - r ** (self.mortgage_term_months + 1)), 2)
 
-    def get_monthly_home_values(self, num_months: int):
+    def get_monthly_home_values(self, num_months: int) -> list[float]:
         assert num_months > 0
         return project_growth(
             principal=self.sale_price,
@@ -638,7 +638,9 @@ class BuyConfig(Config):
 
     def get_deductible_selling_costs(self, sale_price: float) -> float:
         return (
+            # seems that transfer tax is not tax deductible, but the buyer portion can be added to buyer's cost basis
             self.seller_realtor_commission_fraction * sale_price
+            # seems that hoa fee is not tax deductible
             + self.seller_burden_of_escrow_fixed_fee * self.escrow_fixed_fee
             + self.seller_burden_of_title_search_fee * self.title_search_fee
             + self.seller_burden_of_title_search_abstract_fee
