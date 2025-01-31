@@ -677,9 +677,12 @@ class TestBuyConfig(TestConfig):
             # 1st month of next year
             + [monthly_rent_after_34_months]
         )
-        # expected[22] = monthly_rent_after_22_months
-        # expected[23] = monthly_rent_after_22_months
-        # expected[24] = monthly_rent_after_22_months
+        assert actual == pytest.approx(expected)
+
+    def test_get_deductible_selling_costs(self) -> None:
+        sale_price = 600000
+        actual = TestBuyConfig.BUY_CONFIG.get_deductible_selling_costs(sale_price)
+        expected = 0.025 * sale_price + 0 * 500 + 1 * 100 + 0 * 300 + 800 + 50
         assert actual == pytest.approx(expected)
 
     # TODO test the rest of BuyConfig

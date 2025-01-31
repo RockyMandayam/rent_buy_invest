@@ -638,7 +638,9 @@ class BuyConfig(Config):
 
     def get_deductible_selling_costs(self, sale_price: float) -> float:
         return (
+            # seems that transfer tax is not tax deductible, but the buyer portion can be added to buyer's cost basis
             self.seller_realtor_commission_fraction * sale_price
+            # seems that hoa fee is not tax deductible
             + self.seller_burden_of_escrow_fixed_fee * self.escrow_fixed_fee
             + self.seller_burden_of_title_search_fee * self.title_search_fee
             + self.seller_burden_of_title_search_abstract_fee
