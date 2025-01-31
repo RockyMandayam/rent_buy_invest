@@ -595,4 +595,6 @@ class TestBuyConfig(TestConfig):
             num_months=num_months,
         )
 
+    # TODO get_inflation_related_monthly_costs
+
     # TODO test the rest of BuyConfig
