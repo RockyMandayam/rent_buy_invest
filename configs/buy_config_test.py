@@ -565,6 +565,7 @@ class TestBuyConfig(TestConfig):
     def test_get_monthly_home_values(self) -> None:
         with pytest.raises(AssertionError):
             TestBuyConfig.BUY_CONFIG.get_monthly_home_values(0)
+
         num_months = 100
         actual = TestBuyConfig.BUY_CONFIG.get_monthly_home_values(num_months)
         expected = project_growth(
@@ -578,7 +579,11 @@ class TestBuyConfig(TestConfig):
     def test_get_home_value_related_monthly_costs(self) -> None:
         with pytest.raises(AssertionError):
             TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(0)
+
         num_months = 1000
+        actual = TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(
+            num_months
+        )
         first_home_value_related_monthly_costs = (
             TestBuyConfig.BUY_CONFIG.sale_price
             * (
@@ -588,12 +593,33 @@ class TestBuyConfig(TestConfig):
             )
             / MONTHS_PER_YEAR
         )
-        project_growth(
+        expected = project_growth(
             principal=first_home_value_related_monthly_costs,
             annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
             compound_monthly=False,
             num_months=num_months,
         )
+        assert actual == pytest.approx(expected)
+
+        buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config_copy.rental_income_config = None
+        actual = buy_config_copy.get_home_value_related_monthly_costs(num_months)
+        first_home_value_related_monthly_costs = (
+            # no rental cost this time
+            buy_config_copy.sale_price
+            * (
+                buy_config_copy.annual_property_tax_rate
+                + buy_config_copy.annual_maintenance_cost_fraction
+            )
+            / MONTHS_PER_YEAR
+        )
+        expected = project_growth(
+            principal=first_home_value_related_monthly_costs,
+            annual_growth_rate=buy_config_copy.annual_assessed_value_inflation_rate,
+            compound_monthly=False,
+            num_months=num_months,
+        )
+        assert actual == pytest.approx(expected)
 
     # TODO get_inflation_related_monthly_costs
 
