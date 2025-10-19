@@ -6,7 +6,7 @@ NOTE: THIS IS NOT FINANCIAL ADVICE
 
 Calculates the long-term financial pros and cons of decisions related to renting a home, buying a home, and investing in the stock market.
 
-This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/configs/schemas/`.
+This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/src/rent_buy_invest/configs/schemas/`.
 
 Some additional notes about the configs:
 - For simplicity, we assume you have a primary (personal use) home or a home to rent out - no second, third, etc. (personal use) home.
@@ -58,13 +58,14 @@ Some additional notes about the configs:
 ### Setup
 - NOTE: You can (and probably should) do all of the following in a python virtual environment, e.g., using `venv`, but the instructions for doing so are not listed here (for now)
 - Clone this repo
-- Make sure you have python 3.11.4+ (anything 3.8+ should probably work) and pip3 installed
+- Make sure you have python 3.11.4 (anything 3.8+ should probably work) and pip3 installed
 - Navigate to the 'rent_buy_invest' directory and run `pip3 install -r requirements.txt`
+- Run `python3 -m pip install -e .` to install `rent_buy_invest` as a python package
+- Now from anywhere you can run `python3 -m rent_buy_invest
 - To your `PYTHONPATH` environment variable, add the path to this repo
 
 ### Run the Code
-Navigate to the directory containing `rent_buy_invest` and run:
-`python3 rent_buy_invest/main.py rent_buy_invest/configs/examples/experiment-config-example-1.yaml`
+Run: `python3 rent_buy_invest/main.py <experiment-config-file>`. You can try `rent_buy_invest/configs/examples/experiment-config-example-1.yaml` as the experiment config file. This python project should be able to be run from any directory.
 
 ## For Developers
 
