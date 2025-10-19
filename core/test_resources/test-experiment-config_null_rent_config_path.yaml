@@ -1,9 +1,0 @@
-num_months: !!int 40
-
-market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-config.yaml"
-
-rent_config_path: null
-
-house_config_path: !!str "rent_buy_invest/core/test_resources/test-house-config.yaml"
-
-start_date: !!timestamp "2030-07-01"

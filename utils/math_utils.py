@@ -1,9 +1,17 @@
 import datetime
-from typing import Tuple
+from collections.abc import Iterable
+
+MONTHS_PER_YEAR: int = 12
+
+
+def avg(seq: Iterable[float]) -> float:
+    if not seq:
+        return 0
+    return sum(seq) / len(seq)
 
 
 def get_equivalent_monthly_compound_rate(annual_compound_rate: float) -> float:
-    return (1 + annual_compound_rate) ** (1 / 12) - 1
+    return (1 + annual_compound_rate) ** (1 / MONTHS_PER_YEAR) - 1
 
 
 def project_growth(
@@ -12,19 +20,20 @@ def project_growth(
     compound_monthly: bool,
     num_months: int,
     round_to_cent: bool = True,
-) -> float:
-    """Given a principal (starting amount) and an annual growth rate, return
-    the value at the beginning of each month for num_months months, and a final
-    value representing the value at the end of num_months months.
+) -> list[float]:
+    """Given a principal (starting amount) and an annual growth rate, return a
+    list containing the projected fund amount at the beginning of each month for
+    num_months+1 months (the extra month is there to present the final amount after
+    num_months months).
 
     Returns:
-        List[float]: monthly value in dollars
+        list[float]: monthly value in dollars
 
     Raises:
-        AssertionError: If principal is negative or num_months is not positive
+        AssertionError: If principal or num_months is negative
     """
     assert principal >= 0, "Principal must be non-negative."
-    assert num_months > 0, "Number of months must be positive."
+    assert num_months >= 0, "Number of months must be non-negative."
     if compound_monthly:
         equivalent_monthly_rate = get_equivalent_monthly_compound_rate(
             annual_growth_rate
@@ -34,22 +43,22 @@ def project_growth(
         if compound_monthly:
             monthly_value = principal * (1 + equivalent_monthly_rate) ** month
         else:
-            monthly_value = principal * (1 + annual_growth_rate) ** (month // 12)
+            monthly_value = principal * (1 + annual_growth_rate) ** (
+                month // MONTHS_PER_YEAR
+            )
         if round_to_cent:
             monthly_value = round(monthly_value, 2)
         monthly_values.append(monthly_value)
     return monthly_values
 
 
-def month_to_year_month(month: int) -> Tuple[int]:
-    """Convert 0-indexed month to (1-indexed year, 1-indexed month).
-    E.g., 11 becomes (0,12) and 12 becomes (1, 1).
-    """
-    assert month >= 0, "Month must be non-negative."
-    return month // 12 + 1, month % 12 + 1
-
-
 def increment_month(date: datetime.date) -> datetime.date:
+    """Given a datetime date, return a datetime date with the month incremented;
+    if a year boundary is crossed, the year is appropriately incremented
+
+    NOTE: The date is set to the 28 of the month since Feb has 28 days and the callers of
+    this function do not care about the day, only the month.
+    """
     # not using dateutils b/c don't want to depend on it just for this one function
     year, month = date.year, date.month
     month += 1

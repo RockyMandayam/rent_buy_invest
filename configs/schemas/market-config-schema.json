@@ -7,12 +7,34 @@
       "description": "ANNUAL rate of return in the market, as a fraction",
       "type": "number"
     },
+    "tax_brackets_inflation": {
+      "description": "Rate at which the tax bracket limits inflate (by government policy)",
+      "type": "number"
+    },
     "tax_brackets": {
-      "description": "Tax brackets. Assume only capital gains tax, and assume the investor is in the market long-term - so only list long-term capital gains tax brackets.",
+      "description": "Tax brackets",
       "type": "object",
       "properties": {
-        "tax_brackets": {
-          "description": "List of tax brackets ordered from lowest bracket to highest bracket. Each bracket has a lower limit, upper limit, and marginal tax rate. The first bracket's lower limit is assumed to be 0, and every other bracket's lower limit is equal to its previous bracket's upper limit. The last bracket's upper limit must be infinity.",
+        "ordinary_income_tax_brackets": {
+          "description": "Ordinary income tax (also short term capital gains tax) brackets. List of tax brackets ordered from lowest bracket to highest bracket. Each bracket has a lower limit, upper limit, and marginal tax rate. The first bracket's lower limit is assumed to be 0, and every other bracket's lower limit is equal to its previous bracket's upper limit. The last bracket's upper limit must be infinity.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "upper_limit": {
+                "description": "The upper limit of this tax bracket.",
+                "type": "number"
+              },
+              "tax_rate": {
+                "description": "The marginal tax rate for this tax bracket.",
+                "type": "number"
+              }
+            },
+            "required": ["upper_limit", "tax_rate"]
+          }
+        },
+        "long_term_capital_gains_tax_brackets": {
+          "description": "Long term capital gains tax brackets. List of tax brackets ordered from lowest bracket to highest bracket. Each bracket has a lower limit, upper limit, and marginal tax rate. The first bracket's lower limit is assumed to be 0, and every other bracket's lower limit is equal to its previous bracket's upper limit. The last bracket's upper limit must be infinity.",
           "type": "array",
           "items": {
             "type": "object",
@@ -30,8 +52,8 @@
           }
         }
       },
-      "required": ["tax_brackets"]
+      "required": ["ordinary_income_tax_brackets", "long_term_capital_gains_tax_brackets"]
     }
   },
-  "required": ["market_rate_of_return", "tax_brackets"]
+  "required": ["market_rate_of_return", "tax_brackets_inflation", "tax_brackets"]
 }

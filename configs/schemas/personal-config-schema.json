@@ -1,0 +1,20 @@
+{
+  "title": "Personal Configuration",
+  "description": "Config file relating to assumptions about the person making the rent vs buy decision.",
+  "type": "object",
+  "properties": {
+    "ordinary_income": {
+      "description": "ANNUAL ordinary (earned) income (e.g., income reported on a W-2 from employers). Oncome is used only for tax implications, not for determination of affordability.",
+      "type": "number"
+    },
+    "ordinary_income_growth_rate": {
+      "description": "ANNUAL rate of growth of ordinary income",
+      "type": "number"
+    },
+    "years_till_retirement": {
+      "description": "Number of years till retirement. After this many years, the ordinary income will reduce to 0. In reality, due to return on assets, government programs, etc., it should be more, but we ignore this for now.",
+      "type": "number"
+    }
+  },
+  "required": ["ordinary_income", "ordinary_income_growth_rate", "years_till_retirement"]
+}

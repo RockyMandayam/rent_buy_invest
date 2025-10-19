@@ -20,11 +20,11 @@
       "type": "number"
     },
     "annual_rent_inflation_rate": {
-      "description": "ANNUAL rent inflation rate as a fraction. This will be applied to all rent-related expenses (e.g., rent, utilities, parking).",
+      "description": "ANNUAL rent inflation rate as a fraction. This will be applied to all expenses, not just rent (e.g., rent, utilities, renter's insurance, etc.).",
       "type": "number"
     },
     "inflation_adjustment_period": {
-      "description": "How often, in months, to update rent-related expenses for inflation. Twelve is a good number here, as leases are often for 12-month periods and rents change when leases end.",
+      "description": "How often, in months, to update expenses due to inflation. Twelve is a good number here, as leases are often for 12-month periods and rents change when leases end.",
       "type": "number"
     },
     "security_deposit": {
@@ -33,6 +33,10 @@
     },
     "unrecoverable_fraction_of_security_deposit": {
       "description": "The fraction of the security deposit that you expect NOT to be returned to you ever.",
+      "type": "number"
+    },
+    "subsidy_fraction": {
+      "description": "The fraction of ALL total rental costs (including utilities, parking, etc.) that are subsidized for you (maybe you don't have to pay it due to family or friends covering it for example). Note that includes upfront costs (e.g., unrecoverable part of the security deposit) as well as monthly costs.",
       "type": "number"
     }
   },
@@ -44,6 +48,7 @@
     "annual_rent_inflation_rate",
     "inflation_adjustment_period",
     "security_deposit",
-    "unrecoverable_fraction_of_security_deposit"
+    "unrecoverable_fraction_of_security_deposit",
+    "subsidy_fraction"
   ]
 }

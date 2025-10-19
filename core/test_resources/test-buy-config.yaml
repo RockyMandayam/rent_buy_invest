@@ -1,0 +1,120 @@
+##### BASICS AND GENERAL CONFIGS
+
+sale_price: !!float 500000.
+
+annual_assessed_value_inflation_rate: !!float 0.05
+
+##### MORTGAGE RELATED CONFIGS
+
+down_payment_fraction: !!float 0.2
+
+mortgage_annual_interest_rate: !!float 0.06
+
+mortgage_term_months: !!int 360
+
+upfront_mortgage_insurance_fraction: !!float 0.0
+
+annual_mortgage_insurance_fraction: !!float 0.005
+
+is_fha_loan: false
+
+mortgage_origination_points_fee_fraction: !!float 0.015
+
+mortgage_processing_fee: !!float 300.
+
+mortgage_underwriting_fee: !!float 500.
+
+mortgage_discount_points_fee_fraction: !!float 0.005
+
+home_appraisal_cost: !!float 500.
+
+credit_report_fee: !!float 50.
+
+flood_certification_fee: !!float 20.
+
+##### TAXES
+
+transfer_tax_fraction: !!float 0.0011
+
+seller_burden_of_transfer_tax_fraction: !!float 0.9
+
+recording_fee_fraction: !!float 0.03
+
+annual_property_tax_rate: !!float 0.01
+
+##### MISCELLANEOUS CLOSING COSTS
+
+buyer_realtor_commission_fraction: !!float 0.025
+
+seller_realtor_commission_fraction: !!float 0.025
+
+hoa_transfer_fee: !!float 300.
+
+seller_burden_of_hoa_transfer_fee: !!float 1.0
+
+home_inspection_cost: !!float 500.
+
+pest_inspection_cost: !!float 500.
+
+seller_one_time_home_warranty: !!float 600.
+
+escrow_fixed_fee: !!float 500.
+
+seller_burden_of_escrow_fixed_fee: !!float 0.
+
+title_search_fee: !!float 100. 
+
+seller_burden_of_title_search_fee: !!float 1.
+
+title_search_abstract_fee: !!float 300.
+
+seller_burden_of_title_search_abstract_fee: !!float 0.0
+
+title_courier_fee: !!float 0.0
+
+buyer_attorney_fee: !!float 800.
+
+seller_attorney_fee: !!float 800.
+
+lenders_title_insurance_fraction: !!float 0.02
+
+owners_title_insurance_fraction: !!float 0.01 
+
+endorsement_fees: !!float 150.
+
+closing_protection_letter_fee: !!float 35.
+
+survey_fee: !!float 500.
+
+notary_fee: !!float 150.
+
+seller_deed_prep_fee: !!float 50.
+
+seller_natural_hazard_report_fee: !!float 100.
+
+##### MISCELLANEOUS MONTHLY COSTS
+
+annual_homeowners_insurance_fraction: !!float 0.005
+
+annual_flood_insurance: !!float 1000.0
+
+monthly_utilities: !!float 300.
+
+annual_maintenance_cost_fraction: !!float 0.02
+
+annual_home_warranty: !!float 600.
+
+monthly_hoa_fees: !!float 250.
+
+##### RENTAL INCOME RELATED COSTS
+
+rental_income_config:
+  annual_management_cost_fraction: !!float 0.02
+
+  rental_income_waiting_period_months: 24
+
+  monthly_rental_income: 1000
+
+  rental_income_annual_inflation_rate: 0.02
+
+  occupancy_rate: 0.6

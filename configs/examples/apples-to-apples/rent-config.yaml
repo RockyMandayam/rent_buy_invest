@@ -1,0 +1,17 @@
+monthly_rent: !!float 3000.0
+
+monthly_utilities: !!float 200.
+
+monthly_renters_insurance: !!float 50.
+
+monthly_parking_fee: !!float 150.
+
+annual_rent_inflation_rate: !!float 0.07
+
+inflation_adjustment_period: !!int 12
+
+security_deposit: !!float 2000.
+
+unrecoverable_fraction_of_security_deposit: !!float 0.5
+
+subsidy_fraction: !!float 0.0

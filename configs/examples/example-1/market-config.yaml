@@ -23,4 +23,3 @@ tax_brackets:
     -
       upper_limit: !!float .inf
       tax_rate: !!float 0.15
-

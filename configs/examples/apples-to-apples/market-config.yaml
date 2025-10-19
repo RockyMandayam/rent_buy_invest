@@ -6,13 +6,13 @@ tax_brackets:
   ordinary_income_tax_brackets:
     -
       upper_limit: !!float 44625.
-      tax_rate: !!float 0.
+      tax_rate: !!float 0.20
     -
       upper_limit: !!float 492300.
-      tax_rate: !!float 0.15
+      tax_rate: !!float 0.20
     -
       upper_limit: !!float .inf
-      tax_rate: !!float 0.2
+      tax_rate: !!float 0.20
   long_term_capital_gains_tax_brackets:
     -
       upper_limit: !!float 44625.
@@ -23,4 +23,3 @@ tax_brackets:
     -
       upper_limit: !!float .inf
       tax_rate: !!float 0.15
-
