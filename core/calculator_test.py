@@ -1,12 +1,8 @@
 import pytest
 
-from rent_buy_invest.core.calculator import (
-    PMI_LTV_THRESHOLD,
-    Calculator,
-)
-
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.configs.experiment_config_test import TestExperimentConfig
+from rent_buy_invest.core.calculator import PMI_LTV_THRESHOLD, Calculator
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 

@@ -8,11 +8,7 @@ from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.data_utils import to_df
-
-# isort: off
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg, increment_month
-
-# isort: on
 
 # PMI means Private Mortgage Insurance, and this is the mortgage insurance you'd get for a conventional
 # (i.e., non-FHA) loan.
