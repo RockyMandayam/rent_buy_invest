@@ -18,7 +18,7 @@ def test_get_abs_path() -> None:
     relative_path = "rent_buy_invest/configs"
     actual = io_utils.get_abs_path(relative_path)
     expected = [
-        "/Users/rockymandayam/Downloads/rent_buy_invest/configs",  # local dev machine for Rocky
+        "/Users/rockymandayam/Downloads/rent_buy_invest/src/rent_buy_invest/configs",  # local dev machine for Rocky
         "/home/runner/work/rent_buy_invest/rent_buy_invest/configs",  # github action machine
     ]
     assert actual in expected

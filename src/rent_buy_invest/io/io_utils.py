@@ -21,7 +21,7 @@ def get_abs_path(project_path: str) -> str:
     '/Users/FooBarUser/rent_buy_invest/configs'
     """
     if not project_path.startswith("rent_buy_invest"):
-        raise ValueError("Invalid project_path")
+        raise ValueError(f"Invalid project_path: {project_path}")
     dir_containing_top_level_dir = os.path.join(
         os.path.join(os.path.dirname(__file__), ".."), ".."
     )
@@ -30,7 +30,7 @@ def get_abs_path(project_path: str) -> str:
 
 
 class RentBuyInvestFileOpener:
-    """File opener that takes in project path (relative eto rent_buy_invest) and
+    """File opener that takes in project path (relative to rent_buy_invest) and
     automatically handles making any directories in the path.
 
     The default python open() function requires an absolute path and fails if

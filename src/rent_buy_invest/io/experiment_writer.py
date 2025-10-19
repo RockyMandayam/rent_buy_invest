@@ -50,7 +50,9 @@ class ExperimentWriter:
         # TODO move some of this to io_utils xlsx writing method... and make some of this parametrizable or auto-set
         path = os.path.join(self._output_dir, filename)
         io_utils.write_xlsx_df(path, df)
-        wb = openpyxl.load_workbook(path)
+        # Convert to absolute path for openpyxl since it doesn't use get_abs_path()
+        abs_path = io_utils.get_abs_path(path)
+        wb = openpyxl.load_workbook(abs_path)
         ws = wb["Sheet1"]
         ws.column_dimensions["A"].width = 15
         ws.freeze_panes = f"B{num_header_rows+1}"
@@ -65,4 +67,4 @@ class ExperimentWriter:
                 )
             for cell in ws[col_name]:
                 cell.number_format = "$#,##0.00"
-        wb.save(path)
+        wb.save(abs_path)
