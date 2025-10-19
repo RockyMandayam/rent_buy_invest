@@ -15,5 +15,4 @@ jobs:
         run: |
           pip install -r requirements.txt
           isort --version-number
-          isort --check .
-          isort --check-only --profile black .
+          isort --check-only .
