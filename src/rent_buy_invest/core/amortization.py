@@ -8,8 +8,8 @@ class LoanAmortizationSchedule:
     """Per-month balance and payment split for a fixed-payment loan.
 
     The three lists are of equal length and indexed by month, where month 0 is the
-    loan's first month. For month ``m``, ``starting_balance[m]`` is the balance
-    owed before that month's payment, and ``interest[m]`` and ``principal[m]``
+    loan's first month. For month ``m``, ``starting_balances[m]`` is the balance
+    owed before that month's payment, and ``interest_payments[m]`` and ``principal_payments[m]``
     are how that month's payment divides between the two.
 
     A schedule covers however many months the caller asked to project, which is

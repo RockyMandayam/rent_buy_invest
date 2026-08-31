@@ -33,11 +33,12 @@ FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
 # for this many months
 FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 
-# For a given year, if the average mortgage balance is this amoutn or less, all mortgage interest is tax deducible
+# For a given year, if the average mortgage balance is this amount or less, all mortgage interest is tax deducible
 # Otherwise, a "prorated" amount is deductible. E.g., if the average mortgage balance was 800,000,
 # and the max balance on which interest is deductible is 750,000, then
 # (750/800)*(mortgage interest paid that year) is deductible
-# For convenience sake, instead of doing it annually, I'll do it monthly in the calculations
+# The IRS lets you average just the first and last balance of the year; since we have every
+# monthly balance, we average all twelve instead, which tracks the real average balance more closely.
 # This is the cap for a single filer (married filing jointly is also 750,000; married filing
 # separately is half, 375,000). We assume a single filer throughout.
 MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE = 750000
@@ -132,13 +133,13 @@ class Calculator:
                     ]
                 )
                 # ordinary income tax savings due to mortgage interest deduction
-                # with this formula, if the loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
-                # but if the loan amount is larger than that, you only get a "prorated" deduction
+                # with this formula, if the average loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
+                # but if the average loan amount is larger than that, you only get a "prorated" deduction
                 deductible_fraction_of_interest = (
                     MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
                     / max(
                         MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
-                        loan_amount,
+                        avg_loan_amount,
                     )
                 )
                 annual_income = sum(
