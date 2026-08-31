@@ -6,6 +6,7 @@ from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
+from rent_buy_invest.core.amortization import compute_loan_amortization_schedule
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg, increment_month
@@ -83,10 +84,7 @@ class Calculator:
 
         # The remaining housing and rental costs/gains are calculated in the loop
         # which projects forward month by month
-        mortgage_interests = []
         mortgage_interest_deduction_savings = []
-        paid_toward_equity = []
-        loan_amounts = []
         equities = []
         mortgage_insurances = []
         rental_income_taxes = []
@@ -97,8 +95,13 @@ class Calculator:
         ]  # NOTE: first value filled in
         investment_values_if_buying = [0]  # NOTE: first value filed in
 
-        loan_amount = self.buy_config.initial_loan_amount
         monthly_mortgage_payment = self.buy_config.get_monthly_mortgage_payment()
+        mortgage_amortization_schedule = compute_loan_amortization_schedule(
+            self.buy_config.initial_loan_amount,
+            self.buy_config.mortgage_annual_interest_rate,
+            monthly_mortgage_payment,
+            num_months,
+        )
         mortgage_insurance_if_required = round(
             self.buy_config.annual_mortgage_insurance_fraction
             * self.buy_config.initial_loan_amount
@@ -110,23 +113,21 @@ class Calculator:
         for month in range(num_months + 1):
             buy_one_off_cost = 0
 
-            loan_amounts.append(loan_amount)
-
-            # mortgage interest cost
-            mortgage_interest = round(
-                loan_amount
-                * self.buy_config.mortgage_annual_interest_rate
-                / MONTHS_PER_YEAR,
-                2,
-            )
-            mortgage_interests.append(mortgage_interest)
+            loan_amount = mortgage_amortization_schedule.starting_balances[month]
+            mortgage_interest = mortgage_amortization_schedule.interest_payments[month]
             # mortgage interest tax deduction savings
             # only do it at the year boundary
             if month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1):
                 mortgage_interest_for_the_year = sum(
-                    mortgage_interests[-MONTHS_PER_YEAR:]
+                    mortgage_amortization_schedule.interest_payments[
+                        month + 1 - MONTHS_PER_YEAR : month + 1
+                    ]
                 )
-                avg_loan_amount = avg(loan_amounts[-MONTHS_PER_YEAR:])
+                avg_loan_amount = avg(
+                    mortgage_amortization_schedule.starting_balances[
+                        month + 1 - MONTHS_PER_YEAR : month + 1
+                    ]
+                )
                 # ordinary income tax savings due to mortgage interest deduction
                 # with this formula, if the loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
                 # but if the loan amount is larger than that, you only get a "prorated" deduction
@@ -154,18 +155,7 @@ class Calculator:
             )
 
             # mortgage equity payment and equity value
-            if loan_amount == 0:
-                # mortgage already paid off
-                # no loan amount, so mortgage_interest is zero also
-                toward_equity = 0
-            elif loan_amount + mortgage_interest <= monthly_mortgage_payment:
-                # final mortgage payment
-                # paying interest on prev month and the remaining little loan amount
-                toward_equity = loan_amount
-            else:
-                # regular mortgage payment
-                toward_equity = round(monthly_mortgage_payment - mortgage_interest, 2)
-            paid_toward_equity.append(toward_equity)
+            toward_equity = mortgage_amortization_schedule.principal_payments[month]
             equities.append(round(home_values[month] - loan_amount, 2))
 
             if not mortgage_interest:
@@ -257,8 +247,6 @@ class Calculator:
                     round(gain_in_investment_if_buying + surplus, 2)
                 )
 
-            # update loan_amount for next iteration
-            loan_amount -= toward_equity
             assert loan_amount >= 0, "Loan amount cannot be negative."
         # Pop last element from lists which have an extra item (starting value)
         investment_values_if_renting.pop()
@@ -270,18 +258,18 @@ class Calculator:
             "Buy: Invested (Pre-Tax)": investment_values_if_buying,
             "Buy: Home Equity": equities,
             "Buy: Home Value": home_values,
-            "Buy: Loan Amount": loan_amounts,
+            "Buy: Loan Amount": mortgage_amortization_schedule.starting_balances,
             # Buy: costs
             "Buy: Costs Tied to Home Value": home_monthly_costs_related_to_home_value,
             "Buy: Costs Tied to Inflation": home_monthly_costs_related_to_inflation,
             "Buy: Mortgage Insurance": mortgage_insurances,
-            "Buy: Mortgage Interest Payment": mortgage_interests,
-            "Buy: Mortgage Equity Payment": paid_toward_equity,
+            "Buy: Mortgage Interest Payment": mortgage_amortization_schedule.interest_payments,
+            "Buy: Mortgage Equity Payment": mortgage_amortization_schedule.principal_payments,
             "Buy: Mortgage Interest Deduction Savings": mortgage_interest_deduction_savings,
             "Buy: One-Off Costs": buy_one_off_costs,
             # black formats the following line in an easy-to-misread way
             # fmt: off
-            "Buy: Mortgage Payment": [i + e for i, e in zip(mortgage_interests, paid_toward_equity)],
+            "Buy: Mortgage Payment": [i + e for i, e in zip(mortgage_amortization_schedule.interest_payments, mortgage_amortization_schedule.principal_payments)],
             # fmt: on
             # TODO rental income's effect on your taxable income and therefore brackets and deductions savings
             "Buy: Rental Income (Pre-Tax)": home_monthly_rental_incomes,
