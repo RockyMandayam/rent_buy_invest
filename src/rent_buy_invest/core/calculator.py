@@ -178,7 +178,7 @@ class Calculator:
                 ):
                     mortgage_insurance = mortgage_insurance_if_required
                 else:
-                    if month // MONTHS_PER_YEAR < FHA_MI_TERM_IF_BELOW_THRESHOLD:
+                    if month < FHA_MI_TERM_IF_BELOW_THRESHOLD:
                         mortgage_insurance = mortgage_insurance_if_required
                     else:
                         mortgage_insurance = 0
