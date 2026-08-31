@@ -33,11 +33,14 @@ FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
 # for this many months
 FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 
-# For a given year, if the average mortgage balance is 375,000 or less, all mortgage interest is tax deducible
-# Otherwise, a "prorated" amount is deductible. E.g., if the average mortgage balance was 400,000, then
-# (375/400)*(mortgage interest paid that year) is deductible
+# For a given year, if the average mortgage balance is this amoutn or less, all mortgage interest is tax deducible
+# Otherwise, a "prorated" amount is deductible. E.g., if the average mortgage balance was 800,000,
+# and the max balance on which interest is deductible is 750,000, then
+# (750/800)*(mortgage interest paid that year) is deductible
 # For convenience sake, instead of doing it annually, I'll do it monthly in the calculations
-MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE = 375000
+# This is the cap for a single filer (married filing jointly is also 750,000; married filing
+# separately is half, 375,000). We assume a single filer throughout.
+MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE = 750000
 
 
 class Calculator:
