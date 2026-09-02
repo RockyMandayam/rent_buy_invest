@@ -8,30 +8,9 @@ from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.amortization import compute_loan_amortization_schedule
 from rent_buy_invest.core.initial_state import InitialState
+from rent_buy_invest.core.mortgage_insurance import compute_mortgage_insurance_schedule
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg, increment_month
-
-# PMI means Private Mortgage Insurance, and this is the mortgage insurance you'd get for a conventional
-# (i.e., non-FHA) loan.
-# LTV means loan-to-value, which is the ratio, at a given time, of the loan amount to the home value. The
-# initial LTV is the same as the loan-to-purchase-price (LTPP), but the LTV can change over time (and generally
-# decreases, since the loan is usually paid off and home values usually rise).
-# This threshold is the threshold such that when the LTV at the time of home purchase (i.e., the LTPP)
-# is above this threshold, PMI is required; if the LTPP is less than or equal to this threshold, no PMI is required.
-# If PMI is required, the premium is set once and not recalculated again by default. If, however, during the mortgage
-# term, the buyer thinks the LTV has dropped to 0.8 or below, the borrower can request a re-appraisal (which the
-# borrower has to pay for) and if the resulting LTV is 0.8 or below, PMI is no longer required. By the way,
-# as of Jan 25, 2024, the lender is supposed to automatically remove the PMI at 78% but the rule is that the borrower
-# can demand to have it removed at 80%.
-PMI_LTV_THRESHOLD = 0.8
-
-# For FHA loans, the FHA requires FHA mortgage insurance (MI) if the loan-to-purchase-price (LTPP) is greater
-# than this threshold. This FHA MI lasts for the ENTIRETY of the loan
-FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE = 0.9
-
-# If the LTPP is at or below FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE, the borrower must pay for FHA MI
-# for this many months
-FHA_MI_TERM_IF_BELOW_THRESHOLD = MONTHS_PER_YEAR * 11
 
 # For a given year, if the average mortgage balance is this amount or less, all mortgage interest is tax deducible
 # Otherwise, a "prorated" amount is deductible. E.g., if the average mortgage balance was 800,000,
@@ -90,7 +69,6 @@ class Calculator:
         # which projects forward month by month
         mortgage_interest_deduction_savings = []
         equities = []
-        mortgage_insurances = []
         rental_income_taxes = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
@@ -106,17 +84,19 @@ class Calculator:
             monthly_mortgage_payment,
             num_months,
         )
-        mortgage_insurance_if_required = round(
-            self.buy_config.annual_mortgage_insurance_fraction
-            * self.buy_config.initial_loan_amount
-            / MONTHS_PER_YEAR,
-            2,
+        mortgage_insurance_schedule = compute_mortgage_insurance_schedule(
+            mortgage_amortization_schedule,
+            self.buy_config.is_fha_loan,
+            self.buy_config.initial_loan_amount,
+            self.buy_config.initial_loan_fraction,
+            self.buy_config.sale_price,
+            self.buy_config.annual_mortgage_insurance_fraction,
+            self.buy_config.home_appraisal_cost,
         )
+        mortgage_insurances = mortgage_insurance_schedule.premiums
+        buy_one_off_costs = mortgage_insurance_schedule.appraisal_costs
 
-        buy_one_off_costs = []
         for month in range(num_months + 1):
-            buy_one_off_cost = 0
-
             loan_amount = mortgage_amortization_schedule.starting_balances[month]
             mortgage_interest = mortgage_amortization_schedule.interest_payments[month]
             # mortgage interest tax deduction savings
@@ -162,30 +142,6 @@ class Calculator:
             toward_equity = mortgage_amortization_schedule.principal_payments[month]
             equities.append(round(home_values[month] - loan_amount, 2))
 
-            if not mortgage_interest:
-                mortgage_insurance = 0
-            elif not self.buy_config.is_fha_loan:
-                if loan_amount <= PMI_LTV_THRESHOLD * self.buy_config.sale_price:
-                    if mortgage_insurances and mortgage_insurances[-1] != 0:
-                        buy_one_off_cost += self.buy_config.home_appraisal_cost
-                    mortgage_insurance = 0
-                else:
-                    mortgage_insurance = mortgage_insurance_if_required
-            else:
-                if (
-                    self.buy_config.initial_loan_fraction
-                    > FHA_MI_LTPP_THRESHOLD_FOR_LIFELONG_MORTGAGE_INSURANCE
-                ):
-                    mortgage_insurance = mortgage_insurance_if_required
-                else:
-                    if month < FHA_MI_TERM_IF_BELOW_THRESHOLD:
-                        mortgage_insurance = mortgage_insurance_if_required
-                    else:
-                        mortgage_insurance = 0
-            mortgage_insurances.append(mortgage_insurance)
-
-            buy_one_off_costs.append(buy_one_off_cost)
-
             # taxes on rental income
             # only do it at the year boundary
             if month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1):
@@ -213,8 +169,8 @@ class Calculator:
                 + home_monthly_costs_related_to_inflation[month]
                 + mortgage_interest
                 + toward_equity
-                + mortgage_insurance
-                + buy_one_off_cost
+                + mortgage_insurance_schedule.premiums[month]
+                + mortgage_insurance_schedule.appraisal_costs[month]
                 + rental_income_taxes[month]
             )
             housing_monthly_income = home_monthly_rental_incomes[month]
