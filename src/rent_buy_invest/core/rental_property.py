@@ -4,6 +4,9 @@ from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.core.amortization import compute_loan_amortization_schedule
 from rent_buy_invest.core.depreciation import compute_depreciation_schedule
 from rent_buy_invest.core.mortgage_insurance import compute_mortgage_insurance_schedule
+from rent_buy_invest.core.points_amortization import (
+    compute_points_amortization_schedule,
+)
 
 
 @dataclass(frozen=True)
@@ -43,8 +46,15 @@ class RentalSaleResult:
     unallocated, and whether it is worth anything is deliberately left to whoever
     computes the tax rather than decided here.
 
-    There is no section 121 exclusion anywhere in this result. That exclusion is
-    for a home you lived in; a property rented for its whole life never qualifies.
+    ``unamortized_discount_points`` sits outside both stories. Points are deducted
+    a little at a time over the loan's term, and selling ends the loan early, so
+    whatever is left undeducted can be taken in full in the year of the sale. It is
+    an ordinary deduction against income, not part of the gain, so it is reported on
+    its own rather than folded into either figure above.
+
+    Nothing in this result is exempt from tax. When you sell a home you have lived
+    in, the first $250,000 of gain is tax-free for a single filer -- but a property
+    rented for its whole life never qualifies, so the whole gain here is taxable.
     """
 
     final_sale_price: float
@@ -52,6 +62,8 @@ class RentalSaleResult:
     nondeductible_selling_costs: float
     loan_payoff: float
     pretax_cash_proceeds: float
+
+    unamortized_discount_points: float
 
     original_basis: float
     accumulated_depreciation: float
@@ -68,23 +80,26 @@ class RentalProperty:
     The property comes down to five monthly streams. Each one either moves money,
     changes what you are taxed on, or both:
 
-    | stream             | money moves? | changes taxable income? |
-    |--------------------|--------------|-------------------------|
-    | rent received      | in           | yes                     |
-    | operating expenses | out          | yes                     |
-    | mortgage interest  | out          | yes                     |
-    | mortgage principal | out          | **no**                  |
-    | depreciation       | **no**       | yes                     |
+    | stream              | money moves? | changes taxable income? |
+    |---------------------|--------------|-------------------------|
+    | rent received       | in           | yes                     |
+    | operating expenses  | out          | yes                     |
+    | mortgage interest   | out          | yes                     |
+    | mortgage principal  | out          | **no**                  |
+    | depreciation        | **no**       | yes                     |
+    | discount points     | **no**       | yes                     |
 
-    The last two are one-sided, and that is the whole point of this class.
+    The last three are one-sided, and that is the whole point of this class.
     Principal leaves your account without being deductible -- it buys equity
     rather than paying for anything, so you still have the money, it is just in the
-    house now. Depreciation is deductible even though no money moves at all.
+    house now. Depreciation is deductible even though no money moves at all. So are
+    the discount points, whose cash left at closing and is counted among the upfront
+    costs, but which a rental deducts a little at a time over the loan's term.
 
-    So the two figures produced here are different sums of the same five streams:
+    So the two figures produced here are:
 
         cash flow      = rent - operating expenses - interest - principal
-        taxable income = rent - operating expenses - interest - depreciation
+        taxable income = rent - operating expenses - interest - depreciation - discount points
 
     Both matter, for different reasons. Cash flow decides how much money is
     actually available to invest each month, which is what the tool compares
@@ -160,6 +175,15 @@ class RentalProperty:
             self.depreciable_basis, num_months
         )
 
+        # Points bought down the interest rate and were paid at closing. A home you
+        # live in deducts them that year; a rental spreads them over the loan term.
+        self._points_amortization_schedule = compute_points_amortization_schedule(
+            buy_config.mortgage_discount_points_fee_fraction
+            * buy_config.initial_loan_amount,
+            buy_config.mortgage_term_months,
+            num_months,
+        )
+
         self.monthly_mortgage_interest: list[
             float
         ] = self._amortization_schedule.interest_payments
@@ -169,6 +193,9 @@ class RentalProperty:
         self.monthly_depreciation: list[
             float
         ] = self._depreciation_schedule.monthly_depreciation
+        self.monthly_discount_points_deduction: list[
+            float
+        ] = self._points_amortization_schedule.monthly_deduction
         self.monthly_rental_income: list[float] = buy_config.get_monthly_rental_incomes(
             num_months
         )
@@ -240,7 +267,8 @@ class RentalProperty:
                 self.monthly_rental_income[month]
                 - self.monthly_operating_expenses[month]
                 - self.monthly_mortgage_interest[month]
-                - self.monthly_depreciation[month],
+                - self.monthly_depreciation[month]
+                - self.monthly_discount_points_deduction[month],
                 2,
             )
             for month in range(num_months + 1)
@@ -298,6 +326,11 @@ class RentalProperty:
             )
             long_term_capital_gain = round(total_gain - depreciation_recapture_gain, 2)
 
+        # selling ends the loan, so the points not yet deducted are deductible now
+        unamortized_discount_points = (
+            self._points_amortization_schedule.unamortized_remainder_after(month)
+        )
+
         loan_payoff = self._amortization_schedule.starting_balances[month]
         pretax_cash_proceeds = round(
             final_sale_price
@@ -313,6 +346,7 @@ class RentalProperty:
             nondeductible_selling_costs=nondeductible_selling_costs,
             loan_payoff=loan_payoff,
             pretax_cash_proceeds=pretax_cash_proceeds,
+            unamortized_discount_points=unamortized_discount_points,
             original_basis=original_basis,
             accumulated_depreciation=accumulated_depreciation,
             adjusted_basis=adjusted_basis,
