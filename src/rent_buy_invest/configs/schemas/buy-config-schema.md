@@ -4,7 +4,7 @@
 
 ## Properties
 
-- **`sale_price`** *(number, required)*: Sale price of the home (final nominal sale price).
+- **`purchase_price`** *(number, required)*: What you pay for the home: its nominal purchase price, before any closing costs. This is the price at the START of the projection, not what you later sell it for.
 - **`annual_assessed_value_inflation_rate`** *(number, required)*: ANNUAL inflation rate of home's assessed value as a fraction.
 - **`down_payment_fraction`** *(number, required)*: The fraction of the home price put down as the down payment (the remaining is assumed to be the loan amount).
 - **`mortgage_annual_interest_rate`** *(number, required)*: Mortgage ANNUAL interest rate. An 'equivalent' monthly interest rate can be calculated from this. Note that the equivalent monthly interest rate is not just 1/12 of the annual rate, due to the fact that the monthly rate is compounded monthly (i.e., it is a compound interst rate not a simple interest rate).

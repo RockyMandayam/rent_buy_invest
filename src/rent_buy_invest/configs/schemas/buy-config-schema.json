@@ -3,8 +3,8 @@
   "description": "Config file relating to assumptions about buying, owning, and selling a home.",
   "type": "object",
   "properties": {
-    "sale_price": {
-      "description": "Sale price of the home (final nominal sale price).",
+    "purchase_price": {
+      "description": "What you pay for the home: its nominal purchase price, before any closing costs. This is the price at the START of the projection, not what you later sell it for.",
       "type": "number"
     },
     "annual_assessed_value_inflation_rate": {
@@ -239,7 +239,7 @@
     }
   },
   "required": [
-    "sale_price",
+    "purchase_price",
     "annual_assessed_value_inflation_rate",
     "down_payment_fraction",
     "mortgage_annual_interest_rate",

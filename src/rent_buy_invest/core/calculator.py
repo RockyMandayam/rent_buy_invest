@@ -89,7 +89,7 @@ class Calculator:
             self.buy_config.is_fha_loan,
             self.buy_config.initial_loan_amount,
             self.buy_config.initial_loan_fraction,
-            self.buy_config.sale_price,
+            self.buy_config.purchase_price,
             self.buy_config.annual_mortgage_insurance_fraction,
             self.buy_config.home_appraisal_cost,
         )

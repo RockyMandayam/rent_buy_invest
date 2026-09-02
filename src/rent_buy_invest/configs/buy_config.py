@@ -156,7 +156,7 @@ class BuyConfig(Config):
         To see why I don't use yaml tags, see the docstring for __init__
         in Config.
         """
-        self.sale_price: float = kwargs["sale_price"]
+        self.purchase_price: float = kwargs["purchase_price"]
         self.annual_assessed_value_inflation_rate: float = kwargs[
             "annual_assessed_value_inflation_rate"
         ]
@@ -274,7 +274,7 @@ class BuyConfig(Config):
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
-        assert self.sale_price > 0, "Home sale price must be positive."
+        assert self.purchase_price > 0, "Home purchase price must be positive."
         assert (
             self.down_payment_fraction >= 0 and self.down_payment_fraction <= 1
         ), "Down payment fraction must be between 0 and 1 inclusive."
@@ -493,7 +493,7 @@ class BuyConfig(Config):
         assert (
             self.get_upfront_one_time_cost()
             <= BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE
-            * self.sale_price
+            * self.purchase_price
         ), f"Please check the buy config for unreasonably high values and make sure the upfront one time cost adds up to something reasonable (at most {BuyConfig.MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE} of the sale price)"
 
     @property
@@ -503,20 +503,20 @@ class BuyConfig(Config):
 
     @property
     def down_payment(self):
-        return self.down_payment_fraction * self.sale_price
+        return self.down_payment_fraction * self.purchase_price
 
     @property
     def initial_loan_amount(self):
-        return self.initial_loan_fraction * self.sale_price
+        return self.initial_loan_fraction * self.purchase_price
 
     def get_part_of_basis_upfront_one_time_cost(self) -> float:
         return (
             # fmt: off
             (1 - self.seller_burden_of_transfer_tax_fraction)
                 * self.transfer_tax_fraction
-                * self.sale_price
+                * self.purchase_price
             # fmt: on
-            + (self.recording_fee_fraction * self.sale_price)
+            + (self.recording_fee_fraction * self.purchase_price)
             + (1 - self.seller_burden_of_title_search_fee) * self.title_search_fee
             # fmt: off
             + (1 - self.seller_burden_of_title_search_abstract_fee)
@@ -547,7 +547,7 @@ class BuyConfig(Config):
             + self.credit_report_fee
             + self.flood_certification_fee
             # I can't find any specific line from the IRS that says buyer realtor commission is or isn't part of cost basis
-            + (self.buyer_realtor_commission_fraction * self.sale_price)
+            + (self.buyer_realtor_commission_fraction * self.purchase_price)
             # I can't find any specific line from the IRS that says buyer HOA transfer fee is or isn't part of cost basis
             + (1 - self.seller_burden_of_hoa_transfer_fee) * self.hoa_transfer_fee
             + self.home_inspection_cost
@@ -581,7 +581,7 @@ class BuyConfig(Config):
     def get_monthly_home_values(self, num_months: int) -> list[float]:
         assert num_months > 0
         return project_growth(
-            principal=self.sale_price,
+            principal=self.purchase_price,
             annual_growth_rate=self.annual_assessed_value_inflation_rate,
             compound_monthly=True,
             num_months=num_months,
@@ -595,7 +595,7 @@ class BuyConfig(Config):
         else:
             management_cost_fraction = 0
         return (
-            self.sale_price
+            self.purchase_price
             * (
                 self.annual_property_tax_rate
                 + self.annual_maintenance_cost_fraction
@@ -618,7 +618,7 @@ class BuyConfig(Config):
             self.monthly_utilities
             + self.monthly_hoa_fees
             + (
-                self.sale_price
+                self.purchase_price
                 * self.annual_homeowners_insurance_fraction
                 / MONTHS_PER_YEAR
             )
@@ -646,10 +646,10 @@ class BuyConfig(Config):
             # monthly projection, which covers month 0 through num_months inclusive
             return [0 for _ in range(num_months + 1)]
 
-    def get_deductible_selling_costs(self, sale_price: float) -> float:
+    def get_deductible_selling_costs(self, final_sale_price: float) -> float:
         return (
             # seems that transfer tax is not tax deductible, but the buyer portion can be added to buyer's cost basis
-            self.seller_realtor_commission_fraction * sale_price
+            self.seller_realtor_commission_fraction * final_sale_price
             # seems that hoa fee is not tax deductible
             + self.seller_burden_of_escrow_fixed_fee * self.escrow_fixed_fee
             + self.seller_burden_of_title_search_fee * self.title_search_fee
@@ -659,13 +659,11 @@ class BuyConfig(Config):
             + self.seller_deed_prep_fee
         )
 
-    def get_nondeductible_selling_costs(self, sale_price: float) -> float:
-        # NOTE use sale_price not self.sale_price, as we are talking about the FINAL sale price when you sell
-        # the home after owning it, not when you first buy it
+    def get_nondeductible_selling_costs(self, final_sale_price: float) -> float:
         return (
             self.seller_burden_of_transfer_tax_fraction
             * self.transfer_tax_fraction
-            * sale_price
+            * final_sale_price
             + self.seller_burden_of_hoa_transfer_fee * self.hoa_transfer_fee
             + self.seller_one_time_home_warranty
             + self.seller_natural_hazard_report_fee

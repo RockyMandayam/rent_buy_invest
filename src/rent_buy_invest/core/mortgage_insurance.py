@@ -46,7 +46,7 @@ def compute_mortgage_insurance_schedule(
     is_fha_loan: bool,
     initial_loan_amount: float,
     initial_loan_fraction: float,
-    sale_price: float,
+    purchase_price: float,
     annual_mortgage_insurance_fraction: float,
     home_appraisal_cost: float,
 ) -> MortgageInsuranceSchedule:
@@ -83,7 +83,7 @@ def compute_mortgage_insurance_schedule(
             # no interest accruing means no live loan left to insure
             premium = 0
         elif not is_fha_loan:
-            if loan_amount <= PMI_LTV_THRESHOLD * sale_price:
+            if loan_amount <= PMI_LTV_THRESHOLD * purchase_price:
                 if premiums and premiums[-1] != 0:
                     # first month that PMI can be dropped: the borrower pays for the
                     # re-appraisal that proves the LTV

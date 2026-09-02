@@ -4,7 +4,7 @@ from rent_buy_invest.core.mortgage_insurance import (
     compute_mortgage_insurance_schedule,
 )
 
-SALE_PRICE = 500_000
+PURCHASE_PRICE = 500_000
 APPRAISAL_COST = 600
 ANNUAL_MI_FRACTION = 0.012
 
@@ -25,8 +25,8 @@ def _compute(amortization_schedule, is_fha_loan: bool, initial_loan_amount: floa
         amortization_schedule,
         is_fha_loan,
         initial_loan_amount,
-        initial_loan_amount / SALE_PRICE,
-        SALE_PRICE,
+        initial_loan_amount / PURCHASE_PRICE,
+        PURCHASE_PRICE,
         ANNUAL_MI_FRACTION,
         APPRAISAL_COST,
     )

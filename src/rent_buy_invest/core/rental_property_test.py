@@ -56,11 +56,11 @@ def test_depreciable_basis_is_the_buildings_share_of_the_cost() -> None:
     rental_property = _rental_property()
 
     expected = buy_config.rental_income_config.building_fraction_of_value * (
-        buy_config.sale_price + buy_config.get_part_of_basis_upfront_one_time_cost()
+        buy_config.purchase_price + buy_config.get_part_of_basis_upfront_one_time_cost()
     )
     assert rental_property.depreciable_basis == pytest.approx(expected)
     # land is excluded, so the basis is strictly less than what was paid
-    assert rental_property.depreciable_basis < buy_config.sale_price
+    assert rental_property.depreciable_basis < buy_config.purchase_price
 
 
 def test_depreciation_is_level_then_stops() -> None:
@@ -218,7 +218,7 @@ def test_sale_reduces_the_basis_by_the_depreciation_taken() -> None:
     result = rental_property.sale(700_000, month)
 
     expected_original = (
-        buy_config.sale_price + buy_config.get_part_of_basis_upfront_one_time_cost()
+        buy_config.purchase_price + buy_config.get_part_of_basis_upfront_one_time_cost()
     )
     assert result.original_basis == pytest.approx(expected_original)
     assert result.accumulated_depreciation == pytest.approx(
@@ -272,7 +272,9 @@ def test_sale_recapture_is_capped_by_the_gain_not_the_depreciation() -> None:
     rental_property = _rental_property()
     month = 300
     accumulated = rental_property.accumulated_depreciation(month)
-    result = rental_property.sale(rental_property.buy_config.sale_price, month)
+    # sell for exactly what was paid: the only gain is the depreciation that
+    # reduced the basis below the purchase price
+    result = rental_property.sale(rental_property.buy_config.purchase_price, month)
 
     assert 0 < result.total_gain < accumulated
     assert result.depreciation_recapture_gain == pytest.approx(result.total_gain)
