@@ -18,6 +18,9 @@ class TestBuyConfig(TestConfig):
 
     TEST_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
     BUY_CONFIG = BuyConfig.parse(TEST_CONFIG_PATH)
+    PRIMARY_RESIDENCE_CONFIG_PATH = (
+        "rent_buy_invest/core/test_resources/test-primary-residence-buy-config.yaml"
+    )
 
     def test_inputs_with_invalid_schema(self) -> None:
         # check missing and null fields
@@ -473,7 +476,12 @@ class TestBuyConfig(TestConfig):
             allow_greater_than_one=False,
         )
 
-    def test_get_monthly_rental_incomes(self) -> None:
+    def test_get_monthly_rental_incomes_increases_only_annually(self) -> None:
+        """Rent is fixed within a year and steps up at each year boundary.
+
+        Checked here against hand-computed values; test_get_monthly_rental_incomes
+        covers the same method against config-derived ones.
+        """
         buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
         with pytest.raises(AssertionError):
             buy_config_copy.get_monthly_rental_incomes(0)
@@ -691,6 +699,18 @@ class TestBuyConfig(TestConfig):
             + [monthly_rent_after_34_months]
         )
         assert actual == pytest.approx(expected)
+
+    def test_get_monthly_rental_incomes_when_not_rented_out(self) -> None:
+        """A home you live in earns no rent, but still needs a full-length projection."""
+        primary_residence = BuyConfig.parse(TestBuyConfig.PRIMARY_RESIDENCE_CONFIG_PATH)
+        assert primary_residence.rental_income_config is None
+
+        for num_months in (1, 23, 360):
+            actual = primary_residence.get_monthly_rental_incomes(num_months)
+            # must match the length of every other monthly projection: month 0
+            # through num_months inclusive
+            assert len(actual) == num_months + 1
+            assert all(income == 0 for income in actual)
 
     def test_get_deductible_selling_costs(self) -> None:
         sale_price = 600000  # arbitrary
