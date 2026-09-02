@@ -1,7 +1,65 @@
+from dataclasses import dataclass
+
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.core.amortization import compute_loan_amortization_schedule
 from rent_buy_invest.core.depreciation import compute_depreciation_schedule
 from rent_buy_invest.core.mortgage_insurance import compute_mortgage_insurance_schedule
+
+
+@dataclass(frozen=True)
+class RentalSaleResult:
+    """What selling a rental property produces, in cash and in taxable gain.
+
+    Two separate stories, the same split that runs through the monthly figures.
+
+    The cash story is simple: you receive ``final_sale_price``, hand back both
+    kinds of selling cost, and pay off whatever is left of the loan. What remains
+    is ``pretax_cash_proceeds`` -- "pretax" because the tax owed on the sale is
+    computed elsewhere, from the gain figures below, and subtracted by the caller.
+
+    The taxable story runs through the basis. ``original_basis`` is what the
+    property cost you: its purchase price plus the closing costs that count toward
+    it. Every dollar of depreciation you deducted while holding it is a dollar of
+    that cost you have already been given tax relief for, so it comes off, leaving
+    ``adjusted_basis`` -- the part of your cost you have not yet recovered. Gain is
+    measured against that, which is why depreciating raises the eventual gain by
+    exactly what you deducted.
+
+    That gain is then split, because its two halves are taxed at different rates:
+
+    - ``depreciation_recapture_gain`` -- gain up to the depreciation you took,
+      capped at a 25% rate. The IRS calls this unrecaptured section 1250 gain.
+    - ``long_term_capital_gain`` -- everything above that, taxed at the ordinary
+      long-term capital gains rates.
+
+    Both are taxed; the split only decides the rate on each part.
+
+    Those two always add up to ``total_gain`` -- but only when it is positive.
+
+    ``total_gain`` is reported raw and **may be negative**, when the property sells
+    for less than its adjusted basis. Then both ``depreciation_recapture_gain`` and
+    ``long_term_capital_gain`` are zero, because a loss belongs in neither bucket:
+    there is nothing to tax at either rate. The loss sits in ``total_gain`` alone,
+    unallocated, and whether it is worth anything is deliberately left to whoever
+    computes the tax rather than decided here.
+
+    There is no section 121 exclusion anywhere in this result. That exclusion is
+    for a home you lived in; a property rented for its whole life never qualifies.
+    """
+
+    final_sale_price: float
+    deductible_selling_costs: float
+    nondeductible_selling_costs: float
+    loan_payoff: float
+    pretax_cash_proceeds: float
+
+    original_basis: float
+    accumulated_depreciation: float
+    adjusted_basis: float
+    amount_realized: float
+    total_gain: float
+    depreciation_recapture_gain: float
+    long_term_capital_gain: float
 
 
 class RentalProperty:
@@ -195,3 +253,76 @@ class RentalProperty:
         the depreciation recapture at sale is computed on.
         """
         return self._depreciation_schedule.accumulated_through(through_month)
+
+    def sale(self, final_sale_price: float, month: int) -> RentalSaleResult:
+        """Sell the property in ``month`` for ``final_sale_price``.
+
+        ``final_sale_price`` is what you sell for, which is not the ``sale_price``
+        on ``BuyConfig`` -- that field holds what you originally *paid*, despite its
+        name. The two appear in the same arithmetic here, so they are kept under
+        distinct local names.
+
+        ``month`` is a point in the projection, and the state read from it is
+        start-of-month, matching how the rest of the tool reports a month: the loan
+        payoff is the balance owed entering that month.
+
+        Applies no rates. This reports the components; converting them into a tax
+        bill belongs to whoever knows the brackets.
+        """
+        assert final_sale_price >= 0
+        assert 0 <= month <= self.num_months
+
+        purchase_price = self.buy_config.sale_price
+        original_basis = round(
+            purchase_price + self.buy_config.get_part_of_basis_upfront_one_time_cost(),
+            2,
+        )
+        accumulated_depreciation = self.accumulated_depreciation(month)
+        adjusted_basis = round(original_basis - accumulated_depreciation, 2)
+
+        # Only the deductible costs come off the amount realized; the rest are
+        # money out of your pocket that the gain calculation simply ignores.
+        deductible_selling_costs = round(
+            self.buy_config.get_deductible_selling_costs(final_sale_price), 2
+        )
+        nondeductible_selling_costs = round(
+            self.buy_config.get_nondeductible_selling_costs(final_sale_price), 2
+        )
+        amount_realized = round(final_sale_price - deductible_selling_costs, 2)
+
+        # Reported raw: negative when the property sold for less than the part of
+        # its cost you had not yet deducted.
+        total_gain = round(amount_realized - adjusted_basis, 2)
+        if total_gain <= 0:
+            # nothing gained, so nothing to recapture and nothing to tax
+            depreciation_recapture_gain = 0.0
+            long_term_capital_gain = 0.0
+        else:
+            depreciation_recapture_gain = round(
+                min(total_gain, accumulated_depreciation), 2
+            )
+            long_term_capital_gain = round(total_gain - depreciation_recapture_gain, 2)
+
+        loan_payoff = self._amortization_schedule.starting_balances[month]
+        pretax_cash_proceeds = round(
+            final_sale_price
+            - deductible_selling_costs
+            - nondeductible_selling_costs
+            - loan_payoff,
+            2,
+        )
+
+        return RentalSaleResult(
+            final_sale_price=final_sale_price,
+            deductible_selling_costs=deductible_selling_costs,
+            nondeductible_selling_costs=nondeductible_selling_costs,
+            loan_payoff=loan_payoff,
+            pretax_cash_proceeds=pretax_cash_proceeds,
+            original_basis=original_basis,
+            accumulated_depreciation=accumulated_depreciation,
+            adjusted_basis=adjusted_basis,
+            amount_realized=amount_realized,
+            total_gain=total_gain,
+            depreciation_recapture_gain=depreciation_recapture_gain,
+            long_term_capital_gain=long_term_capital_gain,
+        )

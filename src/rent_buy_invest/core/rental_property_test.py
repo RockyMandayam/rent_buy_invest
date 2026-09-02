@@ -12,6 +12,8 @@ PRIMARY_RESIDENCE_CONFIG_PATH = (
     "rent_buy_invest/core/test_resources/test-primary-residence-buy-config.yaml"
 )
 ANNUAL_INFLATION_RATE = 0.03
+# what a single filer could exclude on a home they had lived in; never applies here
+PRIMARY_RESIDENCE_EXCLUSION = 250_000
 NUM_MONTHS = 360
 
 
@@ -195,3 +197,133 @@ def test_paid_off_mortgage_leaves_only_operating_expenses() -> None:
             rental_property.monthly_rental_income[month]
             - rental_property.monthly_operating_expenses[month]
         )
+
+
+def test_sale_rejects_a_month_outside_the_projection() -> None:
+    rental_property = _rental_property()
+
+    with pytest.raises(AssertionError):
+        rental_property.sale(700_000, NUM_MONTHS + 1)
+    with pytest.raises(AssertionError):
+        rental_property.sale(700_000, -1)
+    with pytest.raises(AssertionError):
+        rental_property.sale(-1, NUM_MONTHS)
+
+
+def test_sale_reduces_the_basis_by_the_depreciation_taken() -> None:
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    rental_property = _rental_property()
+    month = 120
+
+    result = rental_property.sale(700_000, month)
+
+    expected_original = (
+        buy_config.sale_price + buy_config.get_part_of_basis_upfront_one_time_cost()
+    )
+    assert result.original_basis == pytest.approx(expected_original)
+    assert result.accumulated_depreciation == pytest.approx(
+        rental_property.accumulated_depreciation(month)
+    )
+    # every dollar deducted is a dollar of cost already recovered, so it leaves
+    # the basis
+    assert result.adjusted_basis == pytest.approx(
+        result.original_basis - result.accumulated_depreciation
+    )
+    assert result.adjusted_basis < result.original_basis
+
+
+def test_sale_splits_the_gain_into_recapture_then_capital_gain() -> None:
+    rental_property = _rental_property()
+    result = rental_property.sale(700_000, 120)
+
+    assert result.total_gain > 0
+    assert result.amount_realized == pytest.approx(
+        result.final_sale_price - result.deductible_selling_costs
+    )
+    assert result.total_gain == pytest.approx(
+        result.amount_realized - result.adjusted_basis
+    )
+    # the two pieces account for the whole gain, nothing lost or double counted
+    assert (
+        result.depreciation_recapture_gain + result.long_term_capital_gain
+    ) == pytest.approx(result.total_gain)
+    # recapture is filled first, up to the depreciation taken
+    assert result.depreciation_recapture_gain == pytest.approx(
+        result.accumulated_depreciation
+    )
+
+
+def test_sale_capital_gain_equals_the_gain_without_any_depreciation() -> None:
+    """The split separates real appreciation from deductions being handed back.
+
+    Whatever is left after recapture is exactly the gain there would have been if
+    the property had never been depreciated at all.
+    """
+    rental_property = _rental_property()
+    result = rental_property.sale(700_000, 120)
+
+    assert result.long_term_capital_gain == pytest.approx(
+        result.amount_realized - result.original_basis
+    )
+
+
+def test_sale_recapture_is_capped_by_the_gain_not_the_depreciation() -> None:
+    # a small gain, well under the depreciation taken by then
+    rental_property = _rental_property()
+    month = 300
+    accumulated = rental_property.accumulated_depreciation(month)
+    result = rental_property.sale(rental_property.buy_config.sale_price, month)
+
+    assert 0 < result.total_gain < accumulated
+    assert result.depreciation_recapture_gain == pytest.approx(result.total_gain)
+    assert result.long_term_capital_gain == 0
+
+
+def test_sale_below_adjusted_basis_reports_a_negative_gain() -> None:
+    """A loss is reported rather than floored, so the tax layer can decide.
+
+    Nothing is recaptured or taxed when there is no gain.
+    """
+    rental_property = _rental_property()
+    result = rental_property.sale(100_000, 120)
+
+    assert result.total_gain < 0
+    assert result.depreciation_recapture_gain == 0
+    assert result.long_term_capital_gain == 0
+
+
+def test_sale_cash_proceeds_ignore_the_gain_calculation() -> None:
+    rental_property = _rental_property()
+    month = 120
+    result = rental_property.sale(700_000, month)
+
+    assert result.loan_payoff == pytest.approx(
+        rental_property._amortization_schedule.starting_balances[month]
+    )
+    # both kinds of selling cost are money out, even though only one of them
+    # reduces the gain
+    assert result.pretax_cash_proceeds == pytest.approx(
+        result.final_sale_price
+        - result.deductible_selling_costs
+        - result.nondeductible_selling_costs
+        - result.loan_payoff
+    )
+    assert result.nondeductible_selling_costs > 0
+    assert result.pretax_cash_proceeds != pytest.approx(result.total_gain)
+
+
+def test_sale_never_applies_the_primary_residence_exclusion() -> None:
+    """A property rented for its whole life never qualifies for section 121."""
+    rental_property = _rental_property()
+    # priced so the gain clearly exceeds the 250k a single filer could exclude
+    # on a home they had lived in
+    result = rental_property.sale(900_000, 120)
+
+    assert result.total_gain > PRIMARY_RESIDENCE_EXCLUSION
+    # the whole gain survives: nothing is carved out before the recapture split
+    assert result.total_gain == pytest.approx(
+        result.amount_realized - result.adjusted_basis
+    )
+    assert (
+        result.depreciation_recapture_gain + result.long_term_capital_gain
+    ) == pytest.approx(result.total_gain)
