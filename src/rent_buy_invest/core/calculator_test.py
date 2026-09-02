@@ -8,6 +8,9 @@ from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH)
+PRIMARY_RESIDENCE_EXPERIMENT_CONFIG = ExperimentConfig.parse(
+    "rent_buy_invest/core/test_resources/test-primary-residence-experiment-config.yaml"
+)
 
 
 class TestCalculator:
@@ -95,3 +98,32 @@ class TestCalculator:
             #     assert row["Buy"]["Surplus (vs renting)"] == pytest.approx(
             #         rent_monthly_cost - home_monthly_cost, abs=0.0001
             #     )
+
+    def test_calculate_for_primary_residence(self) -> None:
+        """A home lived in rather than rented out projects over the full horizon.
+
+        No other config in this repo leaves rental_income_config null, so without
+        this the whole primary-residence path goes unexercised.
+        """
+        experiment_config = PRIMARY_RESIDENCE_EXPERIMENT_CONFIG
+        assert experiment_config.buy_config.rental_income_config is None
+
+        calculator = Calculator(
+            experiment_config.buy_config,
+            experiment_config.rent_config,
+            experiment_config.market_config,
+            experiment_config.personal_config,
+            experiment_config.num_years,
+            experiment_config.start_date,
+            InitialState.from_configs(
+                experiment_config.buy_config,
+                experiment_config.rent_config,
+                experiment_config.market_config,
+                experiment_config.personal_config,
+            ),
+        )
+        projection = calculator.calculate()
+
+        assert projection.shape[0] == experiment_config.num_years * MONTHS_PER_YEAR + 1
+        assert (projection["Buy"]["Rental Income (Pre-Tax)"] == 0).all()
+        assert (projection["Buy"]["Tax on Rental Income"] == 0).all()

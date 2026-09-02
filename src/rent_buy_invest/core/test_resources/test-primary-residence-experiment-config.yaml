@@ -1,0 +1,14 @@
+# Same as test-experiment-config.yaml, but the home is lived in rather than rented out.
+# Exercises the primary-residence path, which no other config in this repo covers.
+
+num_years: !!int 80
+
+market_config_path: !!str "rent_buy_invest/core/test_resources/test-market-config.yaml"
+
+rent_config_path: !!str "rent_buy_invest/core/test_resources/test-rent-config.yaml"
+
+buy_config_path: !!str "rent_buy_invest/core/test_resources/test-primary-residence-buy-config.yaml"
+
+personal_config_path: !!str "rent_buy_invest/core/test_resources/test-personal-config.yaml"
+
+start_date: !!timestamp "2025-01-01"

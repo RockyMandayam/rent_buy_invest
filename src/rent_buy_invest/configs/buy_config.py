@@ -642,7 +642,9 @@ class BuyConfig(Config):
         if self.rental_income_config:
             return self.rental_income_config.get_monthly_rental_incomes(num_months)
         else:
-            return [0 for _ in range(num_months)]
+            # a home you live in earns no rent; length must match every other
+            # monthly projection, which covers month 0 through num_months inclusive
+            return [0 for _ in range(num_months + 1)]
 
     def get_deductible_selling_costs(self, sale_price: float) -> float:
         return (
