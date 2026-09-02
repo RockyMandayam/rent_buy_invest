@@ -52,7 +52,7 @@ class Calculator:
         )
         home_monthly_costs_related_to_inflation = (
             self.buy_config.get_inflation_related_monthly_costs(
-                self.rent_config.annual_rent_inflation_rate, num_months
+                self.market_config.annual_inflation_rate, num_months
             )
         )
         home_monthly_rental_incomes = self.buy_config.get_monthly_rental_incomes(

@@ -6,6 +6,7 @@
 
 - **`market_rate_of_return`** *(number, required)*: ANNUAL rate of return in the market, as a fraction.
 - **`tax_brackets_inflation`** *(number, required)*: Rate at which the tax bracket limits inflate (by government policy).
+- **`annual_inflation_rate`** *(number, required)*: General ANNUAL rate of price inflation in the economy, as a fraction. Used to grow the home costs that track prices rather than home value: utilities, HOA fees, homeowners and flood insurance, and the home warranty. This is not the rate rents rise at, which is 'annual_rent_inflation_rate' in the rent config, and it is not the rate home values rise at, which is 'annual_assessed_value_inflation_rate' in the buy config.
 - **`tax_brackets`** *(object, required)*: Tax brackets.
   - **`ordinary_income_tax_brackets`** *(array, required)*: Ordinary income tax (also short term capital gains tax) brackets. List of tax brackets ordered from lowest bracket to highest bracket. Each bracket has a lower limit, upper limit, and marginal tax rate. The first bracket's lower limit is assumed to be 0, and every other bracket's lower limit is equal to its previous bracket's upper limit. The last bracket's upper limit must be infinity.
     - **Items** *(object)*

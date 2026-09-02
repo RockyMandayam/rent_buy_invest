@@ -15,6 +15,7 @@ class MarketConfig(Config):
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the market, as a decimal
         self.tax_brackets_inflation: Rate at which the tax bracket limits inflate (by government policy)
+        self.annual_inflation_rate: General ANNUAL rate of price inflation in the economy, as a fraction
         # TODO more tax stuff (e.g., standard exemption, net investment income tax, payroll tax, etc.)
         self.ordinary_income_tax_brackets: A TaxBrackets object representing ordinary income tax rates (which are also the tax rates used for short term capital gains and some other types of unearned income)
         self.long_term_capital_gains_tax_brackets: A TaxBrackets object representing long term capital gains tax rates
@@ -22,6 +23,7 @@ class MarketConfig(Config):
     """
 
     MAX_MARKET_RATE_OF_RETURN = 0.5
+    MAX_ANNUAL_INFLATION_RATE = 0.5
 
     @classmethod
     def schema_path(cls) -> str:
@@ -160,6 +162,7 @@ class MarketConfig(Config):
         self,
         market_rate_of_return: float,
         tax_brackets_inflation: float,
+        annual_inflation_rate: float,
         tax_brackets: dict[str, dict],
         validate_non_regressive_tax_brackets: bool = DEFAULT_VALIDATE_NON_REGRESSIVE_TAX_BRACKETS,
     ) -> None:
@@ -170,6 +173,7 @@ class MarketConfig(Config):
         """
         self.market_rate_of_return: float = market_rate_of_return
         self.tax_brackets_inflation: float = tax_brackets_inflation
+        self.annual_inflation_rate: float = annual_inflation_rate
         self.ordinary_income_tax_brackets: MarketConfig.TaxBrackets = (
             MarketConfig.TaxBrackets(
                 tax_brackets["ordinary_income_tax_brackets"],
@@ -199,6 +203,15 @@ class MarketConfig(Config):
         assert (
             self.tax_brackets_inflation >= 0
         ), "tax_brackets_inflation must be non-negative."
+        assert math.isfinite(
+            self.annual_inflation_rate
+        ), "annual_inflation_rate must not be NaN, infinity, or negative infinity"
+        assert (
+            self.annual_inflation_rate >= 0
+        ), "annual_inflation_rate must be non-negative."
+        assert (
+            self.annual_inflation_rate <= MarketConfig.MAX_ANNUAL_INFLATION_RATE
+        ), f"Please set 'annual_inflation_rate' to something reasonable (at most {MarketConfig.MAX_ANNUAL_INFLATION_RATE})"
         assert (
             self.market_rate_of_return <= MarketConfig.MAX_MARKET_RATE_OF_RETURN
         ), "Please set a reasonable market rate of return (at most 0.5)"
