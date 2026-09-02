@@ -184,7 +184,7 @@
       "type": "number"
     },
     "monthly_utilities": {
-      "description": "Monthly utilities for the first month.",
+      "description": "Monthly utilities for the first month. This is regardless of whether you have a renter or not; the utilities are assumed to be charged to the landlord first. The rental config section will let you make adjustments to make it so that the renter can pay some or all of the utilities.",
       "type": "number"
     },
     "annual_maintenance_cost_fraction": {
@@ -212,7 +212,7 @@
           "type": "number"
         },
         "monthly_rental_income": {
-          "description": "The estimated rental income IF you were to rent out the home as soon as you bought it, ignoring any rental_income_waiting_period_months. This is just to get a price point. This code will simulate the rent increases.",
+          "description": "The estimated rental income IF you were to rent out the home as soon as you bought it, ignoring any rental_income_waiting_period_months. This is just to get a price point. This code will simulate the rent increases. NOTE that this represents all rental income, including any utilities. If you want to model that the renter pays all the utilities, you can add the first month's utility payment to this field. If the home utility inflation rate and the rent inflation rate are not equal, then this will diverge. TODO: implement a more exact solution so renter can be modeled to pay all of utilities.",
           "type": "number"
         },
         "rental_income_annual_inflation_rate": {
@@ -222,6 +222,10 @@
         "occupancy_rate": {
           "description": "The estimated fraction of time you expect the home to be rented out. This is based on how long it takes to find a tenant and/or perhaps you have preferences for how often/when you want to rent out the home. And you may have down periods for maintenance, renovation, etc.",
           "type": "number"
+        },
+        "building_fraction_of_value": {
+          "description": "The share of the property's value that is the building rather than the land, as a fraction greater than 0 and at most 1. Only the building can be depreciated; land never can, so this is what splits the cost basis into a depreciable part and a non-depreciable part. Get it from your county property tax assessment, which breaks assessed value into land and improvements: divide the improvement value by the total. It is a single estimate held fixed for the entire time you own the property. It lives here because it is only meaningful for a home that is rented out; a primary residence is not depreciated at all.",
+          "type": "number"
         }
       },
       "required": [
@@ -229,7 +233,8 @@
         "rental_income_waiting_period_months",
         "monthly_rental_income",
         "rental_income_annual_inflation_rate",
-        "occupancy_rate"
+        "occupancy_rate",
+        "building_fraction_of_value"
       ]
     }
   },

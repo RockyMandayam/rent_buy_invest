@@ -118,3 +118,5 @@ rental_income_config:
   rental_income_annual_inflation_rate: 0.02
 
   occupancy_rate: 0.6
+
+  building_fraction_of_value: !!float 0.4

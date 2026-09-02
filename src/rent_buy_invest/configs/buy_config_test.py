@@ -1,6 +1,5 @@
 from copy import deepcopy
 
-import jsonschema
 import pytest
 
 from rent_buy_invest.configs.buy_config import BuyConfig
@@ -78,6 +77,7 @@ class TestBuyConfig(TestConfig):
             ("rental_income_config", "monthly_rental_income"),
             ("rental_income_config", "rental_income_annual_inflation_rate"),
             ("rental_income_config", "occupancy_rate"),
+            ("rental_income_config", "building_fraction_of_value"),
         ]
         nullable_attributes = ("rental_income_config",)
         self._test_inputs_with_invalid_schema(
@@ -460,6 +460,16 @@ class TestBuyConfig(TestConfig):
             BuyConfig,
             config_kwargs,
             ["rental_income_config", "occupancy_rate"],
+            allow_greater_than_one=False,
+        )
+        # a fraction in (0, 1]: all of the value cannot be land, and the building
+        # cannot be worth more than the property it sits on
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["rental_income_config", "building_fraction_of_value"],
+            allow_negative=False,
+            allow_zero=False,
             allow_greater_than_one=False,
         )
 
