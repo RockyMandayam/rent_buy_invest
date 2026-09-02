@@ -184,6 +184,9 @@ class RentalProperty:
             num_months,
         )
 
+        self.monthly_loan_balance: list[
+            float
+        ] = self._amortization_schedule.starting_balances
         self.monthly_mortgage_interest: list[
             float
         ] = self._amortization_schedule.interest_payments

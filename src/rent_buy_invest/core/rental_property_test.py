@@ -394,3 +394,15 @@ def test_sale_after_the_loan_term_leaves_no_points_outstanding() -> None:
 
     result = rental_property.sale(700_000, term + 12)
     assert result.unamortized_discount_points == 0
+
+
+def test_loan_balance_starts_at_the_loan_and_falls_by_the_principal_paid() -> None:
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    rental_property = _rental_property()
+
+    assert rental_property.monthly_loan_balance[0] == buy_config.initial_loan_amount
+    for month in (0, 1, 100, NUM_MONTHS - 1):
+        assert rental_property.monthly_loan_balance[month + 1] == pytest.approx(
+            rental_property.monthly_loan_balance[month]
+            - rental_property.monthly_mortgage_principal[month]
+        )
