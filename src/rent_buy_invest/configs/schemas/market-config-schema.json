@@ -11,6 +11,10 @@
       "description": "Rate at which the tax bracket limits inflate (by government policy)",
       "type": "number"
     },
+    "annual_inflation_rate": {
+      "description": "General ANNUAL rate of price inflation in the economy, as a fraction. Used to grow the home costs that track prices rather than home value: utilities, HOA fees, homeowners and flood insurance, and the home warranty. This is not the rate rents rise at, which is 'annual_rent_inflation_rate' in the rent config, and it is not the rate home values rise at, which is 'annual_assessed_value_inflation_rate' in the buy config.",
+      "type": "number"
+    },
     "tax_brackets": {
       "description": "Tax brackets",
       "type": "object",
@@ -55,5 +59,5 @@
       "required": ["ordinary_income_tax_brackets", "long_term_capital_gains_tax_brackets"]
     }
   },
-  "required": ["market_rate_of_return", "tax_brackets_inflation", "tax_brackets"]
+  "required": ["market_rate_of_return", "tax_brackets_inflation", "annual_inflation_rate", "tax_brackets"]
 }

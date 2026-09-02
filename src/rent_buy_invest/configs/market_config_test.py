@@ -18,6 +18,7 @@ class TestMarketConfig(TestConfig):
         attributes = [
             "market_rate_of_return",
             "tax_brackets_inflation",
+            "annual_inflation_rate",
             "tax_brackets",
             ("tax_brackets", "ordinary_income_tax_brackets"),
             ("tax_brackets", "ordinary_income_tax_brackets", 0, "upper_limit"),
@@ -43,6 +44,13 @@ class TestMarketConfig(TestConfig):
             ["tax_brackets_inflation"],
             allow_negative=False,
             # TODO max value
+        )
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["annual_inflation_rate"],
+            allow_negative=False,
+            max_value=MarketConfig.MAX_ANNUAL_INFLATION_RATE,
         )
         for tax_type in (
             "ordinary_income_tax_brackets",

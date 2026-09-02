@@ -2,6 +2,10 @@ market_rate_of_return: !!float 0.07
 
 tax_brackets_inflation: !!float 0.02
 
+# mirrors this scenario's annual_rent_inflation_rate so results are unchanged;
+# set it to a real general-inflation figure when you next revisit this scenario
+annual_inflation_rate: !!float 0.07
+
 tax_brackets:
   ordinary_income_tax_brackets:
     -
