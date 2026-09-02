@@ -138,7 +138,7 @@ def test_cash_flow_subtracts_the_whole_mortgage_payment() -> None:
         )
 
 
-def test_taxable_income_subtracts_interest_and_depreciation_not_principal() -> None:
+def test_taxable_income_subtracts_interest_deprec_and_points_not_principal() -> None:
     rental_property = _rental_property()
 
     for month in (0, 1, 200, NUM_MONTHS):
@@ -147,11 +147,12 @@ def test_taxable_income_subtracts_interest_and_depreciation_not_principal() -> N
             - rental_property.monthly_operating_expenses[month]
             - rental_property.monthly_mortgage_interest[month]
             - rental_property.monthly_depreciation[month]
+            - rental_property.monthly_discount_points_deduction[month]
         )
 
 
 def test_taxable_income_is_below_cash_flow_while_depreciating() -> None:
-    """Depreciation costs no cash, and principal is not deductible.
+    """Depreciation and points cost no cash, and principal is not deductible.
 
     Their difference is why a rental can hand you money every month and still
     report a loss. This holds while the property is still being depreciated.
@@ -165,6 +166,7 @@ def test_taxable_income_is_below_cash_flow_while_depreciating() -> None:
         )
         assert difference == pytest.approx(
             rental_property.monthly_depreciation[month]
+            + rental_property.monthly_discount_points_deduction[month]
             - rental_property.monthly_mortgage_principal[month]
         )
 
@@ -315,7 +317,7 @@ def test_sale_cash_proceeds_ignore_the_gain_calculation() -> None:
 
 
 def test_sale_never_applies_the_primary_residence_exclusion() -> None:
-    """A property rented for its whole life never qualifies for section 121."""
+    """The tax-free gain on a home you lived in never applies to a rental."""
     rental_property = _rental_property()
     # priced so the gain clearly exceeds the 250k a single filer could exclude
     # on a home they had lived in
@@ -329,3 +331,66 @@ def test_sale_never_applies_the_primary_residence_exclusion() -> None:
     assert (
         result.depreciation_recapture_gain + result.long_term_capital_gain
     ) == pytest.approx(result.total_gain)
+
+
+def test_discount_points_reduce_taxable_income_but_not_cash() -> None:
+    """The cash left at closing; only the deduction is spread over the term."""
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    rental_property = _rental_property()
+
+    fee = (
+        buy_config.mortgage_discount_points_fee_fraction
+        * buy_config.initial_loan_amount
+    )
+    expected_monthly = round(fee / buy_config.mortgage_term_months, 2)
+    assert rental_property.monthly_discount_points_deduction[0] == expected_monthly
+
+    # the same month with the points deduction removed would show identical cash
+    # flow, so nothing here touched the bank account
+    assert rental_property.monthly_pretax_cash_flow[0] == pytest.approx(
+        rental_property.monthly_rental_income[0]
+        - rental_property.monthly_operating_expenses[0]
+        - rental_property.monthly_mortgage_payment[0]
+    )
+
+
+def test_discount_points_stop_deducting_when_the_loan_term_ends() -> None:
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    term = buy_config.mortgage_term_months
+    rental_property = _rental_property(num_months=term + 12)
+
+    assert rental_property.monthly_discount_points_deduction[term - 1] > 0
+    assert rental_property.monthly_discount_points_deduction[term] == 0
+
+
+def test_sale_reports_the_points_not_yet_deducted() -> None:
+    """Selling ends the loan early, so the rest of the points come due at once."""
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    rental_property = _rental_property()
+    month = 120
+
+    result = rental_property.sale(700_000, month)
+    fee = (
+        buy_config.mortgage_discount_points_fee_fraction
+        * buy_config.initial_loan_amount
+    )
+    deducted_so_far = sum(
+        rental_property.monthly_discount_points_deduction[: month + 1]
+    )
+
+    assert result.unamortized_discount_points > 0
+    # every dollar paid is either already deducted or deductible now
+    assert deducted_so_far + result.unamortized_discount_points == pytest.approx(fee)
+    # it is an ordinary deduction, so it is kept out of the gain entirely
+    assert result.total_gain == pytest.approx(
+        result.amount_realized - result.adjusted_basis
+    )
+
+
+def test_sale_after_the_loan_term_leaves_no_points_outstanding() -> None:
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    term = buy_config.mortgage_term_months
+    rental_property = _rental_property(num_months=term + 12)
+
+    result = rental_property.sale(700_000, term + 12)
+    assert result.unamortized_discount_points == 0
