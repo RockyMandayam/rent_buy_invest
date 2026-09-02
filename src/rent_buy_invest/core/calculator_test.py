@@ -70,7 +70,7 @@ class TestCalculator:
             mortgage_insurance = row["Buy"]["Mortgage Insurance"]
             if (
                 loan_amount
-                <= PMI_LTV_THRESHOLD * EXPERIMENT_CONFIG.buy_config.sale_price
+                <= PMI_LTV_THRESHOLD * EXPERIMENT_CONFIG.buy_config.purchase_price
             ):
                 assert mortgage_insurance == 0
             else:

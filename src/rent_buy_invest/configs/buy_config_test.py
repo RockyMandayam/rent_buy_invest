@@ -25,7 +25,7 @@ class TestBuyConfig(TestConfig):
     def test_inputs_with_invalid_schema(self) -> None:
         # check missing and null fields
         attributes = [
-            "sale_price",
+            "purchase_price",
             "annual_assessed_value_inflation_rate",
             "down_payment_fraction",
             "mortgage_annual_interest_rate",
@@ -94,7 +94,7 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["sale_price"],
+            ["purchase_price"],
             allow_negative=False,
             allow_zero=False,
         )
@@ -591,7 +591,7 @@ class TestBuyConfig(TestConfig):
         num_months = 100  # arbitrary number
         actual = TestBuyConfig.BUY_CONFIG.get_monthly_home_values(num_months)
         expected = project_growth(
-            principal=TestBuyConfig.BUY_CONFIG.sale_price,
+            principal=TestBuyConfig.BUY_CONFIG.purchase_price,
             annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
             compound_monthly=True,
             num_months=num_months,
@@ -607,7 +607,7 @@ class TestBuyConfig(TestConfig):
             num_months
         )
         first_home_value_related_monthly_costs = (
-            TestBuyConfig.BUY_CONFIG.sale_price
+            TestBuyConfig.BUY_CONFIG.purchase_price
             * (
                 TestBuyConfig.BUY_CONFIG.annual_property_tax_rate
                 + TestBuyConfig.BUY_CONFIG.annual_maintenance_cost_fraction
@@ -628,7 +628,7 @@ class TestBuyConfig(TestConfig):
         actual = buy_config_copy.get_home_value_related_monthly_costs(num_months)
         first_home_value_related_monthly_costs = (
             # no rental cost this time
-            buy_config_copy.sale_price
+            buy_config_copy.purchase_price
             * (
                 buy_config_copy.annual_property_tax_rate
                 + buy_config_copy.annual_maintenance_cost_fraction
@@ -713,13 +713,15 @@ class TestBuyConfig(TestConfig):
             assert all(income == 0 for income in actual)
 
     def test_get_deductible_selling_costs(self) -> None:
-        sale_price = 600000  # arbitrary
-        actual = TestBuyConfig.BUY_CONFIG.get_deductible_selling_costs(sale_price)
-        expected = 0.025 * sale_price + 0 * 500 + 1 * 100 + 0 * 300 + 800 + 50
+        final_sale_price = 600000  # arbitrary
+        actual = TestBuyConfig.BUY_CONFIG.get_deductible_selling_costs(final_sale_price)
+        expected = 0.025 * final_sale_price + 0 * 500 + 1 * 100 + 0 * 300 + 800 + 50
         assert actual == pytest.approx(expected)
 
     def test_get_nondeductible_selling_costs(self) -> None:
-        sale_price = 800000  # arbitrary
-        actual = TestBuyConfig.BUY_CONFIG.get_nondeductible_selling_costs(sale_price)
-        expected = 0.9 * 0.0011 * sale_price + 1 * 300 + 600 + 100
+        final_sale_price = 800000  # arbitrary
+        actual = TestBuyConfig.BUY_CONFIG.get_nondeductible_selling_costs(
+            final_sale_price
+        )
+        expected = 0.9 * 0.0011 * final_sale_price + 1 * 300 + 600 + 100
         assert actual == pytest.approx(expected)

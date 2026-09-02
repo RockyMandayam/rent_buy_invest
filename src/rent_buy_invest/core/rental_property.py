@@ -141,7 +141,7 @@ class RentalProperty:
             buy_config.is_fha_loan,
             buy_config.initial_loan_amount,
             buy_config.initial_loan_fraction,
-            buy_config.sale_price,
+            buy_config.purchase_price,
             buy_config.annual_mortgage_insurance_fraction,
             buy_config.home_appraisal_cost,
         )
@@ -152,7 +152,7 @@ class RentalProperty:
         self.depreciable_basis: float = (
             buy_config.rental_income_config.building_fraction_of_value
             * (
-                buy_config.sale_price
+                buy_config.purchase_price
                 + buy_config.get_part_of_basis_upfront_one_time_cost()
             )
         )
@@ -257,11 +257,6 @@ class RentalProperty:
     def sale(self, final_sale_price: float, month: int) -> RentalSaleResult:
         """Sell the property in ``month`` for ``final_sale_price``.
 
-        ``final_sale_price`` is what you sell for, which is not the ``sale_price``
-        on ``BuyConfig`` -- that field holds what you originally *paid*, despite its
-        name. The two appear in the same arithmetic here, so they are kept under
-        distinct local names.
-
         ``month`` is a point in the projection, and the state read from it is
         start-of-month, matching how the rest of the tool reports a month: the loan
         payoff is the balance owed entering that month.
@@ -272,9 +267,9 @@ class RentalProperty:
         assert final_sale_price >= 0
         assert 0 <= month <= self.num_months
 
-        purchase_price = self.buy_config.sale_price
         original_basis = round(
-            purchase_price + self.buy_config.get_part_of_basis_upfront_one_time_cost(),
+            self.buy_config.purchase_price
+            + self.buy_config.get_part_of_basis_upfront_one_time_cost(),
             2,
         )
         accumulated_depreciation = self.accumulated_depreciation(month)

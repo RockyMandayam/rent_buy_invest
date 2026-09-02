@@ -1,6 +1,6 @@
 ##### BASICS AND GENERAL CONFIGS
 
-sale_price: !!float 500000.
+purchase_price: !!float 500000.
 
 annual_assessed_value_inflation_rate: !!float 0.07
 
