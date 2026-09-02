@@ -61,6 +61,7 @@ class BuyConfig(Config):
             monthly_rental_income: float,
             rental_income_annual_inflation_rate: float,
             occupancy_rate: float,
+            building_fraction_of_value: float,
         ) -> None:
             self.annual_management_cost_fraction = annual_management_cost_fraction
             self.rental_income_waiting_period_months = (
@@ -71,6 +72,7 @@ class BuyConfig(Config):
                 rental_income_annual_inflation_rate
             )
             self.occupancy_rate = occupancy_rate
+            self.building_fraction_of_value = building_fraction_of_value
             self._validate()
 
         def _validate(self) -> None:
@@ -91,6 +93,11 @@ class BuyConfig(Config):
             assert (
                 self.occupancy_rate >= 0 and self.occupancy_rate <= 1
             ), "occupancy_rate must be between 0 and 1 inclusive."
+            # all of the value cannot be land, and the building cannot be worth
+            # more than the property it sits on
+            assert (
+                0 < self.building_fraction_of_value <= 1
+            ), "building_fraction_of_value must be greater than 0 and at most 1."
             # TODO can't access _validate_max_value since that is in Config class and RentalIncomeConfig
             # doesn't inherit from Config. RentalIncomeConfig could inherit from Config, but then specifying
             # the schema is tricky. For now, I'm just "ad hoc" checking these fields instead of calling
@@ -248,6 +255,7 @@ class BuyConfig(Config):
                 rental_income_config_kwargs["monthly_rental_income"],
                 rental_income_config_kwargs["rental_income_annual_inflation_rate"],
                 rental_income_config_kwargs["occupancy_rate"],
+                rental_income_config_kwargs["building_fraction_of_value"],
             )
         else:
             self.rental_income_config = None
