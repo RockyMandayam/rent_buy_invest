@@ -166,6 +166,9 @@ class Calculator:
             # investment_values_if_renting and investment_values_if_buying have their
             # start-of-the-month value already filled in, so this calculates the value
             # at the end of the month.
+            # The deduction saving is money the buyer does not send the IRS, so it
+            # lands here as a negative cost, in the same year-boundary month the
+            # rental income tax beside it lands in. It is zero in every other month.
             housing_monthly_cost = (
                 home_monthly_costs_related_to_home_value[month]
                 + home_monthly_costs_related_to_inflation[month]
@@ -174,6 +177,7 @@ class Calculator:
                 + mortgage_insurance_schedule.premiums[month]
                 + mortgage_insurance_schedule.appraisal_costs[month]
                 + rental_income_taxes[month]
+                - mortgage_interest_deduction_savings[month]
             )
             housing_monthly_income = home_monthly_rental_incomes[month]
             housing_net_monthly_cost = housing_monthly_cost - housing_monthly_income
