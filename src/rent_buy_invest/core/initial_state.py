@@ -66,3 +66,35 @@ class InitialState:
             "Buy": [self.buy_upfront_one_time_cost, self.home_equity_if_buying, 0],
         }
         return to_df(cols, rows)
+
+
+@dataclass(frozen=True)
+class RentalVsInvestInitialState:
+    """What each world holds on day one, before any month is projected.
+
+    The same money spent two ways. Buying it puts ``property_equity_if_buying``
+    into a property as a down payment and burns
+    ``upfront_one_time_cost_if_buying`` on closing costs, which buy nothing you
+    can sell. Investing it puts the whole amount -- down payment and closing
+    costs alike -- into the market instead, which is why
+    ``market_balance_if_investing`` is larger than the equity opposite it.
+
+    That gap is the head start the investing world begins with, and the rest of
+    the projection is about whether the property earns it back.
+    """
+
+    upfront_one_time_cost_if_buying: float
+    property_equity_if_buying: float
+    market_balance_if_investing: float
+
+    def get_df(self) -> list[list[Any | None]]:
+        rows = ["Upfront one-time costs", "Property equity", "Invested (Pre-Tax)"]
+        cols = {
+            "Buy Rental": [
+                self.upfront_one_time_cost_if_buying,
+                self.property_equity_if_buying,
+                0,
+            ],
+            "Invest": [0, 0, self.market_balance_if_investing],
+        }
+        return to_df(cols, rows)

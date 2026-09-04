@@ -6,6 +6,7 @@ from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.core.final_state import RentalVsInvestFinalState
+from rent_buy_invest.core.initial_state import RentalVsInvestInitialState
 from rent_buy_invest.core.rental_property import RentalProperty
 from rent_buy_invest.core.tax import TaxModule
 from rent_buy_invest.utils.data_utils import to_df
@@ -86,6 +87,14 @@ class RentalVsInvestExperiment:
         )
 
         # NOTE _project adds a bunch of instance attributes
+        self.initial_state: RentalVsInvestInitialState = RentalVsInvestInitialState(
+            upfront_one_time_cost_if_buying=round(
+                buy_config.get_upfront_one_time_cost(), 2
+            ),
+            property_equity_if_buying=round(buy_config.down_payment, 2),
+            market_balance_if_investing=self.upfront_cost_of_buying,
+        )
+
         self._project()
         self.final_state: RentalVsInvestFinalState = self._liquidate()
 

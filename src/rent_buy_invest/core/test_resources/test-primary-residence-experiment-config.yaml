@@ -1,3 +1,5 @@
+mode: !!str "rent_vs_buy"
+
 # Same as test-experiment-config.yaml, but the home is lived in rather than rented out.
 # Exercises the primary-residence path, which no other config in this repo covers.
 
