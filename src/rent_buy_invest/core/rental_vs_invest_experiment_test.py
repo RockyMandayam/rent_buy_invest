@@ -17,13 +17,15 @@ BUY_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-buy-config.yaml"
 NUM_YEARS = 30
 
 
-def _experiment(buy_config: BuyConfig = None) -> RentalVsInvestExperiment:
+def _experiment(
+    buy_config: BuyConfig = None, num_years: int = NUM_YEARS
+) -> RentalVsInvestExperiment:
     experiment_config = ExperimentConfig.parse(EXPERIMENT_CONFIG_PATH)
     return RentalVsInvestExperiment(
         buy_config if buy_config is not None else experiment_config.buy_config,
         experiment_config.market_config,
         experiment_config.personal_config,
-        NUM_YEARS,
+        num_years,
         experiment_config.start_date,
     )
 
@@ -166,3 +168,232 @@ def test_nothing_is_sold_before_the_horizon() -> None:
 
     assert projection[("Buy Rental", "Loan Amount")].iloc[-1] >= 0
     assert projection[("Buy Rental", "Equity")].iloc[-1] > 0
+
+
+def _underwater_buy_config() -> BuyConfig:
+    """Borrow almost everything, and let the property not appreciate.
+
+    Selling then costs more than it brings in, which is the only way to reach a
+    negative sale proceeds figure.
+    """
+    kwargs = deepcopy(io_utils.read_yaml(BUY_CONFIG_PATH))
+    kwargs["down_payment_fraction"] = 0.01
+    kwargs["annual_assessed_value_inflation_rate"] = 0.0
+    return BuyConfig(**kwargs)
+
+
+def test_wealth_is_what_each_world_is_left_holding() -> None:
+    final_state = _experiment().final_state
+
+    assert final_state.wealth_if_buying == pytest.approx(
+        final_state.market_balance_if_buying
+        + final_state.sale_proceeds
+        - final_state.tax_if_buying
+    )
+    # the investing world owns no property, so it has only its account
+    assert final_state.wealth_if_investing == pytest.approx(
+        final_state.market_balance_if_investing - final_state.tax_if_investing
+    )
+
+
+def test_the_buying_worlds_gains_are_taxed_together_not_separately() -> None:
+    """Brackets are progressive, so splitting them would understate the tax."""
+    experiment = _experiment()
+    sale = experiment.rental_property.sale(
+        experiment.property_values[-1], experiment.num_months
+    )
+    month = experiment.num_months + 1
+    income = sum(
+        experiment.ordinary_incomes[
+            experiment.num_months - MONTHS_PER_YEAR : experiment.num_months
+        ]
+    )
+    investment_gain = (
+        experiment.final_state.market_balance_if_buying - experiment.basis_if_buying[-1]
+    )
+
+    together = experiment.tax_module.tax_on_realized_gains(
+        month,
+        income,
+        sale.depreciation_recapture_gain,
+        sale.long_term_capital_gain + investment_gain,
+    ).total
+    apart = (
+        experiment.tax_module.tax_on_realized_gains(
+            month,
+            income,
+            sale.depreciation_recapture_gain,
+            sale.long_term_capital_gain,
+        ).total
+        + experiment.tax_module.tax_on_realized_gains(
+            month, income, 0, investment_gain
+        ).total
+    )
+
+    assert together > apart
+    # the experiment used the combined figure, not the split one. At this horizon
+    # the points have fully amortized, so no deduction offsets it -- the 10-year
+    # case below covers that.
+    assert experiment.final_state.tax_if_buying == pytest.approx(together)
+
+
+def test_the_unamortized_points_reduce_the_sale_year_tax() -> None:
+    experiment = _experiment(num_years=10)
+    sale = experiment.rental_property.sale(
+        experiment.property_values[-1], experiment.num_months
+    )
+
+    # a 30-year loan sold after 10 years still has most of its points undeducted
+    assert sale.unamortized_discount_points > 0
+    gains_tax = experiment.tax_module.tax_on_realized_gains(
+        experiment.num_months + 1,
+        sum(
+            experiment.ordinary_incomes[
+                experiment.num_months - MONTHS_PER_YEAR : experiment.num_months
+            ]
+        ),
+        sale.depreciation_recapture_gain,
+        sale.long_term_capital_gain
+        + (
+            experiment.final_state.market_balance_if_buying
+            - experiment.basis_if_buying[-1]
+        ),
+    ).total
+    assert experiment.final_state.tax_if_buying < gains_tax
+
+
+def test_selling_underwater_reduces_wealth_rather_than_being_ignored() -> None:
+    """Owing more than the sale brings in is money you bring to closing."""
+    experiment = _experiment(_underwater_buy_config(), num_years=1)
+    final_state = experiment.final_state
+
+    assert final_state.sale_proceeds < 0
+    assert final_state.wealth_if_buying == pytest.approx(
+        final_state.market_balance_if_buying
+        + final_state.sale_proceeds
+        - final_state.tax_if_buying
+    )
+    assert final_state.wealth_if_buying < final_state.market_balance_if_buying
+
+
+def test_a_sale_at_a_loss_owes_no_tax_on_the_property() -> None:
+    experiment = _experiment(_underwater_buy_config(), num_years=1)
+    sale = experiment.rental_property.sale(
+        experiment.property_values[-1], experiment.num_months
+    )
+
+    assert sale.total_gain < 0
+    assert sale.depreciation_recapture_gain == 0
+    assert sale.long_term_capital_gain == 0
+
+
+def test_market_gains_exclude_the_money_that_was_paid_in() -> None:
+    """Basis is every deposit, not just the opening balance.
+
+    A world that pays into the market monthly for thirty years is not taxed on the
+    money it paid in -- only on what that money earned.
+    """
+    experiment = _experiment()
+
+    deposits_if_buying = sum(s for s in experiment.buy_surpluses[:-1] if s > 0)
+    deposits_if_investing = sum(-s for s in experiment.buy_surpluses[:-1] if s < 0)
+
+    assert experiment.basis_if_buying[-1] == pytest.approx(deposits_if_buying)
+    assert experiment.basis_if_investing[-1] == pytest.approx(
+        experiment.upfront_cost_of_buying + deposits_if_investing
+    )
+    # both worlds paid in a lot, so ignoring it would overstate the gain badly
+    assert deposits_if_investing > experiment.upfront_cost_of_buying
+
+
+def test_market_basis_tracks_the_balance_month_by_month() -> None:
+    """Basis only rises on a deposit; the balance also rises with the market."""
+    experiment = _experiment()
+
+    for lst in (experiment.basis_if_buying, experiment.basis_if_investing):
+        assert len(lst) == experiment.num_months + 1
+        # a cost basis never falls
+        assert all(b >= a for a, b in zip(lst, lst[1:]))
+
+    # and the balance outgrows it, because the market grew the deposits
+    assert experiment.invested_if_investing[-1] > experiment.basis_if_investing[-1]
+
+
+def test_a_world_taxed_on_its_deposits_would_owe_far_more() -> None:
+    """Pins the size of the bug this guards against."""
+    experiment = _experiment()
+    final_state = experiment.final_state
+    month = experiment.num_months + 1
+    income = sum(
+        experiment.ordinary_incomes[
+            experiment.num_months - MONTHS_PER_YEAR : experiment.num_months
+        ]
+    )
+
+    correct = final_state.tax_if_investing
+    if_basis_ignored = experiment.tax_module.tax_on_realized_gains(
+        month, income, 0, final_state.market_balance_if_investing
+    ).total
+
+    assert if_basis_ignored > correct
+    assert if_basis_ignored - correct > 100_000
+
+
+def test_the_points_deduction_comes_off_before_the_gains_stack() -> None:
+    """A deduction lowers the income the gains stack on, not just the tax on it.
+
+    Computing the two in parallel would put the gains too high in the brackets.
+    Needs a purpose-built config: with the shared fixture the deduction never
+    crosses a bracket edge, so the two orderings agree and nothing is proved.
+    """
+    buy_kwargs = deepcopy(io_utils.read_yaml(BUY_CONFIG_PATH))
+    buy_kwargs["mortgage_discount_points_fee_fraction"] = 0.05  # the maximum allowed
+    personal_kwargs = deepcopy(
+        io_utils.read_yaml(
+            "rent_buy_invest/core/test_resources/test-personal-config.yaml"
+        )
+    )
+    # sits just above the top of the 0% capital gains band, so the deduction
+    # pushes the gains down into it
+    personal_kwargs["ordinary_income"] = 56_000.0
+    personal_kwargs["ordinary_income_growth_rate"] = 0.0
+
+    experiment_config = ExperimentConfig.parse(EXPERIMENT_CONFIG_PATH)
+    experiment = RentalVsInvestExperiment(
+        BuyConfig(**buy_kwargs),
+        experiment_config.market_config,
+        PersonalConfig(**personal_kwargs),
+        10,
+        experiment_config.start_date,
+    )
+
+    month = experiment.num_months
+    tax_month = month + 1
+    income = sum(experiment.ordinary_incomes[month - MONTHS_PER_YEAR : month])
+    sale = experiment.rental_property.sale(experiment.property_values[-1], month)
+    gain = max(experiment.invested_if_buying[-1] - experiment.basis_if_buying[-1], 0)
+    assert sale.unamortized_discount_points > 0
+
+    # what the gains would cost with the deduction ignored entirely
+    stacked_on_full_income = experiment.tax_module.tax_on_realized_gains(
+        tax_month,
+        income,
+        sale.depreciation_recapture_gain,
+        sale.long_term_capital_gain + gain,
+    ).total
+    # and with it applied, which is what the experiment asks for
+    sequenced = experiment.tax_module.tax_on_realized_gains(
+        tax_month,
+        income,
+        sale.depreciation_recapture_gain,
+        sale.long_term_capital_gain + gain,
+        ordinary_income_deduction=sale.unamortized_discount_points,
+    )
+
+    # the deduction is worth more than its own tax saving, because it also drops
+    # the gains into a lower band
+    assert sequenced.tax_saved_by_deduction > 0
+    assert (
+        stacked_on_full_income - sequenced.total
+    ) > sequenced.tax_saved_by_deduction + 1_000
+    assert experiment.final_state.tax_if_buying == pytest.approx(sequenced.total)
