@@ -6,7 +6,14 @@ NOTE: THIS IS NOT FINANCIAL ADVICE
 
 Calculates the long-term financial pros and cons of decisions related to renting a home, buying a home, and investing in the stock market.
 
-This is a tool for helping determine whether to rent vs buy a home. The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `rent_buy_invest/src/rent_buy_invest/configs/schemas/`.
+It answers one of two questions, chosen by the `mode` field in the experiment config:
+
+- **`rent_vs_buy`**: rent a home to live in, or buy one to live in? Needs a rent config alongside the buy config.
+- **`rental_vs_invest`**: buy a property to rent out, or put the same money in the market instead? Where you live does not appear in this comparison at all, because it is the same either way and cancels out. This mode takes no rent config, and its buy config must have a `rental_income_config`.
+
+Both questions are described by the same set of config files, which is why `mode` states which one you are asking rather than being inferred from the data. Either way the tool projects two worlds forward month by month, invests whatever one costs less than the other, and compares net worth at the horizon.
+
+The main financial parameters of the scenario must be specified in config files. The documentation on these config files are present in .md files in `src/rent_buy_invest/configs/schemas/`.
 
 Some additional notes about the configs:
 - For simplicity, we assume you have a primary (personal use) home or a home to rent out - no second, third, etc. (personal use) home.
@@ -14,14 +21,16 @@ Some additional notes about the configs:
     - This calculator is not meant to indicate that the results here would match what happened historically. This calculator is just a limited approximator using the customs/laws as of around 2024/2025.
     - For ease of calculation, the start date will be taken to be the start of the tax year, and any other fiscal years (for loans, etc.)
 - This calculator assumes there is no prepayment penalty on the mortgage (which is relevant for when you sell the home before the mortgage is paid off).
-- There is a mortgage interest tax deduction. To get this deduction, you need to itemize your deductions instead of taking the standard deduction. This script assumes you will itemize your deductions. Although deductions are calculated annually, for convenience sake, it's done monthly in these calculations.
+- There is a mortgage interest tax deduction. To get this deduction, you need to itemize your deductions instead of taking the standard deduction. This script assumes you will itemize your deductions. Deductions are calculated annually, at the year boundary, so the saving lands in the twelfth month of each year.
     - See IRS 2024 Publication 936 for details
 - Typically, discount points which are paid upfront to reduce the interest rate on the mortgage can also be deducted from taxes if it is a primary home and not a commercial development. There are some finer details, but by and large, you can deduct discount points from your taxes if they are for a mortgage on a primary home, they are computed as a fraction of the principal balance, and they appear clearly as points on your settlement. Discount point payments are often thought of as some kind of prepaid interest.
     - I think it can also be a secondary home, and there are finer details, but those are ignored in this calculator
     - Also, there are restrictions as to whether points must be deducted ratably vs all at once. This calculator assumes you can deduct it all at once. In this calculator, any deduction savings are accounted for in the initial state.
 - Mortgage insurance used to be tax deductible, but it seems it no longer is.
-- Property tax: Property taxes are billed annually based on the assessed value of the home. For convenience / to make the math easy, `rent_buy_invest` assumes this annual billing cycle start coincides with the start of the mortgage term.
+- Property tax: Property taxes are billed annually based on the assessed value of the home. For convenience / to make the math easy, `rent_buy_invest` assumes this annual billing cycle start coincides with the start of the mortgage term. The assessed value starts at the purchase price. In a state that caps how fast it may grow (California's Proposition 13, Florida's Save Our Homes), set `annual_assessed_value_growth_cap` in the buy config; the assessed value then grows each year by the lesser of general inflation and that cap, instead of tracking what the home is actually worth. Leave it null where there is no such cap, and the two are treated as the same number.
 - Homeowners insurance: Homeowners insurance pricing is based on the replacement cost of the home (the cost of rebuilding the home if it gets destroyed), plus the regular supply+demand of the market. Since replacement cost has to do with constructing the home and not the market value, it is put under the inflation-related home ownership costs, not the home value related home ownership costs.
+    - This is why `annual_homeowners_insurance_fraction` looks like a contradiction: it is a fraction of the purchase price, yet the cost it produces then grows with `annual_inflation_rate` rather than with the home's value. The fraction only SIZES the premium at the start - a $1M home costs more to insure than a $300k one, and a fraction of the purchase price is a convenient way to say so in month 0. From there the premium follows rebuilding costs, which inflate. So the fraction sets the starting level, and inflation sets the growth; the home's own appreciation never enters.
+    - It is the only cost in the inflation-related group that is sized from the home's value at all. Utilities, HOA fees, flood insurance, and the home warranty are entered as dollar amounts directly.
 - Depending on your situation, you may be required (by the lender, as a condition to getting a loan).
     - There are a few ways to pay mortgage insurance.
         - Monthly premium: You pay every month.
@@ -38,8 +47,8 @@ Some additional notes about the configs:
 - The seller of a home will pay some prorated property tax. This is to ensure that the seller and buyer are only paying property taxes for the portion of the year that each owned the home respectively. Note that the seller's property tax rate and the buyer's property tax rate can be different. These details are ignored in this document, since it all either "washes out" or is not significant long-term.
 - Rental cost inflation: Currently, the `annual_rent_inflation_rate` is applied to all rental expenses, not just rent (e.g., rent, utilities, renter's insruance, etc.). Ideally `rent_buy_invest` would have separate inflation rates for different categories.
 - Home cost inflation: There are a few different categories of costs associated with buying a home:
-    - Home value related costs: property tax, homeowners insurance, maintenance, and management. These change according to `annual_assessed_value_inflation_rate`
-    - Inflation related costs: utilities and HOA fees. These increase change according to `annual_inflation_rate`
+    - Home value related costs: property tax, maintenance, and management. Maintenance and management change according to `annual_home_appreciation_rate`, and so does property tax unless `annual_assessed_value_growth_cap` is set, in which case property tax follows the capped assessed value instead. Homeowners insurance is deliberately NOT in this group - see the note above on why it is inflation related.
+    - Inflation related costs: utilities, HOA fees, homeowners insurance, flood insurance, and the home warranty. These change according to `annual_inflation_rate`
     - Mortgage insurance: Mortgage insurance is calculated based on the initial loan amount
     - Mortgage interest: The interest portion of the mortgage payment. Since the mortgage payment is a constant value, and since the loan amount decreases over time, there is some math you can work out to show that the interest portion of the mortgage payment decreases over time according to some fixed schedule.
 - Here is some info about typical home buying/selling costs, based on some quick online searching (all of these change depending on the specific buyer/seller, and when the market favors the buyer more, the seller is more likely to pay for some of the buyer's costs, and when the market favors the seller more, the buyer is more likely to pay for some of the seller's costs):
@@ -59,29 +68,39 @@ Some additional notes about the configs:
 - NOTE: You can (and probably should) do all of the following in a python virtual environment, e.g., using `venv`, but the instructions for doing so are not listed here (for now)
 - Clone this repo
 - Make sure you have python 3.11.4 (anything 3.8+ should probably work) and pip3 installed
-- Navigate to the 'rent_buy_invest' directory and run `pip3 install -r requirements.txt`
-- Run `python3 -m pip install -e .` to install `rent_buy_invest` as a python package
-- Now from anywhere you can run `python3 -m rent_buy_invest
-- To your `PYTHONPATH` environment variable, add the path to this repo
+- Navigate to the repo root. Note that two directories are named `rent_buy_invest`: the repo root (the one holding `requirements.txt` and `pyproject.toml`) and the package inside it at `src/rent_buy_invest`. Both of the commands below are run from the repo root.
+- Run `pip3 install -r requirements.txt`
+- Run `python3 -m pip install -e .` to install `rent_buy_invest` as a python package. This is what puts the package on the import path, so you do not need to set `PYTHONPATH`.
+- Now, from anywhere, you can run `python3 -m rent_buy_invest`
 
 ### Run the Code
-Run: `python3 rent_buy_invest/main.py <experiment-config-file>`. You can try `rent_buy_invest/configs/examples/experiment-config-example-1.yaml` as the experiment config file. This python project should be able to be run from any directory.
+Run: `python3 -m rent_buy_invest <experiment-config-file>`, optionally with `--experiment-name <name>` (it defaults to `unnamed_experiment`).
+
+The experiment config path is written starting from the inner `rent_buy_invest` package directory, and is resolved against wherever the package is installed rather than against your shell's working directory, so this works from anywhere. For example:
+
+```
+python3 -m rent_buy_invest rent_buy_invest/configs/examples/example-1/experiment-config.yaml
+```
+
+`configs/examples/` holds a directory per scenario, each with its own experiment config plus the market, rent, buy, and personal configs it points at. `rental_vs_invest/` is the one to copy for the rental question; the others are `rent_vs_buy`.
+
+Output is written to `src/rent_buy_invest/out/<experiment-name>/<timestamp>/`: the configs the run used, the initial state, the month-by-month projection, and the final comparison.
 
 ## For Developers
 
 ### Making a PR
 Steps:
-- Before finalizing the PR, and ideally before every commit, from the `rent_buy_invest` folder, run `black .`, `isort .`, and for each of the four config files run `jsonschema2md path/to/<config_file>.json path/to/<config_file>.md`. Also make sure tests pass by running `pytest .`
+- Before finalizing the PR, and ideally before every commit, from the repo root, run `black .`, `isort .`, and for each of the five config schemas (experiment, market, rent, buy, personal) run `jsonschema2md path/to/<config_file>.json path/to/<config_file>.md`. Also make sure tests pass by running `pytest .`
 - You can set at least some of this stuff up in a pre-commit hook, but I haven't done that yet.
 
 ### Updating the config schema
 Steps:
-- Update json schema (add/remove/modify the field in the appropriate .json file in `rent_buy_invest/configs/schemas/`). Remove to update the list of `required` fields appropriately.
+- Update json schema (add/remove/modify the field in the appropriate .json file in `src/rent_buy_invest/configs/schemas/`). Remove to update the list of `required` fields appropriately.
 - Update the config schema documentation: `jsonschema2md path/to/<config_file>.json path/to/<config_file>.md`
 - Update the yaml config files, both examples and tests
-    - examples are in `rent_buy_invest/configs/examples`
-    - tests are in `rent_buy_invest/core/test_resources`
-- Update appropriate config classes (the following classes in `rent_buy_invest/core/`: `experiment_config.py`, `rent_config.py`, `market_config.py`, `buy_config.py`)
+    - examples are in `src/rent_buy_invest/configs/examples` (every scenario directory needs the new field)
+    - tests are in `src/rent_buy_invest/core/test_resources`
+- Update appropriate config classes (in `src/rent_buy_invest/configs/`: `experiment_config.py`, `rent_config.py`, `market_config.py`, `buy_config.py`, `personal_config.py`)
 - Update tests, both invalid_schema and invalid_inputs methods in the relevant test file
 - Make sure all tests pass
 - Make sure you can run the code

@@ -180,7 +180,7 @@
       "type": "number"
     },
     "annual_homeowners_insurance_fraction": {
-      "description": "ANNUAL cost of homeowners insurance as fraction of the assessed home value. Note that there is still a deductible. This field depends a lot on the home, conditions, coverage, insurance, etc.",
+      "description": "The first year's homeowners insurance premium, as a fraction of the PURCHASE PRICE (not the assessed value, and not the home's value in any later year). This fraction only sets the starting premium, because a more expensive home costs more to insure; from there the premium grows with 'annual_inflation_rate' from the market config rather than with the home's value, since what is being insured is the cost of rebuilding rather than what the property would sell for. Note that there is still a deductible. This field depends a lot on the home, conditions, coverage, insurance, etc.",
       "type": "number"
     },
     "annual_flood_insurance": {
