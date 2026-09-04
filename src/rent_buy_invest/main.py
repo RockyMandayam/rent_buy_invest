@@ -6,6 +6,9 @@ from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.final_state import FinalState
 from rent_buy_invest.core.initial_state import InitialState
+from rent_buy_invest.core.rental_vs_invest_experiment import (
+    RentalVsInvestExperiment,
+)
 from rent_buy_invest.io.experiment_writer import ExperimentWriter
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
@@ -190,6 +193,36 @@ def _run_rent_vs_buy(
     )
 
 
+def _run_rental_vs_invest(
+    experiment_config: ExperimentConfig, experiment_writer: ExperimentWriter
+) -> None:
+    """Compare buying a property to rent out against investing the same money.
+
+    Where you live does not appear: it is the same in both worlds, so it cancels
+    out of the difference between them. That is why no rent config is read here.
+
+    Writes the initial state, the month-by-month projection, and the final
+    comparison into the experiment's output directory -- the same three files as
+    the other comparison, so the two are readable side by side.
+    """
+    experiment = RentalVsInvestExperiment(
+        experiment_config.buy_config,
+        experiment_config.market_config,
+        experiment_config.personal_config,
+        experiment_config.num_years,
+        experiment_config.start_date,
+    )
+    experiment_writer.write_xlsx_df(
+        "initial_state.xlsx", experiment.initial_state.get_df(), num_header_rows=1
+    )
+    experiment_writer.write_xlsx_df(
+        "projection.xlsx", experiment.get_projection_df(), num_header_rows=2
+    )
+    experiment_writer.write_xlsx_df(
+        "final_state.xlsx", experiment.final_state.get_df(), num_header_rows=1
+    )
+
+
 def main() -> None:
     """Main method; entrypoint for this repo."""
 
@@ -204,7 +237,15 @@ def main() -> None:
     # dump configs in output dir (to keep record of configs)
     experiment_writer.write_yaml("configs.yaml", experiment_config)
 
-    _run_rent_vs_buy(experiment_config, experiment_writer)
+    # Dispatch on the mode explicitly rather than falling through on an else, so
+    # that adding a third comparison and forgetting to wire it up fails loudly
+    # instead of quietly running the wrong one.
+    if experiment_config.mode == ExperimentConfig.RENT_VS_BUY:
+        _run_rent_vs_buy(experiment_config, experiment_writer)
+    elif experiment_config.mode == ExperimentConfig.RENTAL_VS_INVEST:
+        _run_rental_vs_invest(experiment_config, experiment_writer)
+    else:
+        raise AssertionError(f"no runner wired up for mode {experiment_config.mode}")
 
 
 if __name__ == "__main__":
