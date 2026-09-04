@@ -102,7 +102,7 @@ class TestBuyConfig(TestConfig):
             BuyConfig,
             config_kwargs,
             ["annual_assessed_value_inflation_rate"],
-            max_value=BuyConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
+            max_value=BuyConfig.MAX_ANNUAL_ASSESSED_VALUE_INFLATION_RATE,
         )
         check_float_field(
             BuyConfig,
