@@ -25,9 +25,10 @@ Some additional notes about the configs:
     - See IRS 2024 Publication 936 for details
 - Typically, discount points which are paid upfront to reduce the interest rate on the mortgage can also be deducted from taxes if it is a primary home and not a commercial development. There are some finer details, but by and large, you can deduct discount points from your taxes if they are for a mortgage on a primary home, they are computed as a fraction of the principal balance, and they appear clearly as points on your settlement. Discount point payments are often thought of as some kind of prepaid interest.
     - I think it can also be a secondary home, and there are finer details, but those are ignored in this calculator
-    - Also, there are restrictions as to whether points must be deducted ratably vs all at once. This calculator assumes you can deduct it all at once. In this calculator, any deduction savings are accounted for in the initial state.
+    - Also, there are restrictions as to whether points must be deducted ratably vs all at once. The two modes differ here, matching how the two situations are actually treated. In `rent_vs_buy` the points are deducted all at once and the saving is accounted for in the initial state. In `rental_vs_invest` they are deducted a little at a time across the mortgage term, and whatever is still undeducted when the property is sold is taken in full in the year of the sale.
 - Mortgage insurance used to be tax deductible, but it seems it no longer is.
 - Property tax: Property taxes are billed annually based on the assessed value of the home. For convenience / to make the math easy, `rent_buy_invest` assumes this annual billing cycle start coincides with the start of the mortgage term. The assessed value starts at the purchase price. In a state that caps how fast it may grow (California's Proposition 13, Florida's Save Our Homes), set `annual_assessed_value_growth_cap` in the buy config; the assessed value then grows each year by the lesser of general inflation and that cap, instead of tracking what the home is actually worth. Leave it null where there is no such cap, and the two are treated as the same number.
+    - Property tax is deducted as an ordinary business expense in `rental_vs_invest`, where it is a cost of running the rental. It is NOT deducted in `rent_vs_buy`. That is deliberate: for a home you live in, property tax is deductible only inside the capped state-and-local-tax (SALT) total, and that cap is assumed already used up by state income tax - which you pay whether you rent or buy, so it cancels and owning adds no deduction. That assumption breaks at lower incomes or in a state with no income tax, where the full SALT cap would be available for property tax.
 - Homeowners insurance: Homeowners insurance pricing is based on the replacement cost of the home (the cost of rebuilding the home if it gets destroyed), plus the regular supply+demand of the market. Since replacement cost has to do with constructing the home and not the market value, it is put under the inflation-related home ownership costs, not the home value related home ownership costs.
     - This is why `annual_homeowners_insurance_fraction` looks like a contradiction: it is a fraction of the purchase price, yet the cost it produces then grows with `annual_inflation_rate` rather than with the home's value. The fraction only SIZES the premium at the start - a $1M home costs more to insure than a $300k one, and a fraction of the purchase price is a convenient way to say so in month 0. From there the premium follows rebuilding costs, which inflate. So the fraction sets the starting level, and inflation sets the growth; the home's own appreciation never enters.
     - It is the only cost in the inflation-related group that is sized from the home's value at all. Utilities, HOA fees, flood insurance, and the home warranty are entered as dollar amounts directly.
@@ -60,6 +61,41 @@ Some additional notes about the configs:
     - The buyer usually pays for the home inspection. This calculator assumes the buyer pays for it.
     - The pest inspection can be paid by the buyer or seller, more often the seller. However, this calculator assumes the buyer pays for it
     - The closing protection letter is typically paid by the buyer. This calculator assumes the buyer pays.
+
+
+## The rental comparison (`rental_vs_invest`) in more detail
+
+### Where you live does not appear at all
+
+The engine only ever tracks the *difference* between two worlds. Your own housing is the same whichever way this decision goes - you live somewhere either way, on the same budget - so it cancels out of that difference exactly, and adding equal personal rent to both sides would change no number. Leaving it out is simply the cleanest way to represent that; it is not a claim that you live for free. This is also why the mode takes no rent config: supplying one would be a file that changes nothing, so it is rejected rather than silently ignored.
+
+The flip side is that this mode cannot tell you anything about the home you live in. That is what `rent_vs_buy` is for. The two are separate questions and the tool answers them one at a time.
+
+### What it models
+
+- Rent received, scaled by an occupancy rate, starting after a configurable waiting period and growing at its own inflation rate.
+- Operating expenses: property tax, homeowners and flood insurance, HOA, owner-paid utilities, maintenance, management, home warranty, mortgage insurance, and the one-off appraisal that ends PMI. All of these are deductible against rental income.
+- Mortgage interest (deductible) and mortgage principal (not deductible - it buys equity rather than being a cost).
+- Straight-line depreciation of the building over 27.5 years (330 months). `building_fraction_of_value` splits the basis into the depreciable building and the land, which is never depreciable; it is a single static estimate held fixed for the whole hold.
+- Discount points, amortized across the mortgage term, with any unamortized remainder deducted in the year of the sale.
+- The sale: selling costs, gain measured against the depreciation-reduced basis, depreciation recapture taxed at ordinary rates but capped at 25%, and long-term capital gain stacked on top of that.
+
+### What it does not model
+
+These are deliberate simplifications, not oversights. Each one was chosen; several would be substantial work to add.
+
+- **No passive-activity-loss rules.** A rental loss offsets ordinary income immediately and in full - no $25,000 allowance, no MAGI phaseout, no suspension, no carryforward.
+- **Losses are worth nothing after retirement.** A deduction is capped at your income, and `personal_config` drives ordinary income to 0 at `years_till_retirement`. So a $30,000 rental loss saves $4,500 against $120,000 of income, and exactly $0 against no income - and because there is no carryforward, that value is gone rather than deferred. On any projection that runs past retirement this understates the rental case in every year after you stop working.
+- **No QBI / section 199A deduction.**
+- **No NIIT (3.8%), and no state or local income tax anywhere in the tool.**
+- **No 1031 exchange**, no section 1245, bonus depreciation, or cost segregation, and no mid-month or mid-year conventions.
+- **Single filer throughout**, itemizing every year - the standard deduction is never taken.
+- **The property is a rental for the entire hold.** No conversion to or from personal use partway through, no personal-use days, no mixed use. It also gets no primary-home capital gains exclusion; the $250,000 exclusion applies only in `rent_vs_buy`, and only when the buy config has no `rental_income_config`.
+- **One property.** No second or third.
+
+### Rental income in `rent_vs_buy` is much cruder
+
+A `rent_vs_buy` buy config may also carry a `rental_income_config`, but do not read that path as a rental model. There, rental income is taxed **gross**: no operating expenses, no mortgage interest, and no depreciation are netted against it, and there is no depreciation recapture at sale. It exists to let a rent-vs-buy comparison acknowledge some offsetting income. If the rental question is the one you care about, use `rental_vs_invest`, which is where that math actually lives.
 
 
 ## Installation & How to Run
