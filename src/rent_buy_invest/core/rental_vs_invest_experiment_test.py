@@ -178,7 +178,7 @@ def _underwater_buy_config() -> BuyConfig:
     """
     kwargs = deepcopy(io_utils.read_yaml(BUY_CONFIG_PATH))
     kwargs["down_payment_fraction"] = 0.01
-    kwargs["annual_assessed_value_inflation_rate"] = 0.0
+    kwargs["annual_home_appreciation_rate"] = 0.0
     return BuyConfig(**kwargs)
 
 

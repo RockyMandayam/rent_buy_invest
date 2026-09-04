@@ -2,7 +2,7 @@
 
 purchase_price: !!float 500000.
 
-annual_assessed_value_inflation_rate: !!float 0.07
+annual_home_appreciation_rate: !!float 0.07
 
 ##### MORTGAGE RELATED CONFIGS
 
