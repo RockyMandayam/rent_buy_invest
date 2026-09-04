@@ -111,7 +111,9 @@ def test_operating_expenses_exclude_the_whole_mortgage() -> None:
     rental_property = _rental_property()
 
     expected_first_month = (
-        buy_config.get_home_value_related_monthly_costs(NUM_MONTHS)[0]
+        buy_config.get_home_value_related_monthly_costs(
+            ANNUAL_INFLATION_RATE, NUM_MONTHS
+        )[0]
         + buy_config.get_inflation_related_monthly_costs(
             ANNUAL_INFLATION_RATE, NUM_MONTHS
         )[0]

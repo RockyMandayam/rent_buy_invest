@@ -11,6 +11,10 @@
       "description": "The ANNUAL rate at which the home's value grows, as a fraction (0.03 means the home is worth 3% more after a year). It is compounded monthly. This is the growth of the home's own value; it is not general price inflation, which is 'annual_inflation_rate' in the market config.",
       "type": "number"
     },
+    "annual_assessed_value_growth_cap": {
+      "description": "The most the home's taxable assessed value may grow in a year, as a fraction, or null where the state has no such cap. The assessed value is the number the county charges property tax on; it starts at the purchase price and is not what the home would sell for. With a cap in place the assessed value grows each year by the LESSER of general price inflation ('annual_inflation_rate' in the market config) and this number, so California's Proposition 13 is 0.02 and Florida's Save Our Homes is 0.03. With null, the assessed value is taken to grow with the home's own value at 'annual_home_appreciation_rate'. Reassessment on a sale is not modeled: the property is assumed to be held for the whole projection.",
+      "type": ["number", "null"]
+    },
     "down_payment_fraction": {
       "description": "The fraction of the home price put down as the down payment (the remaining is assumed to be the loan amount).",
       "type": "number"
@@ -241,6 +245,7 @@
   "required": [
     "purchase_price",
     "annual_home_appreciation_rate",
+    "annual_assessed_value_growth_cap",
     "down_payment_fraction",
     "mortgage_annual_interest_rate",
     "mortgage_term_months",

@@ -4,6 +4,9 @@ purchase_price: !!float 500000.
 
 annual_home_appreciation_rate: !!float 0.05
 
+# null: no assessment cap, so property tax tracks the home's value
+annual_assessed_value_growth_cap: !!null
+
 ##### MORTGAGE RELATED CONFIGS
 
 down_payment_fraction: !!float 0.2

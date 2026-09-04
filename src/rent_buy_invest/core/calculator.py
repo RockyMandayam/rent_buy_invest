@@ -48,7 +48,9 @@ class Calculator:
         # Some housing costs/gains can be calculated independently at once
         home_values = self.buy_config.get_monthly_home_values(num_months)
         home_monthly_costs_related_to_home_value = (
-            self.buy_config.get_home_value_related_monthly_costs(num_months)
+            self.buy_config.get_home_value_related_monthly_costs(
+                self.market_config.annual_inflation_rate, num_months
+            )
         )
         home_monthly_costs_related_to_inflation = (
             self.buy_config.get_inflation_related_monthly_costs(

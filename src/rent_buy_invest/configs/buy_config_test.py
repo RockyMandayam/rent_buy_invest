@@ -13,6 +13,14 @@ from rent_buy_invest.utils.math_utils import (
 )
 
 
+def _differ_by_at_most_a_cent(actual: list[float], expected: list[float]) -> bool:
+    """True if no month's dollar amount differs from its counterpart by over a cent."""
+    assert len(actual) == len(expected)
+    return all(
+        abs(round(a * 100) - round(e * 100)) <= 1 for a, e in zip(actual, expected)
+    )
+
+
 class TestBuyConfig(TestConfig):
     """Tests BuyConfig and its nested class RentalIncomeConfig"""
 
@@ -27,6 +35,7 @@ class TestBuyConfig(TestConfig):
         attributes = [
             "purchase_price",
             "annual_home_appreciation_rate",
+            "annual_assessed_value_growth_cap",
             "down_payment_fraction",
             "mortgage_annual_interest_rate",
             "mortgage_term_months",
@@ -82,7 +91,10 @@ class TestBuyConfig(TestConfig):
             ("rental_income_config", "occupancy_rate"),
             ("rental_income_config", "building_fraction_of_value"),
         ]
-        nullable_attributes = ("rental_income_config",)
+        nullable_attributes = (
+            "rental_income_config",
+            "annual_assessed_value_growth_cap",
+        )
         self._test_inputs_with_invalid_schema(
             BuyConfig, attributes, nullable_attributes
         )
@@ -103,6 +115,13 @@ class TestBuyConfig(TestConfig):
             config_kwargs,
             ["annual_home_appreciation_rate"],
             max_value=BuyConfig.MAX_ANNUAL_HOME_APPRECIATION_RATE,
+        )
+        check_float_field(
+            BuyConfig,
+            config_kwargs,
+            ["annual_assessed_value_growth_cap"],
+            allow_negative=False,
+            max_value=BuyConfig.MAX_ANNUAL_ASSESSED_VALUE_GROWTH_CAP,
         )
         check_float_field(
             BuyConfig,
@@ -598,13 +617,38 @@ class TestBuyConfig(TestConfig):
         )
         assert actual == pytest.approx(expected)
 
+    def test_get_annual_assessed_value_growth_rate(self) -> None:
+        buy_config = deepcopy(TestBuyConfig.BUY_CONFIG)
+
+        # no cap: the assessed value is taken to be the home's value, so the
+        # inflation rate does not enter into it at all
+        buy_config.annual_assessed_value_growth_cap = None
+        assert (
+            buy_config.get_annual_assessed_value_growth_rate(0.03)
+            == buy_config.annual_home_appreciation_rate
+        )
+
+        # capped: the lesser of inflation and the cap wins, either way round
+        buy_config.annual_assessed_value_growth_cap = 0.02
+        assert buy_config.get_annual_assessed_value_growth_rate(0.03) == 0.02
+        assert buy_config.get_annual_assessed_value_growth_rate(0.01) == 0.01
+
     def test_get_home_value_related_monthly_costs(self) -> None:
+        annual_inflation_rate = 0.03  # arbitrary; only the capped case reads it
         with pytest.raises(AssertionError):
-            TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(0)
+            TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(
+                annual_inflation_rate, 0
+            )
 
         num_months = 1000  # arbitrary number
+        # Uncapped, property tax grows at the same rate as maintenance and
+        # management, so the three are one series growing with the home's value.
+        # This is what the whole bundle was before property tax was split out of
+        # it; splitting must not move the total. Everything below assumes the
+        # shared config is uncapped, and says nothing if a cap is ever added to it.
+        assert TestBuyConfig.BUY_CONFIG.annual_assessed_value_growth_cap is None
         actual = TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(
-            num_months
+            annual_inflation_rate, num_months
         )
         first_home_value_related_monthly_costs = (
             TestBuyConfig.BUY_CONFIG.purchase_price
@@ -621,11 +665,17 @@ class TestBuyConfig(TestConfig):
             compound_monthly=False,
             num_months=num_months,
         )
-        assert actual == pytest.approx(expected)
+        # Not exactly equal: the bundle rounded one series to the cent, the split
+        # rounds the sum of two unrounded ones, so a month whose true cost sits on
+        # a half-cent boundary can land on the other side. That is worth at most a
+        # cent, and it is a cent either way round, so it is asserted in cents.
+        assert _differ_by_at_most_a_cent(actual, expected)
 
         buy_config_copy = deepcopy(TestBuyConfig.BUY_CONFIG)
         buy_config_copy.rental_income_config = None
-        actual = buy_config_copy.get_home_value_related_monthly_costs(num_months)
+        actual = buy_config_copy.get_home_value_related_monthly_costs(
+            annual_inflation_rate, num_months
+        )
         first_home_value_related_monthly_costs = (
             # no rental cost this time
             buy_config_copy.purchase_price
@@ -641,7 +691,49 @@ class TestBuyConfig(TestConfig):
             compound_monthly=False,
             num_months=num_months,
         )
-        assert actual == pytest.approx(expected)
+        assert _differ_by_at_most_a_cent(actual, expected)
+
+    def test_get_home_value_related_monthly_costs_holds_property_tax_down_when_capped(
+        self,
+    ) -> None:
+        """A cap slows property tax alone, leaving maintenance and management be.
+
+        After one year the two configs differ by exactly one year's growth of the
+        property tax line, at the two different rates.
+        """
+        annual_inflation_rate = 0.03
+        capped = deepcopy(TestBuyConfig.BUY_CONFIG)
+        capped.annual_assessed_value_growth_cap = 0.02
+        # A cap that did not bind would make the whole test vacuous: it has to be
+        # under both of the rates it is competing against.
+        assert TestBuyConfig.BUY_CONFIG.annual_assessed_value_growth_cap is None
+        assert capped.annual_assessed_value_growth_cap < annual_inflation_rate
+        assert (
+            capped.annual_assessed_value_growth_cap
+            < capped.annual_home_appreciation_rate
+        )
+        num_months = MONTHS_PER_YEAR
+
+        uncapped_costs = TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(
+            annual_inflation_rate, num_months
+        )
+        capped_costs = capped.get_home_value_related_monthly_costs(
+            annual_inflation_rate, num_months
+        )
+
+        # month 0 is before any growth has happened, so the cap cannot have bitten
+        assert capped_costs[0] == uncapped_costs[0]
+
+        first_monthly_property_tax = (
+            capped.purchase_price * capped.annual_property_tax_rate / MONTHS_PER_YEAR
+        )
+        expected_shortfall = first_monthly_property_tax * (
+            capped.annual_home_appreciation_rate
+            - capped.annual_assessed_value_growth_cap
+        )
+        assert uncapped_costs[MONTHS_PER_YEAR] - capped_costs[
+            MONTHS_PER_YEAR
+        ] == pytest.approx(expected_shortfall, abs=0.01)
 
     # TODO get_inflation_related_monthly_costs
 
