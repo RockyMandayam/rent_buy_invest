@@ -101,6 +101,46 @@ def test_mortgage_payment_is_interest_plus_principal() -> None:
         )
 
 
+def test_operating_expenses_include_the_management_fee() -> None:
+    """The manager's cut is a cost of running the rental, and it is deductible.
+
+    It used to be folded into the home-value related costs, where a vacancy did
+    not reduce it and it drifted with the home's value instead of the rent.
+    """
+    buy_config = BuyConfig.parse(BUY_CONFIG_PATH)
+    rental_property = _rental_property()
+    management_fees = buy_config.rental_income_config.get_monthly_management_fees(
+        NUM_MONTHS
+    )
+    assert sum(management_fees) > 0
+
+    expected_first_month = (
+        buy_config.get_home_value_related_monthly_costs(
+            ANNUAL_INFLATION_RATE, NUM_MONTHS
+        )[0]
+        + buy_config.get_inflation_related_monthly_costs(
+            ANNUAL_INFLATION_RATE, NUM_MONTHS
+        )[0]
+        + management_fees[0]
+    )
+    # the test config puts 20% down, so no mortgage insurance is ever owed
+    assert rental_property.monthly_operating_expenses[0] == pytest.approx(
+        expected_first_month, abs=0.01
+    )
+
+    # and because operating expenses are deductible, the fee reduces taxable income
+    # by exactly what it costs
+    no_manager = deepcopy(buy_config)
+    no_manager.rental_income_config.management_fee_fraction_of_rent = 0
+    unmanaged = RentalProperty(no_manager, ANNUAL_INFLATION_RATE, NUM_MONTHS)
+    assert sum(rental_property.monthly_operating_expenses) - sum(
+        unmanaged.monthly_operating_expenses
+    ) == pytest.approx(sum(management_fees), abs=0.01)
+    assert sum(unmanaged.monthly_taxable_income) - sum(
+        rental_property.monthly_taxable_income
+    ) == pytest.approx(sum(management_fees), abs=0.01)
+
+
 def test_operating_expenses_exclude_the_whole_mortgage() -> None:
     """Neither half of the mortgage payment belongs in operating expenses.
 

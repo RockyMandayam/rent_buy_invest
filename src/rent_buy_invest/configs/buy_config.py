@@ -48,7 +48,7 @@ class BuyConfig(Config):
     MAX_MONTHLY_UTILITIES = 1000.0
     MAX_ANNUAL_MAINTENANCE_COST_FRACTION = 0.05
     MAX_MONTHLY_HOA_FEES = 1000.0
-    MAX_ANNUAL_MANAGEMENT_COST_FRACTION = 0.05
+    MAX_MANAGEMENT_FEE_FRACTION_OF_RENT = 0.3
     # TODO add upper limit for monthly_rental_income
     MAX_MONTHLY_RENTAL_INCOME_INFLATION_RATE = 0.3
     MAX_UPFRONT_ONE_TIME_COST_AS_FRACTION_OF_SALE_PRICE = 0.5
@@ -56,7 +56,7 @@ class BuyConfig(Config):
     class RentalIncomeConfig:
         def __init__(
             self,
-            annual_management_cost_fraction: float,
+            management_fee_fraction_of_rent: float,
             # TODO do type checking for all args like this
             rental_income_waiting_period_months: int,
             monthly_rental_income: float,
@@ -64,7 +64,7 @@ class BuyConfig(Config):
             occupancy_rate: float,
             building_fraction_of_value: float,
         ) -> None:
-            self.annual_management_cost_fraction = annual_management_cost_fraction
+            self.management_fee_fraction_of_rent = management_fee_fraction_of_rent
             self.rental_income_waiting_period_months = (
                 rental_income_waiting_period_months
             )
@@ -83,8 +83,8 @@ class BuyConfig(Config):
                     value
                 ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
             assert (
-                self.annual_management_cost_fraction >= 0
-            ), "Annual management cost fraction must be non-negative."
+                self.management_fee_fraction_of_rent >= 0
+            ), "management_fee_fraction_of_rent must be non-negative."
             assert (
                 self.rental_income_waiting_period_months >= 0
             ), "rental_income_waiting_period_months must be non-negative."
@@ -105,8 +105,8 @@ class BuyConfig(Config):
             # _validate_max_value
             for attr_name, max_value in (
                 (
-                    "annual_management_cost_fraction",
-                    BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+                    "management_fee_fraction_of_rent",
+                    BuyConfig.MAX_MANAGEMENT_FEE_FRACTION_OF_RENT,
                 ),
                 (
                     "rental_income_annual_inflation_rate",
@@ -143,6 +143,30 @@ class BuyConfig(Config):
                 num_months=(num_months - self.rental_income_waiting_period_months),
             )
             return period_of_no_rental_income + period_of_rental_income
+
+        def get_monthly_management_fees(self, num_months: int) -> list[float]:
+            """The dollars paid to the property manager in month ``m``.
+
+            A percentage-based manager bills against the rent they actually
+            collect, so this is a cut of the same monthly rent that
+            ``get_monthly_rental_incomes`` produces -- already reduced by the
+            occupancy rate, and zero throughout the waiting period before the
+            property is let at all. It follows rent rather than the home's value,
+            which is why it is not one of the home-value related costs.
+
+            Entry ``m`` is the fee for that one month, not a running total. The
+            list runs from month 0 through ``num_months`` inclusive.
+
+            What this does NOT include is the leasing fee a manager charges for
+            signing a new tenant, commonly a large fraction of one month's rent.
+            That is billed per turnover, and the model has no notion of turnover
+            events -- occupancy is a single average rate, not a sequence of
+            tenancies.
+            """
+            return [
+                round(monthly_rent * self.management_fee_fraction_of_rent, 2)
+                for monthly_rent in self.get_monthly_rental_incomes(num_months)
+            ]
 
     @classmethod
     def schema_path(cls) -> str:
@@ -256,7 +280,7 @@ class BuyConfig(Config):
         rental_income_config_kwargs = kwargs["rental_income_config"]
         if rental_income_config_kwargs:
             self.rental_income_config = BuyConfig.RentalIncomeConfig(
-                rental_income_config_kwargs["annual_management_cost_fraction"],
+                rental_income_config_kwargs["management_fee_fraction_of_rent"],
                 rental_income_config_kwargs["rental_income_waiting_period_months"],
                 rental_income_config_kwargs["monthly_rental_income"],
                 rental_income_config_kwargs["rental_income_annual_inflation_rate"],
@@ -638,29 +662,25 @@ class BuyConfig(Config):
         self, annual_inflation_rate: float, num_months: int
     ) -> list[float]:
         """The dollars leaving your account in month ``m`` for the holding costs
-        that scale with what the property is worth: property tax, maintenance, and
-        (for a rental) management.
+        that scale with what the property is worth: property tax and maintenance.
 
         Entry ``m`` is the cost for that one month, not a running total. The list
         runs from month 0 through ``num_months`` inclusive.
 
         Property tax grows at its own rate because it is charged on the assessed
         value, which an assessment cap can hold well below the home's own value.
-        Maintenance and management track the home's value directly.
+        Maintenance tracks the home's value directly. The management fee used to
+        sit here too, but it is a cut of the rent collected rather than of what
+        the home is worth, so it now lives in
+        ``RentalIncomeConfig.get_monthly_management_fees``.
 
         The two are summed before either is rounded, rather than rounded and then
-        added. Property tax and upkeep were one series before the cap existed, and
+        added. Property tax and maintenance were one series before the cap existed, and
         rounding each separately would have shifted the total by up to a cent every
         month even with no cap set; rounding once keeps them together except where
         the untruncated total lands on a half-cent boundary.
         """
         assert num_months > 0
-        if self.rental_income_config:
-            management_cost_fraction = (
-                self.rental_income_config.annual_management_cost_fraction
-            )
-        else:
-            management_cost_fraction = 0
         monthly_property_tax = project_growth(
             principal=(
                 self.purchase_price * self.annual_property_tax_rate / MONTHS_PER_YEAR
@@ -672,10 +692,10 @@ class BuyConfig(Config):
             num_months=num_months,
             round_to_cent=False,
         )
-        monthly_upkeep = project_growth(
+        monthly_maintenance = project_growth(
             principal=(
                 self.purchase_price
-                * (self.annual_maintenance_cost_fraction + management_cost_fraction)
+                * self.annual_maintenance_cost_fraction
                 / MONTHS_PER_YEAR
             ),
             annual_growth_rate=self.annual_home_appreciation_rate,
@@ -684,8 +704,10 @@ class BuyConfig(Config):
             round_to_cent=False,
         )
         return [
-            round(property_tax + upkeep, 2)
-            for property_tax, upkeep in zip(monthly_property_tax, monthly_upkeep)
+            round(property_tax + maintenance, 2)
+            for property_tax, maintenance in zip(
+                monthly_property_tax, monthly_maintenance
+            )
         ]
 
     def _get_first_inflation_related_monthly_cost(self) -> float:
