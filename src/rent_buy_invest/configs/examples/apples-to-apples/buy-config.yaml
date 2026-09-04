@@ -112,7 +112,7 @@ monthly_hoa_fees: !!float 200.0
 ##### RENTAL INCOME RELATED COSTS
 
 rental_income_config:
-  management_fee_fraction_of_rent: !!float 0.0
+  annual_management_cost_fraction: !!float 0.0
 
   rental_income_waiting_period_months: 24
 

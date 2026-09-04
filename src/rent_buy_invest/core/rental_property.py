@@ -211,13 +211,10 @@ class RentalProperty:
         inflation_related_costs = buy_config.get_inflation_related_monthly_costs(
             annual_inflation_rate, num_months
         )
-        management_fees = buy_config.rental_income_config.get_monthly_management_fees(
-            num_months
-        )
 
         # The catch-all stream: property tax, homeowners and flood insurance, HOA,
-        # owner-paid utilities, maintenance, the property manager's cut of the rent,
-        # home warranty, mortgage insurance, and the one-off appraisal that ends PMI.
+        # owner-paid utilities, maintenance, management, home warranty, mortgage
+        # insurance, and the one-off appraisal that ends PMI.
         #
         # What they have in common is that each behaves exactly one way -- money
         # leaves your account and the amount is deductible -- so both figures below
@@ -234,7 +231,6 @@ class RentalProperty:
             round(
                 home_value_related_costs[month]
                 + inflation_related_costs[month]
-                + management_fees[month]
                 + mortgage_insurance_schedule.premiums[month]
                 + mortgage_insurance_schedule.appraisal_costs[month],
                 2,

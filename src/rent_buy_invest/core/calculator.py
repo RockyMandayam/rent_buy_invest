@@ -60,16 +60,6 @@ class Calculator:
         home_monthly_rental_incomes = self.buy_config.get_monthly_rental_incomes(
             num_months
         )
-        # Charged on rent collected, so it tracks the income above rather than the
-        # home's value, and is zero whenever no rent is coming in.
-        if self.buy_config.rental_income_config:
-            home_monthly_management_fees = (
-                self.buy_config.rental_income_config.get_monthly_management_fees(
-                    num_months
-                )
-            )
-        else:
-            home_monthly_management_fees = [0.0] * (num_months + 1)
 
         # Projected ordinary income (used only for tax projection purposes)
         ordinary_incomes = self.personal_config.get_ordinary_incomes(num_months)
@@ -194,7 +184,6 @@ class Calculator:
                 + toward_equity
                 + mortgage_insurance_schedule.premiums[month]
                 + mortgage_insurance_schedule.appraisal_costs[month]
-                + home_monthly_management_fees[month]
                 + rental_income_taxes[month]
                 - mortgage_interest_deduction_savings[month]
             )
@@ -247,7 +236,6 @@ class Calculator:
             # Buy: costs
             "Buy: Costs Tied to Home Value": home_monthly_costs_related_to_home_value,
             "Buy: Costs Tied to Inflation": home_monthly_costs_related_to_inflation,
-            "Buy: Management Fee": home_monthly_management_fees,
             "Buy: Mortgage Insurance": mortgage_insurances,
             "Buy: Mortgage Interest Payment": mortgage_amortization_schedule.interest_payments,
             "Buy: Mortgage Equity Payment": mortgage_amortization_schedule.principal_payments,

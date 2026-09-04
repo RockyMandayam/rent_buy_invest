@@ -143,7 +143,6 @@ class TestCalculator:
                 + row["Buy"]["Costs Tied to Inflation"]
                 + row["Buy"]["Mortgage Payment"]
                 + row["Buy"]["Mortgage Insurance"]
-                + row["Buy"]["Management Fee"]
                 + row["Buy"]["One-Off Costs"]
                 + row["Buy"]["Tax on Rental Income"]
                 - row["Buy"]["Rental Income (Pre-Tax)"]
