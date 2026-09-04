@@ -16,6 +16,7 @@ class BuyConfig(Config):
     """
 
     MAX_ANNUAL_HOME_APPRECIATION_RATE = 0.5
+    MAX_ANNUAL_ASSESSED_VALUE_GROWTH_CAP = 0.5
     MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
     MAX_MORTGAGE_TERM = 60 * MONTHS_PER_YEAR
     MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION = 0.1
@@ -160,6 +161,11 @@ class BuyConfig(Config):
         self.annual_home_appreciation_rate: float = kwargs[
             "annual_home_appreciation_rate"
         ]
+        # None where the state has no assessment cap, in which case the assessed
+        # value is taken to be the home's value.
+        self.annual_assessed_value_growth_cap: float | None = kwargs[
+            "annual_assessed_value_growth_cap"
+        ]
         self.down_payment_fraction: float = kwargs["down_payment_fraction"]
         self.mortgage_annual_interest_rate: float = kwargs[
             "mortgage_annual_interest_rate"
@@ -271,6 +277,8 @@ class BuyConfig(Config):
             # TODO this feels wrong
             if attribute == "rental_income_config":
                 continue
+            if attribute == "annual_assessed_value_growth_cap" and value is None:
+                continue
             assert math.isfinite(
                 value
             ), f"'{attribute}' attribute must not be NaN, infinity, or negative infinity."
@@ -323,6 +331,10 @@ class BuyConfig(Config):
         assert (
             self.annual_property_tax_rate >= 0
         ), "Annual property tax rate must be non-negative."
+        assert (
+            self.annual_assessed_value_growth_cap is None
+            or self.annual_assessed_value_growth_cap >= 0
+        ), "annual_assessed_value_growth_cap must be non-negative."
         assert (
             self.buyer_realtor_commission_fraction >= 0
         ), "Buyer ealtor commission fraction must be non-negative."
@@ -399,6 +411,11 @@ class BuyConfig(Config):
             "annual_home_appreciation_rate",
             BuyConfig.MAX_ANNUAL_HOME_APPRECIATION_RATE,
         )
+        if self.annual_assessed_value_growth_cap is not None:
+            self._validate_max_value(
+                "annual_assessed_value_growth_cap",
+                BuyConfig.MAX_ANNUAL_ASSESSED_VALUE_GROWTH_CAP,
+            )
         self._validate_max_value(
             "mortgage_annual_interest_rate",
             BuyConfig.MAX_MORTGAGE_ANNUAL_INTEREST_RATE,
@@ -587,31 +604,89 @@ class BuyConfig(Config):
             num_months=num_months,
         )
 
-    def _get_first_home_value_related_monthly_costs(self) -> float:
+    def get_annual_assessed_value_growth_rate(
+        self, annual_inflation_rate: float
+    ) -> float:
+        """The ANNUAL rate at which the taxable assessed value grows, as a fraction.
+
+        The assessed value is what the county taxes; it starts at the purchase
+        price and is a separate number from what the home would sell for. With no
+        cap the two are taken to be the same, so this is just the home's own
+        appreciation rate.
+
+        With a cap, the growth is the LESSER of general price inflation and the
+        cap. That is California's Proposition 13 rule, and Florida's Save Our
+        Homes works the same way with a 3% cap. It is NOT the Texas-style rule,
+        which caps how fast the assessed value may chase the home's own value
+        rather than tying it to inflation; that is not modeled.
+
+        TODO the capped assessed value is never held down to what the home is
+        actually worth, so a sustained decline leaves you paying tax on a value
+        the home no longer has. California's Proposition 8 exists for exactly
+        this and reassesses downward to market; that relief is not modeled.
+
+        Args:
+            annual_inflation_rate: General annual price inflation, as a fraction
+                (``annual_inflation_rate`` in the market config). Ignored when
+                there is no cap.
+        """
+        if self.annual_assessed_value_growth_cap is None:
+            return self.annual_home_appreciation_rate
+        return min(annual_inflation_rate, self.annual_assessed_value_growth_cap)
+
+    def get_home_value_related_monthly_costs(
+        self, annual_inflation_rate: float, num_months: int
+    ) -> list[float]:
+        """The dollars leaving your account in month ``m`` for the holding costs
+        that scale with what the property is worth: property tax, maintenance, and
+        (for a rental) management.
+
+        Entry ``m`` is the cost for that one month, not a running total. The list
+        runs from month 0 through ``num_months`` inclusive.
+
+        Property tax grows at its own rate because it is charged on the assessed
+        value, which an assessment cap can hold well below the home's own value.
+        Maintenance and management track the home's value directly.
+
+        The two are summed before either is rounded, rather than rounded and then
+        added. Property tax and upkeep were one series before the cap existed, and
+        rounding each separately would have shifted the total by up to a cent every
+        month even with no cap set; rounding once keeps them together except where
+        the untruncated total lands on a half-cent boundary.
+        """
+        assert num_months > 0
         if self.rental_income_config:
             management_cost_fraction = (
                 self.rental_income_config.annual_management_cost_fraction
             )
         else:
             management_cost_fraction = 0
-        return (
-            self.purchase_price
-            * (
-                self.annual_property_tax_rate
-                + self.annual_maintenance_cost_fraction
-                + management_cost_fraction
-            )
-            / MONTHS_PER_YEAR
+        monthly_property_tax = project_growth(
+            principal=(
+                self.purchase_price * self.annual_property_tax_rate / MONTHS_PER_YEAR
+            ),
+            annual_growth_rate=self.get_annual_assessed_value_growth_rate(
+                annual_inflation_rate
+            ),
+            compound_monthly=False,
+            num_months=num_months,
+            round_to_cent=False,
         )
-
-    def get_home_value_related_monthly_costs(self, num_months: int) -> float:
-        assert num_months > 0
-        return project_growth(
-            principal=self._get_first_home_value_related_monthly_costs(),
+        monthly_upkeep = project_growth(
+            principal=(
+                self.purchase_price
+                * (self.annual_maintenance_cost_fraction + management_cost_fraction)
+                / MONTHS_PER_YEAR
+            ),
             annual_growth_rate=self.annual_home_appreciation_rate,
             compound_monthly=False,
             num_months=num_months,
+            round_to_cent=False,
         )
+        return [
+            round(property_tax + upkeep, 2)
+            for property_tax, upkeep in zip(monthly_property_tax, monthly_upkeep)
+        ]
 
     def _get_first_inflation_related_monthly_cost(self) -> float:
         return (

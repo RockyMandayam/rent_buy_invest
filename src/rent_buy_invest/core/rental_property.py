@@ -129,10 +129,12 @@ class RentalProperty:
             buy_config: Describes the property being rented out. Its
                 ``rental_income_config`` must be set -- a config without one
                 describes a home someone lives in, which is not a rental.
-            annual_inflation_rate: Rate at which the inflation-linked holding costs
-                grow (utilities, HOA, insurance, home warranty). Property tax,
-                maintenance, and management instead track the home's value, using
-                the appreciation rate already in ``buy_config``.
+            annual_inflation_rate: General annual price inflation, as a fraction.
+                Grows the inflation-linked holding costs (utilities, HOA,
+                insurance, home warranty), and, where ``buy_config`` sets an
+                assessment cap, the assessed value that property tax is charged
+                on. Maintenance and management instead track the home's value,
+                using the appreciation rate already in ``buy_config``.
             num_months: Last month of the projection; results cover month 0 through
                 this month inclusive.
         """
@@ -204,7 +206,7 @@ class RentalProperty:
         )
 
         home_value_related_costs = buy_config.get_home_value_related_monthly_costs(
-            num_months
+            annual_inflation_rate, num_months
         )
         inflation_related_costs = buy_config.get_inflation_related_monthly_costs(
             annual_inflation_rate, num_months
