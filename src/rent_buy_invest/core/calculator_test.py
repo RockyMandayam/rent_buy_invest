@@ -99,6 +99,56 @@ class TestCalculator:
             #         rent_monthly_cost - home_monthly_cost, abs=0.0001
             #     )
 
+    def test_calculate_applies_the_mortgage_interest_deduction(self) -> None:
+        """The deduction has to reach the cash flow, not just the output column.
+
+        It was computed and published as ``Mortgage Interest Deduction Savings``
+        for a long time without ever being subtracted from what buying costs,
+        which left it with no effect on the answer at all. The whole suite passed
+        the entire time, so this pins the subtraction rather than the column.
+
+        The two worlds' net monthly costs are not published, but their difference
+        is: exactly one of the two surpluses is non-zero each month, and the pair
+        is the gap between the two costs.
+        """
+        calculator = Calculator(
+            EXPERIMENT_CONFIG.buy_config,
+            EXPERIMENT_CONFIG.rent_config,
+            EXPERIMENT_CONFIG.market_config,
+            EXPERIMENT_CONFIG.personal_config,
+            EXPERIMENT_CONFIG.num_years,
+            EXPERIMENT_CONFIG.start_date,
+            InitialState.from_configs(
+                EXPERIMENT_CONFIG.buy_config,
+                EXPERIMENT_CONFIG.rent_config,
+                EXPERIMENT_CONFIG.market_config,
+                EXPERIMENT_CONFIG.personal_config,
+            ),
+        )
+        projection = calculator.calculate()
+
+        deduction_savings = projection["Buy"]["Mortgage Interest Deduction Savings"]
+        # a config that never deducts anything would pass this test vacuously
+        assert (deduction_savings > 0).any()
+
+        for row_index in range(projection.shape[0]):
+            row = projection.iloc[row_index, :]
+            buy_net_monthly_cost = (
+                row["Buy"]["Costs Tied to Home Value"]
+                + row["Buy"]["Costs Tied to Inflation"]
+                + row["Buy"]["Mortgage Payment"]
+                + row["Buy"]["Mortgage Insurance"]
+                + row["Buy"]["One-Off Costs"]
+                + row["Buy"]["Tax on Rental Income"]
+                - row["Buy"]["Rental Income (Pre-Tax)"]
+                - row["Buy"]["Mortgage Interest Deduction Savings"]
+            )
+            rent_net_monthly_cost = row["Rent"]["Costs Tied to Inflation"]
+            gap_between_the_two_worlds = row["Rent"]["Surplus"] - row["Buy"]["Surplus"]
+            assert gap_between_the_two_worlds == pytest.approx(
+                buy_net_monthly_cost - rent_net_monthly_cost, abs=0.01
+            )
+
     def test_calculate_for_primary_residence(self) -> None:
         """A home lived in rather than rented out projects over the full horizon.
 
