@@ -127,11 +127,19 @@ class Calculator:
                 annual_income = sum(
                     ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
                 )
-                mortgage_interest_deduction_saving = deductible_fraction_of_interest * (
+                # The cap limits how much interest may be DEDUCTED, so it has to
+                # shrink the deduction and let the brackets act on what is left.
+                # Shrinking the resulting saving instead would price the surviving
+                # dollars at the average rate of the whole deduction, and since a
+                # deduction comes off the top of income first, that understates the saving.
+                deductible_mortgage_interest = (
+                    deductible_fraction_of_interest * mortgage_interest_for_the_year
+                )
+                mortgage_interest_deduction_saving = (
                     self.market_config.get_income_tax_savings_from_deduction(
                         month,
                         annual_income,
-                        mortgage_interest_for_the_year,
+                        deductible_mortgage_interest,
                     )
                 )
             else:

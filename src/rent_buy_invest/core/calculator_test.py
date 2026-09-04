@@ -1,11 +1,16 @@
+from copy import deepcopy
+
 import pytest
 
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.configs.experiment_config_test import TestExperimentConfig
-from rent_buy_invest.core.calculator import Calculator
+from rent_buy_invest.core.calculator import (
+    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
+    Calculator,
+)
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
-from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
+from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg
 
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH)
 PRIMARY_RESIDENCE_EXPERIMENT_CONFIG = ExperimentConfig.parse(
@@ -148,6 +153,87 @@ class TestCalculator:
             assert gap_between_the_two_worlds == pytest.approx(
                 buy_net_monthly_cost - rent_net_monthly_cost, abs=0.01
             )
+
+    def test_calculate_prorates_the_deduction_not_the_saving_on_a_jumbo_loan(
+        self,
+    ) -> None:
+        """Over the balance cap, the deduction shrinks -- not the tax saving.
+
+        Scaling the saving instead prices the surviving interest at the average
+        rate of the whole deduction, including the lower brackets the real,
+        smaller deduction never reaches. Every example config in this repo has a
+        loan under the cap, where the two agree exactly, so the prorating path
+        goes unexercised without a deliberately oversized loan here.
+        """
+        experiment_config = deepcopy(EXPERIMENT_CONFIG)
+        # four times the price, so the loan clears the cap with room to spare
+        experiment_config.buy_config.purchase_price *= 4
+        assert (
+            experiment_config.buy_config.initial_loan_amount
+            > MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
+        )
+
+        calculator = Calculator(
+            experiment_config.buy_config,
+            experiment_config.rent_config,
+            experiment_config.market_config,
+            experiment_config.personal_config,
+            experiment_config.num_years,
+            experiment_config.start_date,
+            InitialState.from_configs(
+                experiment_config.buy_config,
+                experiment_config.rent_config,
+                experiment_config.market_config,
+                experiment_config.personal_config,
+            ),
+        )
+        projection = calculator.calculate()
+
+        num_months = experiment_config.num_years * MONTHS_PER_YEAR
+        ordinary_incomes = experiment_config.personal_config.get_ordinary_incomes(
+            num_months
+        )
+        market_config = experiment_config.market_config
+        years_where_the_two_formulas_disagree = 0
+
+        for month in range(MONTHS_PER_YEAR - 1, num_months + 1, MONTHS_PER_YEAR):
+            first_month_of_year = month + 1 - MONTHS_PER_YEAR
+            interest_for_the_year = projection["Buy"]["Mortgage Interest Payment"][
+                first_month_of_year : month + 1
+            ].sum()
+            avg_loan_amount = avg(
+                list(projection["Buy"]["Loan Amount"][first_month_of_year : month + 1])
+            )
+            annual_income = sum(ordinary_incomes[first_month_of_year : month + 1])
+            deductible_fraction = (
+                MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
+                / max(
+                    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
+                    avg_loan_amount,
+                )
+            )
+            prorated_deduction = market_config.get_income_tax_savings_from_deduction(
+                month, annual_income, deductible_fraction * interest_for_the_year
+            )
+            prorated_saving = (
+                deductible_fraction
+                * market_config.get_income_tax_savings_from_deduction(
+                    month, annual_income, interest_for_the_year
+                )
+            )
+
+            reported = projection["Buy"]["Mortgage Interest Deduction Savings"].iloc[
+                month
+            ]
+            assert reported == pytest.approx(prorated_deduction, abs=0.01)
+            if prorated_deduction != pytest.approx(prorated_saving, abs=0.01):
+                years_where_the_two_formulas_disagree += 1
+                # a deduction comes off the top of income first, so prorating the
+                # saving can only ever come out low
+                assert prorated_saving < prorated_deduction
+
+        # without this the assertions above would hold for either formula
+        assert years_where_the_two_formulas_disagree > 0
 
     def test_calculate_for_primary_residence(self) -> None:
         """A home lived in rather than rented out projects over the full horizon.
