@@ -7,8 +7,8 @@
       "description": "What you pay for the home: its nominal purchase price, before any closing costs. This is the price at the START of the projection, not what you later sell it for.",
       "type": "number"
     },
-    "annual_assessed_value_inflation_rate": {
-      "description": "ANNUAL inflation rate of home's assessed value as a fraction.",
+    "annual_home_appreciation_rate": {
+      "description": "The ANNUAL rate at which the home's value grows, as a fraction (0.03 means the home is worth 3% more after a year). It is compounded monthly. This is the growth of the home's own value; it is not general price inflation, which is 'annual_inflation_rate' in the market config.",
       "type": "number"
     },
     "down_payment_fraction": {
@@ -240,7 +240,7 @@
   },
   "required": [
     "purchase_price",
-    "annual_assessed_value_inflation_rate",
+    "annual_home_appreciation_rate",
     "down_payment_fraction",
     "mortgage_annual_interest_rate",
     "mortgage_term_months",

@@ -15,7 +15,7 @@ class BuyConfig(Config):
         See rent_buy_invest/configs/schemas/buy-config-schema.md for documentation
     """
 
-    MAX_ANNUAL_ASSESSED_VALUE_INFLATION_RATE = 0.5
+    MAX_ANNUAL_HOME_APPRECIATION_RATE = 0.5
     MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
     MAX_MORTGAGE_TERM = 60 * MONTHS_PER_YEAR
     MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION = 0.1
@@ -157,8 +157,8 @@ class BuyConfig(Config):
         in Config.
         """
         self.purchase_price: float = kwargs["purchase_price"]
-        self.annual_assessed_value_inflation_rate: float = kwargs[
-            "annual_assessed_value_inflation_rate"
+        self.annual_home_appreciation_rate: float = kwargs[
+            "annual_home_appreciation_rate"
         ]
         self.down_payment_fraction: float = kwargs["down_payment_fraction"]
         self.mortgage_annual_interest_rate: float = kwargs[
@@ -396,8 +396,8 @@ class BuyConfig(Config):
         ), "annual_home_warranty must be non-negative."
         assert self.monthly_hoa_fees >= 0, "Monthly HOA fees must be non-negative."
         self._validate_max_value(
-            "annual_assessed_value_inflation_rate",
-            BuyConfig.MAX_ANNUAL_ASSESSED_VALUE_INFLATION_RATE,
+            "annual_home_appreciation_rate",
+            BuyConfig.MAX_ANNUAL_HOME_APPRECIATION_RATE,
         )
         self._validate_max_value(
             "mortgage_annual_interest_rate",
@@ -582,7 +582,7 @@ class BuyConfig(Config):
         assert num_months > 0
         return project_growth(
             principal=self.purchase_price,
-            annual_growth_rate=self.annual_assessed_value_inflation_rate,
+            annual_growth_rate=self.annual_home_appreciation_rate,
             compound_monthly=True,
             num_months=num_months,
         )
@@ -608,7 +608,7 @@ class BuyConfig(Config):
         assert num_months > 0
         return project_growth(
             principal=self._get_first_home_value_related_monthly_costs(),
-            annual_growth_rate=self.annual_assessed_value_inflation_rate,
+            annual_growth_rate=self.annual_home_appreciation_rate,
             compound_monthly=False,
             num_months=num_months,
         )

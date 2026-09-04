@@ -131,8 +131,8 @@ class RentalProperty:
                 describes a home someone lives in, which is not a rental.
             annual_inflation_rate: Rate at which the inflation-linked holding costs
                 grow (utilities, HOA, insurance, home warranty). Property tax,
-                maintenance, and management instead track the assessed value, using
-                the rate already in ``buy_config``.
+                maintenance, and management instead track the home's value, using
+                the appreciation rate already in ``buy_config``.
             num_months: Last month of the projection; results cover month 0 through
                 this month inclusive.
         """

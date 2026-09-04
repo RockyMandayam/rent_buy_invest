@@ -26,7 +26,7 @@ class TestBuyConfig(TestConfig):
         # check missing and null fields
         attributes = [
             "purchase_price",
-            "annual_assessed_value_inflation_rate",
+            "annual_home_appreciation_rate",
             "down_payment_fraction",
             "mortgage_annual_interest_rate",
             "mortgage_term_months",
@@ -101,8 +101,8 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["annual_assessed_value_inflation_rate"],
-            max_value=BuyConfig.MAX_ANNUAL_ASSESSED_VALUE_INFLATION_RATE,
+            ["annual_home_appreciation_rate"],
+            max_value=BuyConfig.MAX_ANNUAL_HOME_APPRECIATION_RATE,
         )
         check_float_field(
             BuyConfig,
@@ -592,7 +592,7 @@ class TestBuyConfig(TestConfig):
         actual = TestBuyConfig.BUY_CONFIG.get_monthly_home_values(num_months)
         expected = project_growth(
             principal=TestBuyConfig.BUY_CONFIG.purchase_price,
-            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
+            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_home_appreciation_rate,
             compound_monthly=True,
             num_months=num_months,
         )
@@ -617,7 +617,7 @@ class TestBuyConfig(TestConfig):
         )
         expected = project_growth(
             principal=first_home_value_related_monthly_costs,
-            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_assessed_value_inflation_rate,
+            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_home_appreciation_rate,
             compound_monthly=False,
             num_months=num_months,
         )
@@ -637,7 +637,7 @@ class TestBuyConfig(TestConfig):
         )
         expected = project_growth(
             principal=first_home_value_related_monthly_costs,
-            annual_growth_rate=buy_config_copy.annual_assessed_value_inflation_rate,
+            annual_growth_rate=buy_config_copy.annual_home_appreciation_rate,
             compound_monthly=False,
             num_months=num_months,
         )
