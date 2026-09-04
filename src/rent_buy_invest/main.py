@@ -57,14 +57,14 @@ def _cap_gains_from_selling_investments(projection: pd.DataFrame, world: str) ->
     return max(final - opening - deposits, 0)
 
 
-def main() -> None:
-    """Main method; entrypoint for this repo."""
+def _run_rent_vs_buy(
+    experiment_config: ExperimentConfig, experiment_writer: ExperimentWriter
+) -> None:
+    """Compare renting a home to live in against buying one to live in.
 
-    # get args; set up `--help` and `-h`
-    args = _get_args()
-
-    # load configs
-    experiment_config = ExperimentConfig.parse(args.experiment_config)
+    Writes the initial state, the month-by-month projection, and the final
+    comparison into the experiment's output directory.
+    """
     num_years = experiment_config.num_years
     market_config = experiment_config.market_config
     personal_config = experiment_config.personal_config
@@ -72,10 +72,6 @@ def main() -> None:
     buy_config = experiment_config.buy_config
     start_date = experiment_config.start_date
 
-    # initialize experiment writer
-    experiment_writer = ExperimentWriter(args.experiment_name)
-    # dump configs in output dir (to keep record of configs)
-    experiment_writer.write_yaml("configs.yaml", experiment_config)
     # calculate initial state
     initial_state = InitialState.from_configs(
         buy_config, rent_config, market_config, personal_config
@@ -192,6 +188,23 @@ def main() -> None:
     experiment_writer.write_xlsx_df(
         "final_state.xlsx", final_state.get_df(), num_header_rows=1
     )
+
+
+def main() -> None:
+    """Main method; entrypoint for this repo."""
+
+    # get args; set up `--help` and `-h`
+    args = _get_args()
+
+    # load configs
+    experiment_config = ExperimentConfig.parse(args.experiment_config)
+
+    # initialize experiment writer
+    experiment_writer = ExperimentWriter(args.experiment_name)
+    # dump configs in output dir (to keep record of configs)
+    experiment_writer.write_yaml("configs.yaml", experiment_config)
+
+    _run_rent_vs_buy(experiment_config, experiment_writer)
 
 
 if __name__ == "__main__":
