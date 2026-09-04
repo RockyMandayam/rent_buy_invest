@@ -84,7 +84,7 @@ class TestBuyConfig(TestConfig):
             "annual_home_warranty",
             "monthly_hoa_fees",
             "rental_income_config",
-            ("rental_income_config", "annual_management_cost_fraction"),
+            ("rental_income_config", "management_fee_fraction_of_rent"),
             ("rental_income_config", "rental_income_waiting_period_months"),
             ("rental_income_config", "monthly_rental_income"),
             ("rental_income_config", "rental_income_annual_inflation_rate"),
@@ -455,9 +455,9 @@ class TestBuyConfig(TestConfig):
         check_float_field(
             BuyConfig,
             config_kwargs,
-            ["rental_income_config", "annual_management_cost_fraction"],
+            ["rental_income_config", "management_fee_fraction_of_rent"],
             allow_negative=False,
-            max_value=BuyConfig.MAX_ANNUAL_MANAGEMENT_COST_FRACTION,
+            max_value=BuyConfig.MAX_MANAGEMENT_FEE_FRACTION_OF_RENT,
         )
 
         check_float_field(
@@ -655,7 +655,6 @@ class TestBuyConfig(TestConfig):
             * (
                 TestBuyConfig.BUY_CONFIG.annual_property_tax_rate
                 + TestBuyConfig.BUY_CONFIG.annual_maintenance_cost_fraction
-                + TestBuyConfig.BUY_CONFIG.rental_income_config.annual_management_cost_fraction
             )
             / MONTHS_PER_YEAR
         )
@@ -736,6 +735,57 @@ class TestBuyConfig(TestConfig):
         ] == pytest.approx(expected_shortfall, abs=0.01)
 
     # TODO get_inflation_related_monthly_costs
+
+    def test_get_monthly_management_fees(self) -> None:
+        """The fee is a cut of rent collected, so it follows rent, not the home."""
+        rental_income_config = TestBuyConfig.BUY_CONFIG.rental_income_config
+        assert rental_income_config.management_fee_fraction_of_rent > 0
+        num_months = 240  # arbitrary number
+
+        rents = rental_income_config.get_monthly_rental_incomes(num_months)
+        fees = rental_income_config.get_monthly_management_fees(num_months)
+        assert len(fees) == num_months + 1
+
+        for rent, fee in zip(rents, fees):
+            assert fee == round(
+                rent * rental_income_config.management_fee_fraction_of_rent, 2
+            )
+            # no rent collected, nothing billed -- what makes this a fee on rent
+            # rather than a fee on the home
+            if rent == 0:
+                assert fee == 0
+
+        # the fee is NOT one of the costs that scale with the home's value
+        combined = TestBuyConfig.BUY_CONFIG.get_home_value_related_monthly_costs(
+            0.03, num_months
+        )
+        home_value_related_only = project_growth(
+            principal=(
+                TestBuyConfig.BUY_CONFIG.purchase_price
+                * (
+                    TestBuyConfig.BUY_CONFIG.annual_property_tax_rate
+                    + TestBuyConfig.BUY_CONFIG.annual_maintenance_cost_fraction
+                )
+                / MONTHS_PER_YEAR
+            ),
+            annual_growth_rate=TestBuyConfig.BUY_CONFIG.annual_home_appreciation_rate,
+            compound_monthly=False,
+            num_months=num_months,
+        )
+        assert _differ_by_at_most_a_cent(combined, home_value_related_only)
+
+    def test_get_monthly_management_fees_falls_with_occupancy(self) -> None:
+        """A manager paid on collections earns less when the property sits empty."""
+        num_months = 120  # arbitrary number
+        fully_occupied = deepcopy(TestBuyConfig.BUY_CONFIG.rental_income_config)
+        fully_occupied.occupancy_rate = 1.0
+        half_empty = deepcopy(TestBuyConfig.BUY_CONFIG.rental_income_config)
+        half_empty.occupancy_rate = 0.5
+
+        full_fees = fully_occupied.get_monthly_management_fees(num_months)
+        half_fees = half_empty.get_monthly_management_fees(num_months)
+        assert sum(full_fees) > 0
+        assert sum(half_fees) == pytest.approx(sum(full_fees) / 2, rel=0.001)
 
     def test_get_monthly_rental_incomes(self) -> None:
         with pytest.raises(AssertionError):
