@@ -1,9 +1,5 @@
 import argparse
-import datetime
-import os
-from typing import Any
 
-import openpyxl
 import pandas as pd
 
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
@@ -11,7 +7,6 @@ from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.final_state import FinalState
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.io.experiment_writer import ExperimentWriter
-from rent_buy_invest.io.io_utils import RentBuyInvestFileOpener
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
 PRIMARY_HOME_CAP_GAINS_EXEMPTION = 250000
@@ -40,6 +35,26 @@ def _get_args() -> argparse.Namespace:
     if not args.experiment_name:
         args.experiment_name = "unnamed_experiment"
     return args
+
+
+def _cap_gains_from_selling_investments(projection: pd.DataFrame, world: str) -> float:
+    """Gain on a world's market account: its balance less everything paid in.
+
+    Cost basis is the opening balance **plus every deposit**, not just the
+    opening balance. Each world pays its monthly surplus into the market for the
+    whole projection, and that is money you put in, not money you made. Ignoring
+    it taxes you on your own deposits.
+
+    The final month's surplus is excluded because it never lands: ``Calculator``
+    appends one extra balance and pops it, so the last row's cash flow never moves
+    an account.
+
+    TODO handle losses here and everywhere else. For now, just set gain to 0.
+    """
+    final = projection[(world, "Invested (Pre-Tax)")].iloc[-1]
+    opening = projection[(world, "Invested (Pre-Tax)")].iloc[0]
+    deposits = projection[(world, "Surplus")].iloc[:-1].sum()
+    return max(final - opening - deposits, 0)
 
 
 def main() -> None:
@@ -103,10 +118,8 @@ def main() -> None:
     )
     # get cap gains on investments if buying
     final_investments_if_buying = projection[("Buy", "Invested (Pre-Tax)")].iloc[-1]
-    initial_investments_if_buying = projection[("Buy", "Invested (Pre-Tax)")].iloc[0]
-    # TODO handle losses here and everywhere else. For now, just set gain to 0
-    cap_gains_from_selling_investments_if_buying = max(
-        final_investments_if_buying - initial_investments_if_buying, 0
+    cap_gains_from_selling_investments_if_buying = _cap_gains_from_selling_investments(
+        projection, "Buy"
     )
     # get cap gains on home
     # don't want to separately find tax for investments and home, since they don't contribute "proportionally"
@@ -157,9 +170,8 @@ def main() -> None:
 
     # Now do rent case
     final_investments_if_renting = projection[("Rent", "Invested (Pre-Tax)")].iloc[-1]
-    initial_investments_if_renting = projection[("Rent", "Invested (Pre-Tax)")].iloc[0]
-    cap_gains_from_selling_investments_if_renting = max(
-        final_investments_if_renting - initial_investments_if_renting, 0
+    cap_gains_from_selling_investments_if_renting = _cap_gains_from_selling_investments(
+        projection, "Rent"
     )
     total_cap_gains_if_renting = cap_gains_from_selling_investments_if_renting
     income_and_cap_gains_tax_if_renting = market_config.get_tax(
