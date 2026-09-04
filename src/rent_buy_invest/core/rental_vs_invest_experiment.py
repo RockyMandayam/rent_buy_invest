@@ -5,6 +5,7 @@ import pandas as pd
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.personal_config import PersonalConfig
+from rent_buy_invest.core.final_state import RentalVsInvestFinalState
 from rent_buy_invest.core.rental_property import RentalProperty
 from rent_buy_invest.core.tax import TaxModule
 from rent_buy_invest.utils.data_utils import to_df
@@ -78,9 +79,15 @@ class RentalVsInvestExperiment:
         self.upfront_cost_of_buying: float = round(
             buy_config.down_payment + buy_config.get_upfront_one_time_cost(), 2
         )
+        # Stored rather than recomputed: both the monthly loop and the sale need
+        # it, and they must agree on the final year's figure.
+        self.ordinary_incomes: list[float] = personal_config.get_ordinary_incomes(
+            self.num_months
+        )
 
         # NOTE _project adds a bunch of instance attributes
         self._project()
+        self.final_state: RentalVsInvestFinalState = self._liquidate()
 
     def _project(self) -> None:
         """Run the month-by-month projection, storing the result on the instance.
@@ -92,7 +99,7 @@ class RentalVsInvestExperiment:
         num_months = self.num_months
         rental_property = self.rental_property
 
-        ordinary_incomes = self.personal_config.get_ordinary_incomes(num_months)
+        ordinary_incomes = self.ordinary_incomes
         property_values = self.buy_config.get_monthly_home_values(num_months)
 
         annual_taxes: list[float] = []
@@ -102,6 +109,11 @@ class RentalVsInvestExperiment:
         # NOTE: first value filled in; the value at the start of each month
         invested_if_buying = [0.0]
         invested_if_investing = [self.upfront_cost_of_buying]
+        # Cost basis: every dollar deposited, which is not gain when the account is
+        # cashed out. Tracked alongside the balances, and popped the same way, so
+        # the two cannot fall out of step.
+        basis_if_buying = [0.0]
+        basis_if_investing = [self.upfront_cost_of_buying]
 
         for month in range(num_months + 1):
             # Tax is settled annually, so it lands entirely in the last month of
@@ -151,22 +163,109 @@ class RentalVsInvestExperiment:
             if buy_surplus >= 0:
                 invested_if_buying.append(round(grown_if_buying + buy_surplus, 2))
                 invested_if_investing.append(grown_if_investing)
+                basis_if_buying.append(round(basis_if_buying[-1] + buy_surplus, 2))
+                basis_if_investing.append(basis_if_investing[-1])
             else:
                 invested_if_buying.append(grown_if_buying)
                 invested_if_investing.append(round(grown_if_investing - buy_surplus, 2))
+                basis_if_buying.append(basis_if_buying[-1])
+                basis_if_investing.append(
+                    round(basis_if_investing[-1] - buy_surplus, 2)
+                )
 
-        # Each list has one extra entry: the value at the start of the month after
-        # the horizon, which the projection does not cover.
+        # Only the balances are trimmed. A balance is state at a point in time, so
+        # each was seeded with its month-0 value and every pass appended the NEXT
+        # month's -- leaving one entry too many, the balance at the start of the
+        # month after the horizon, which the projection does not cover. The other
+        # lists hold flows, what happened DURING a month, so a pass appends its own
+        # month and they come out the right length already.
+        #
+        # A consequence worth knowing: the final month's surplus is computed but
+        # lands in the entry that gets discarded here, so it never moves a balance.
+        # Reported month m is therefore the state entering month m, which is what
+        # the sale at the horizon is priced against.
         invested_if_buying.pop()
         invested_if_investing.pop()
+        basis_if_buying.pop()
+        basis_if_investing.pop()
 
         self.invested_if_buying: list[float] = invested_if_buying
         self.invested_if_investing: list[float] = invested_if_investing
+        self.basis_if_buying: list[float] = basis_if_buying
+        self.basis_if_investing: list[float] = basis_if_investing
         self.property_values: list[float] = property_values
         self.equities: list[float] = equities
         self.annual_taxes: list[float] = annual_taxes
         self.after_tax_cash_flows: list[float] = after_tax_cash_flows
         self.buy_surpluses: list[float] = buy_surpluses
+
+    def _liquidate(self) -> RentalVsInvestFinalState:
+        """Sell the property and cash out both worlds, so wealth is comparable.
+
+        Called once at construction, after the projection. An unsold property and
+        an untaxed investment account are not comparable, so everything is turned
+        into money here and the tax that would be owed on doing so is subtracted.
+
+        The buying world's property gain and investment gain are taxed **together**
+        rather than separately. Brackets are progressive, so two gains taxed apart
+        cost less than the same total taxed as one, and this world realises both in
+        the same year. ``main.py`` stacks them for the same reason.
+        """
+        rental_property = self.rental_property
+        sale = rental_property.sale(self.property_values[-1], self.num_months)
+
+        # The bracket position everything stacks on is last year's income, and the
+        # brackets themselves have inflated for the whole horizon by now.
+        tax_month = self.num_months + 1
+        # The same twelve months the monthly loop settled tax on at the final year boundary
+        annual_income = sum(
+            self.ordinary_incomes[self.num_months - MONTHS_PER_YEAR : self.num_months]
+        )
+
+        # Gains on the market accounts: the balance less what was put in. Basis is
+        # every deposit, not just the opening one -- a world that paid in monthly
+        # for thirty years is not taxed on the money it paid in. Losses are floored
+        # at zero, since the tax layer has no way to use them yet.
+        market_balance_if_buying = self.invested_if_buying[-1]
+        market_balance_if_investing = self.invested_if_investing[-1]
+        investment_gain_if_buying = max(
+            market_balance_if_buying - self.basis_if_buying[-1], 0
+        )
+        investment_gain_if_investing = max(
+            market_balance_if_investing - self.basis_if_investing[-1], 0
+        )
+
+        # Hand over what happened and let the tax layer work out what it costs.
+        # Selling ended the loan, so the points never amortized are deductible in
+        # full this year; tax_on_realized_gains knows that comes off before the gains
+        # stack, so the ordering is not this method's business.
+        tax_if_buying = self.tax_module.tax_on_realized_gains(
+            tax_month,
+            annual_income,
+            sale.depreciation_recapture_gain,
+            sale.long_term_capital_gain + investment_gain_if_buying,
+            ordinary_income_deduction=sale.unamortized_discount_points,
+        ).total
+
+        # The investing world has no property, so no recapture and no deduction --
+        # only the gain on its market account.
+        tax_if_investing = self.tax_module.tax_on_realized_gains(
+            tax_month, annual_income, 0, investment_gain_if_investing
+        ).total
+
+        return RentalVsInvestFinalState(
+            market_balance_if_buying=market_balance_if_buying,
+            sale_proceeds=sale.pretax_cash_proceeds,
+            tax_if_buying=tax_if_buying,
+            wealth_if_buying=round(
+                market_balance_if_buying + sale.pretax_cash_proceeds - tax_if_buying, 2
+            ),
+            market_balance_if_investing=market_balance_if_investing,
+            tax_if_investing=tax_if_investing,
+            wealth_if_investing=round(
+                market_balance_if_investing - tax_if_investing, 2
+            ),
+        )
 
     def get_projection_df(self) -> pd.DataFrame:
         """Render the stored projection as a table, for output."""

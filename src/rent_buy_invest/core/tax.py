@@ -10,15 +10,26 @@ MAX_DEPRECIATION_RECAPTURE_RATE = 0.25
 
 
 @dataclass(frozen=True)
-class LiquidationTax:
-    """Tax owed on the sale of a property, split by what is being taxed.
+class RealizedGainsTax:
+    """The extra tax from realizing gains in a year, split by what is being taxed.
 
-    ``total`` is what you actually pay; the two parts above it show where it came
-    from and are reported separately because they are charged at different rates.
+    ``total`` is the extra tax the gains caused -- not a whole tax bill. The tax
+    on the income you would have earned anyway is excluded, because it is the same
+    whichever choice you make. The parts above it show where the figure came from:
+    the two gains are charged at different rates, and any deduction against ordinary
+    income comes off the whole thing.
+
+        total = depreciation_recapture_tax + long_term_capital_gain_tax
+                - tax_saved_by_deduction
+
+    ``tax_saved_by_deduction`` is positive, like every saving in this class, so it
+    subtracts. ``total`` can come out negative when the deduction is worth more
+    than the gains cost.
     """
 
     depreciation_recapture_tax: float
     long_term_capital_gain_tax: float
+    tax_saved_by_deduction: float
     total: float
 
 
@@ -80,36 +91,108 @@ class TaxModule:
         # -0.0 is falsy in python
         return -tax_saved if tax_saved else 0.0
 
-    def liquidation_tax(
+    def tax_saved_by_deduction(
+        self,
+        month: int,
+        ordinary_income: float,
+        deduction: float,
+    ) -> float:
+        """How much a deduction against ordinary income cuts the tax bill.
+
+        Returns a **positive** number: the amount you no longer owe. That is the
+        opposite convention from the rest of this class, where positive means tax
+        owed, and it is deliberate -- a caller subtracts a saving, and a figure
+        called a saving should not be negative.
+
+        A deduction can only offset income you actually have. Deducting more than
+        you earned saves only what the income was worth, and the remainder is not
+        carried into another year.
+        """
+        assert month >= 0
+        assert ordinary_income >= 0
+        assert deduction >= 0
+
+        return round(
+            self.market_config.get_income_tax_savings_from_deduction(
+                month, ordinary_income, deduction
+            ),
+            2,
+        )
+
+    def tax_on_realized_gains(
         self,
         month: int,
         ordinary_income: float,
         depreciation_recapture_gain: float,
         long_term_capital_gain: float,
-    ) -> LiquidationTax:
-        """Tax owed in the year the property is sold.
+        ordinary_income_deduction: float = 0,
+    ) -> RealizedGainsTax:
+        """The extra tax caused by realizing gains in a year.
 
-        The two kinds of gain are not taxed independently -- they stack, in a fixed
-        order, on top of the income you already have:
+        Not a whole tax bill and not specific to property: it takes gains and a
+        deduction and returns what they cost. The investing world calls it with no
+        property at all.
 
-            ordinary income  ->  depreciation recapture  ->  capital gain
+        **What is taxable, by category.** Income is not one pile. Each category has
+        its own rate schedule:
 
-        Each layer starts where the one below it ended. Ignoring the order would
-        understate the capital gains rate, most severely in a low-income year,
-        which is exactly when a sale is most likely to be modeled here.
+        ==========================================  ===============================
+        category                                    schedule
+        ==========================================  ===============================
+        ordinary income, less deductions            ordinary brackets
+        (salary, rent, short-term capital gains)
+        depreciation recapture                      ordinary rates, capped at
+                                                    ``MAX_DEPRECIATION_RECAPTURE_RATE``
+        long-term capital gain                      long-term capital gains brackets
+        ==========================================  ===============================
 
-        Only the ceiling differs between the layers: recapture is charged at your
-        ordinary rates but never above ``MAX_DEPRECIATION_RECAPTURE_RATE``, while
-        the capital gain uses the long-term capital gains brackets.
+        Deductions come off ordinary income, which is the bottom of the pile. That
+        is why ``ordinary_income_deduction`` is a parameter here rather than
+        something a caller nets out first -- see below.
 
-        TODO: A sale at a loss reaches this method as two zeros and is therefore untaxed.
-        Whether such a loss ought to produce a deduction is a separate question
-        this tool does not yet answer.
+        **The categories are not independent.** Each one stacks on top of the ones
+        beneath it, and its *rate* depends on how much is down there:
+
+            ordinary income  (less any deduction)
+              ->  depreciation recapture
+                ->  long-term capital gain
+
+        A long-term gain is always charged on its own schedule -- it never becomes
+        ordinary income -- but your salary has already used up the lower bands, so
+        the gain starts further up. The same $100,000 gain can cost 5% or 15%
+        depending only on what sits below it. Handing a caller the job of
+        sequencing that would be easy to get wrong, so it happens here: the
+        deduction comes off first, then each layer is charged where it lands.
+
+        **Why a difference and not a total.** The tax on your salary is owed
+        whether or not you sell anything, so it is identical in both worlds this
+        tool compares and cancels out of the answer. Charging it would also make
+        each world's wealth meaningless on its own -- income tax on a job has no
+        business being subtracted from the proceeds of selling a house. So the whole
+        year is worked out the way the law does it, and then what would have been
+        owed anyway is subtracted:
+
+            total = (ordinary + recapture + capital gain, all stacked)
+                    - (ordinary alone, with no sale and no deduction)
+
+        ``ordinary_income`` is therefore a *position*, not a charge: it says where
+        on the brackets everything else lands. It is never taxed here.
+
+        TODO: A sale at a loss reaches this method as two zeros and is therefore
+        untaxed. Whether such a loss ought to produce a deduction is a separate
+        question this tool does not yet answer.
         """
         assert month >= 0
         assert ordinary_income >= 0
         assert depreciation_recapture_gain >= 0
         assert long_term_capital_gain >= 0
+        assert ordinary_income_deduction >= 0
+
+        tax_saved_by_deduction = self.tax_saved_by_deduction(
+            month, ordinary_income, ordinary_income_deduction
+        )
+        # everything above stacks on what is left of the income
+        ordinary_income = max(ordinary_income - ordinary_income_deduction, 0)
 
         # First layer above ordinary income: what the recapture would cost at
         # ordinary rates, then capped. Note that depreciation recapture is taxed
@@ -141,8 +224,14 @@ class TaxModule:
             2,
         )
 
-        return LiquidationTax(
+        return RealizedGainsTax(
             depreciation_recapture_tax=depreciation_recapture_tax,
             long_term_capital_gain_tax=long_term_capital_gain_tax,
-            total=round(depreciation_recapture_tax + long_term_capital_gain_tax, 2),
+            tax_saved_by_deduction=tax_saved_by_deduction,
+            total=round(
+                depreciation_recapture_tax
+                + long_term_capital_gain_tax
+                - tax_saved_by_deduction,
+                2,
+            ),
         )
