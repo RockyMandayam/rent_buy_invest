@@ -11,7 +11,7 @@ from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, increment_month
 
 
-class RentalVsInvestCalculator:
+class RentalVsInvestExperiment:
     """Projects buying a property to rent out against investing the same money.
 
     Two worlds, month by month. In one you buy the property; in the other you put
@@ -40,6 +40,16 @@ class RentalVsInvestCalculator:
 
     The projection stops at the horizon without selling anything. Liquidating the
     property and comparing final wealth is a separate step.
+
+    **Constructing this runs it.** The monthly loop happens once, at construction,
+    and its results are stored as plain lists indexed by month. There is no method
+    to call in the right order, and nothing downstream reads numbers back out of
+    the rendered table. ``get_projection_df`` only formats what is already there.
+
+    Named an experiment rather than a calculator because that is what it is: a
+    completed run. The repo already uses the word that way -- ``ExperimentConfig``
+    holds a run's inputs and ``ExperimentWriter`` writes its outputs -- but until
+    now nothing was one, and ``main.py`` played that role procedurally.
     """
 
     def __init__(
@@ -69,7 +79,16 @@ class RentalVsInvestCalculator:
             buy_config.down_payment + buy_config.get_upfront_one_time_cost(), 2
         )
 
-    def calculate(self) -> pd.DataFrame:
+        # NOTE _project adds a bunch of instance attributes
+        self._project()
+
+    def _project(self) -> None:
+        """Run the month-by-month projection, storing the result on the instance.
+
+        Called once at construction. Everything it produces is a plain list
+        indexed by month, so nothing downstream has to read numbers back out of
+        the rendered DataFrame.
+        """
         num_months = self.num_months
         rental_property = self.rental_property
 
@@ -141,11 +160,22 @@ class RentalVsInvestCalculator:
         invested_if_buying.pop()
         invested_if_investing.pop()
 
+        self.invested_if_buying: list[float] = invested_if_buying
+        self.invested_if_investing: list[float] = invested_if_investing
+        self.property_values: list[float] = property_values
+        self.equities: list[float] = equities
+        self.annual_taxes: list[float] = annual_taxes
+        self.after_tax_cash_flows: list[float] = after_tax_cash_flows
+        self.buy_surpluses: list[float] = buy_surpluses
+
+    def get_projection_df(self) -> pd.DataFrame:
+        """Render the stored projection as a table, for output."""
+        rental_property = self.rental_property
         cols = {
-            "Buy Rental: Invested (Pre-Tax)": invested_if_buying,
-            "Buy Rental: Property Value": property_values,
+            "Buy Rental: Invested (Pre-Tax)": self.invested_if_buying,
+            "Buy Rental: Property Value": self.property_values,
             "Buy Rental: Loan Amount": rental_property.monthly_loan_balance,
-            "Buy Rental: Equity": equities,
+            "Buy Rental: Equity": self.equities,
             "Buy Rental: Rental Income": rental_property.monthly_rental_income,
             "Buy Rental: Operating Expenses": rental_property.monthly_operating_expenses,
             "Buy Rental: Mortgage Interest Payment": rental_property.monthly_mortgage_interest,
@@ -153,14 +183,14 @@ class RentalVsInvestCalculator:
             "Buy Rental: Depreciation": rental_property.monthly_depreciation,
             "Buy Rental: Discount Points Deduction": rental_property.monthly_discount_points_deduction,
             "Buy Rental: Taxable Income": rental_property.monthly_taxable_income,
-            "Buy Rental: Tax": annual_taxes,
-            "Buy Rental: Cash Flow (After Tax)": after_tax_cash_flows,
-            "Buy Rental: Surplus": buy_surpluses,
-            "Invest: Invested (Pre-Tax)": invested_if_investing,
+            "Buy Rental: Tax": self.annual_taxes,
+            "Buy Rental: Cash Flow (After Tax)": self.after_tax_cash_flows,
+            "Buy Rental: Surplus": self.buy_surpluses,
+            "Invest: Invested (Pre-Tax)": self.invested_if_investing,
         }
         rows = []
         date = self.start_date
-        for _ in range(num_months + 1):
+        for _ in range(self.num_months + 1):
             rows.append(date.strftime("%b %d, %Y"))
             date = increment_month(date)
         return to_df(cols, rows, multi_col=True)
