@@ -15,7 +15,7 @@ class BuyConfig(Config):
         See rent_buy_invest/configs/schemas/buy-config-schema.md for documentation
     """
 
-    MAX_ANNUAL_RENT_INFLATION_RATE = 1.0
+    MAX_ANNUAL_ASSESSED_VALUE_INFLATION_RATE = 0.5
     MAX_MORTGAGE_ANNUAL_INTEREST_RATE = 1.0
     MAX_MORTGAGE_TERM = 60 * MONTHS_PER_YEAR
     MAX_UPFRONT_MORTGAGE_INSURANCE_FRACTION = 0.1
@@ -397,7 +397,7 @@ class BuyConfig(Config):
         assert self.monthly_hoa_fees >= 0, "Monthly HOA fees must be non-negative."
         self._validate_max_value(
             "annual_assessed_value_inflation_rate",
-            BuyConfig.MAX_ANNUAL_RENT_INFLATION_RATE,
+            BuyConfig.MAX_ANNUAL_ASSESSED_VALUE_INFLATION_RATE,
         )
         self._validate_max_value(
             "mortgage_annual_interest_rate",
