@@ -11,6 +11,7 @@ from rent_buy_invest.core.calculator import (
 )
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
+from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg
 
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH)
@@ -211,6 +212,7 @@ class TestCalculator:
             num_months
         )
         market_config = experiment_config.market_config
+        tax_module = TaxModule(market_config)
         years_where_the_two_formulas_disagree = 0
 
         for month in range(MONTHS_PER_YEAR - 1, num_months + 1, MONTHS_PER_YEAR):
@@ -229,14 +231,21 @@ class TestCalculator:
                     avg_loan_amount,
                 )
             )
-            prorated_deduction = market_config.get_income_tax_savings_from_deduction(
-                month, annual_income, deductible_fraction * interest_for_the_year
-            )
+            salary = TaxableAmounts(ordinary_income=annual_income)
+            prorated_deduction = -tax_module.extra_tax_from(
+                month,
+                salary,
+                TaxableAmounts(
+                    ordinary_deductions=deductible_fraction * interest_for_the_year
+                ),
+            ).ordinary
             prorated_saving = (
                 deductible_fraction
-                * market_config.get_income_tax_savings_from_deduction(
-                    month, annual_income, interest_for_the_year
-                )
+                * -tax_module.extra_tax_from(
+                    month,
+                    salary,
+                    TaxableAmounts(ordinary_deductions=interest_for_the_year),
+                ).ordinary
             )
 
             reported = projection["Buy"]["Mortgage Interest Deduction Savings"].iloc[
@@ -324,10 +333,17 @@ class TestCalculator:
             stacked = market_config.get_tax(
                 month, salary + rent, ordinary_income_deduction=deduction
             ) - market_config.get_tax(month, salary)
-            parallel = market_config.get_additional_tax_from_additional_income(
-                month, salary, rent
-            ) - market_config.get_income_tax_savings_from_deduction(
-                month, salary, deduction
+            parallel = (
+                market_config.get_additional_tax_from_additional_income(
+                    month, salary, rent
+                )
+                - -TaxModule(market_config)
+                .extra_tax_from(
+                    month,
+                    TaxableAmounts(ordinary_income=salary),
+                    TaxableAmounts(ordinary_deductions=deduction),
+                )
+                .ordinary
             )
             assert reported == pytest.approx(stacked, abs=0.02)
             if stacked != pytest.approx(parallel, abs=0.02):

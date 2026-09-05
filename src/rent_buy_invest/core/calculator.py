@@ -9,6 +9,7 @@ from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.amortization import compute_loan_amortization_schedule
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.mortgage_insurance import compute_mortgage_insurance_schedule
+from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg, increment_month
 
@@ -41,6 +42,7 @@ class Calculator:
         self.num_years: int = num_years
         self.start_date: datetime.date = start_date
         self.initial_state: InitialState = initial_state
+        self.tax_module: TaxModule = TaxModule(market_config)
 
     def calculate(self) -> pd.DataFrame:
         num_months = self.num_years * MONTHS_PER_YEAR
@@ -159,18 +161,22 @@ class Calculator:
                 #
                 # The convention here is the one a tax return follows: all income
                 # first, then deductions come off the top of it.
-                rental_income_tax = (
-                    self.market_config.get_additional_tax_from_additional_income(
-                        month, annual_income, annual_rental_income
-                    )
-                )
-                mortgage_interest_deduction_saving = (
-                    self.market_config.get_income_tax_savings_from_deduction(
-                        month,
-                        annual_income + annual_rental_income,
-                        deductible_mortgage_interest,
-                    )
-                )
+                # Both adjustments are ordinary income, and only their combined
+                # effect on the year is a fact -- splitting it between the two
+                # reported columns is a convention. The convention is the one a
+                # tax return follows, so the position accumulates: income first,
+                # then the deduction off the top of it.
+                position = TaxableAmounts(ordinary_income=annual_income)
+                rent_received = TaxableAmounts(ordinary_income=annual_rental_income)
+                rental_income_tax = self.tax_module.extra_tax_from(
+                    month, position, rent_received
+                ).ordinary
+                position = position + rent_received
+                mortgage_interest_deduction_saving = -self.tax_module.extra_tax_from(
+                    month,
+                    position,
+                    TaxableAmounts(ordinary_deductions=deductible_mortgage_interest),
+                ).ordinary
             else:
                 rental_income_tax = 0
                 mortgage_interest_deduction_saving = 0

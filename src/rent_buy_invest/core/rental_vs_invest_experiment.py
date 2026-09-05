@@ -8,7 +8,7 @@ from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.core.final_state import RentalVsInvestFinalState
 from rent_buy_invest.core.initial_state import RentalVsInvestInitialState
 from rent_buy_invest.core.rental_property import RentalProperty
-from rent_buy_invest.core.tax import TaxModule
+from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, increment_month
 
@@ -166,25 +166,32 @@ class RentalVsInvestExperiment:
                 dividends_if_buying = get_dividends(growth_if_buying_this_year)
                 dividends_if_investing = get_dividends(growth_if_investing_this_year)
 
-                # The year's tax is charged in layers, each on top of the
-                # taxable income the one before it left. The rental comes first:
-                # its net income, routinely a loss, moves that income up or down.
-                annual_tax = self.tax_module.annual_rental_activity_tax(
-                    month, income_for_the_year, taxable_rental_income_for_the_year
-                )
-                # Dividends land on whatever the rental left, not on salary --
-                # charging them against salary would tax them in a bracket the
-                # loss means you never reach. A loss bigger than the income
-                # leaves nothing to stack on, hence the floor at zero. The
-                # investing world owns no property, so its base is just salary.
-                dividend_tax_if_buying = self.tax_module.annual_dividend_tax(
+                # One call per world, and the layering happens inside it: the
+                # rental's net income moves taxable income up or down, and the
+                # dividends are then charged wherever that left it. Handing over
+                # the whole year at once is what makes that ordering impossible
+                # to get wrong here.
+                salary = TaxableAmounts(ordinary_income=income_for_the_year)
+                tax_if_buying = self.tax_module.extra_tax_from(
                     month,
-                    max(income_for_the_year + taxable_rental_income_for_the_year, 0.0),
-                    dividends_if_buying,
+                    salary,
+                    TaxableAmounts(
+                        ordinary_income=max(taxable_rental_income_for_the_year, 0.0),
+                        ordinary_deductions=max(
+                            -taxable_rental_income_for_the_year, 0.0
+                        ),
+                        long_term_capital_gains=dividends_if_buying,
+                    ),
                 )
-                dividend_tax_if_investing = self.tax_module.annual_dividend_tax(
-                    month, income_for_the_year, dividends_if_investing
+                # The investing world owns no property, so it has no rental layer.
+                tax_if_investing = self.tax_module.extra_tax_from(
+                    month,
+                    salary,
+                    TaxableAmounts(long_term_capital_gains=dividends_if_investing),
                 )
+                annual_tax = tax_if_buying.ordinary
+                dividend_tax_if_buying = tax_if_buying.long_term_capital_gain
+                dividend_tax_if_investing = tax_if_investing.long_term_capital_gain
                 reinvested_if_buying = round(
                     dividends_if_buying - dividend_tax_if_buying, 2
                 )
@@ -328,20 +335,26 @@ class RentalVsInvestExperiment:
 
         # Hand over what happened and let the tax layer work out what it costs.
         # Selling ended the loan, so the points never amortized are deductible in
-        # full this year; tax_on_realized_gains knows that comes off before the gains
-        # stack, so the ordering is not this method's business.
-        tax_if_buying = self.tax_module.tax_on_realized_gains(
+        # full this year; extra_tax_from charges it before the gains stack, so the
+        # ordering is not this method's business.
+        tax_if_buying = self.tax_module.extra_tax_from(
             tax_month,
-            annual_income,
-            sale.depreciation_recapture_gain,
-            sale.long_term_capital_gain + investment_gain_if_buying,
-            ordinary_income_deduction=sale.unamortized_discount_points,
+            TaxableAmounts(ordinary_income=annual_income),
+            TaxableAmounts(
+                ordinary_deductions=sale.unamortized_discount_points,
+                depreciation_recapture=sale.depreciation_recapture_gain,
+                long_term_capital_gains=(
+                    sale.long_term_capital_gain + investment_gain_if_buying
+                ),
+            ),
         ).total
 
         # The investing world has no property, so no recapture and no deduction --
         # only the gain on its market account.
-        tax_if_investing = self.tax_module.tax_on_realized_gains(
-            tax_month, annual_income, 0, investment_gain_if_investing
+        tax_if_investing = self.tax_module.extra_tax_from(
+            tax_month,
+            TaxableAmounts(ordinary_income=annual_income),
+            TaxableAmounts(long_term_capital_gains=investment_gain_if_investing),
         ).total
 
         return RentalVsInvestFinalState(
