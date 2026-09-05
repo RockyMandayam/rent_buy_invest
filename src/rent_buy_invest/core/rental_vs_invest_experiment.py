@@ -166,15 +166,16 @@ class RentalVsInvestExperiment:
                 dividends_if_buying = get_dividends(growth_if_buying_this_year)
                 dividends_if_investing = get_dividends(growth_if_investing_this_year)
 
-                # One call per world, so a world's layers are charged in order
-                # instead of each being worked out from salary in isolation. The
-                # investing world owns no property, so it has no rental layer.
+                # The year's tax is charged in layers, each on top of the
+                # taxable income the one before it left. The rental comes first:
+                # its net income, routinely a loss, moves that income up or down.
                 annual_tax = self.tax_module.annual_rental_activity_tax(
                     month, income_for_the_year, taxable_rental_income_for_the_year
                 )
-                # Dividends are charged on top of what the rental left, not on
-                # salary: a rental loss drags taxable income down first, and a
-                # loss bigger than the income leaves nothing to stack on. The
+                # Dividends land on whatever the rental left, not on salary --
+                # charging them against salary would tax them in a bracket the
+                # loss means you never reach. A loss bigger than the income
+                # leaves nothing to stack on, hence the floor at zero. The
                 # investing world owns no property, so its base is just salary.
                 dividend_tax_if_buying = self.tax_module.annual_dividend_tax(
                     month,
