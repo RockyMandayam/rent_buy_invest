@@ -50,9 +50,8 @@ def _cap_gains_from_selling_investments(projection: pd.DataFrame, world: str) ->
     The final month's surplus is excluded because it never lands: ``Calculator``
     appends one extra balance and pops it, so the last row's cash flow never moves
     an account.
-
-    TODO handle losses here and everywhere else. For now, just set gain to 0.
     """
+    # NOTE you cannot deduct losses for a primary residence property...
     final = projection[(world, "Invested (Pre-Tax)")].iloc[-1]
     opening = projection[(world, "Invested (Pre-Tax)")].iloc[0]
     deposits = projection[(world, "Surplus")].iloc[:-1].sum()
