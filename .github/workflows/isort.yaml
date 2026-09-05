@@ -10,7 +10,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.11.4
+          python-version: 3.12
       - name: Run isort
         run: |
           pip install -r requirements.txt
