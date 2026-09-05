@@ -33,6 +33,69 @@ class RealizedGainsTax:
     total: float
 
 
+@dataclass(frozen=True)
+class TaxableAmounts:
+    """What happened in one tax year, sorted into the categories taxed differently.
+
+    Dollars of income, deduction and gain -- not tax. There are four fields
+    because this tool taxes four things by different rules; anything a caller has
+    is one of them, and where each lands is fixed law rather than a caller's
+    choice:
+
+        ordinary income, less deductions   ordinary brackets
+          -> depreciation recapture        ordinary rates, capped at
+                                           MAX_DEPRECIATION_RECAPTURE_RATE
+            -> long-term capital gain      long-term capital gains brackets
+
+    Within a category the items are interchangeable: a year's rent and a year's
+    salary are one number by the time the brackets see them, and so are a
+    mortgage interest deduction and a rental loss. Between categories they are
+    not, which is why the split is here and not finer.
+
+    Amounts add, so a year can be built up a piece at a time and priced once.
+    """
+
+    ordinary_income: float = 0.0
+    ordinary_deductions: float = 0.0
+    depreciation_recapture: float = 0.0
+    long_term_capital_gains: float = 0.0
+
+    def __add__(self, other: "TaxableAmounts") -> "TaxableAmounts":
+        return TaxableAmounts(
+            ordinary_income=self.ordinary_income + other.ordinary_income,
+            ordinary_deductions=self.ordinary_deductions + other.ordinary_deductions,
+            depreciation_recapture=(
+                self.depreciation_recapture + other.depreciation_recapture
+            ),
+            long_term_capital_gains=(
+                self.long_term_capital_gains + other.long_term_capital_gains
+            ),
+        )
+
+
+@dataclass(frozen=True)
+class TaxCost:
+    """What some amounts cost, split by the schedule that charged each part.
+
+    Each field is the EXTRA tax that category caused, in dollars, on top of what
+    was already there -- never a whole tax bill. ``ordinary`` is income net of
+    deductions, so it comes out negative in a year the deductions win, which is
+    routine for a rental.
+
+        total = ordinary + depreciation_recapture + long_term_capital_gain
+
+    The split is by category and no finer. Attributing one category's tax to the
+    individual items inside it -- how much of a year's ordinary tax was "the
+    rent" versus "the mortgage interest" -- has no answer in tax law; only their
+    combined effect is a fact.
+    """
+
+    ordinary: float
+    depreciation_recapture: float
+    long_term_capital_gain: float
+    total: float
+
+
 class TaxModule:
     """Turns amounts of income and gain into dollars of tax owed.
 
@@ -48,6 +111,98 @@ class TaxModule:
 
     def __init__(self, market_config: MarketConfig) -> None:
         self.market_config: MarketConfig = market_config
+
+    def _tax_owed(self, month: int, amounts: TaxableAmounts) -> float:
+        """The whole tax bill for a year described by ``amounts``, in dollars.
+
+        Private because an absolute bill is never what this tool wants: the tax
+        on income you would have earned anyway is identical in both worlds being
+        compared and cancels out of the answer. Charging it would also make each
+        world's wealth meaningless on its own. Callers want ``extra_tax_from``,
+        which is the difference of two of these.
+
+        The categories are charged in the order they stack, each starting where
+        the one beneath it ended.
+        """
+        taxable_ordinary_income = max(
+            amounts.ordinary_income - amounts.ordinary_deductions, 0.0
+        )
+        tax = self.market_config.get_tax(
+            month,
+            amounts.ordinary_income,
+            ordinary_income_deduction=amounts.ordinary_deductions,
+        )
+
+        # Recapture is charged at ordinary rates, but never above the cap.
+        tax += min(
+            MAX_DEPRECIATION_RECAPTURE_RATE * amounts.depreciation_recapture,
+            self.market_config.get_additional_tax_from_additional_income(
+                month, taxable_ordinary_income, amounts.depreciation_recapture
+            ),
+        )
+
+        # Capital gain has its own schedule, but starts where the recapture ended:
+        # the same gain costs more with more sitting underneath it.
+        gains_start_at = taxable_ordinary_income + amounts.depreciation_recapture
+        tax += self.market_config.get_tax(
+            month,
+            gains_start_at,
+            long_term_capital_gains=amounts.long_term_capital_gains,
+        ) - self.market_config.get_tax(month, gains_start_at)
+        return tax
+
+    def extra_tax_from(
+        self, month: int, already: TaxableAmounts, added: TaxableAmounts
+    ) -> TaxCost:
+        """What ``added`` costs on top of ``already``, split by category.
+
+        This is the one place tax layers are sequenced. Each category is priced
+        where it actually lands -- on top of everything beneath it, including
+        whatever ``added`` itself put there -- by pricing the same year three
+        times and taking the steps between. The parts therefore add up to the
+        total by construction, not by convention.
+
+        Working a category out from ``already`` alone instead would charge it as
+        if the other categories had not happened, and price some of it in
+        brackets the year never reaches. That mistake is silent: it only shows up
+        in years where an amount is big enough to move a bracket.
+
+        ``already`` says where on the brackets everything lands; its own tax is
+        never charged.
+        """
+        assert month >= 0
+        assert already.ordinary_income >= 0
+        assert added.ordinary_income >= 0
+        assert added.ordinary_deductions >= 0
+        assert added.depreciation_recapture >= 0
+        assert added.long_term_capital_gains >= 0
+
+        through_ordinary = already + TaxableAmounts(
+            ordinary_income=added.ordinary_income,
+            ordinary_deductions=added.ordinary_deductions,
+        )
+        through_recapture = through_ordinary + TaxableAmounts(
+            depreciation_recapture=added.depreciation_recapture
+        )
+        through_gains = through_recapture + TaxableAmounts(
+            long_term_capital_gains=added.long_term_capital_gains
+        )
+
+        tax_before = self._tax_owed(month, already)
+        tax_through_ordinary = self._tax_owed(month, through_ordinary)
+        tax_through_recapture = self._tax_owed(month, through_recapture)
+        tax_through_gains = self._tax_owed(month, through_gains)
+
+        ordinary = round(tax_through_ordinary - tax_before, 2)
+        depreciation_recapture = round(tax_through_recapture - tax_through_ordinary, 2)
+        long_term_capital_gain = round(tax_through_gains - tax_through_recapture, 2)
+        return TaxCost(
+            ordinary=ordinary,
+            depreciation_recapture=depreciation_recapture,
+            long_term_capital_gain=long_term_capital_gain,
+            # the sum of the rounded parts, so the object is self-consistent
+            total=round(ordinary + depreciation_recapture + long_term_capital_gain, 2),
+        )
 
     def annual_rental_activity_tax(
         self,
@@ -71,25 +226,15 @@ class TaxModule:
         nothing and is not carried forward to a later year, though real tax law
         would carry it.
         """
-        assert month >= 0
-        assert base_ordinary_income >= 0
-
-        if taxable_rental_income >= 0:
-            return round(
-                self.market_config.get_additional_tax_from_additional_income(
-                    month, base_ordinary_income, taxable_rental_income
-                ),
-                2,
-            )
-        tax_saved = round(
-            self.market_config.get_income_tax_savings_from_deduction(
-                month, base_ordinary_income, -taxable_rental_income
+        # A profit is more ordinary income; a loss is a deduction against it.
+        return self.extra_tax_from(
+            month,
+            TaxableAmounts(ordinary_income=base_ordinary_income),
+            TaxableAmounts(
+                ordinary_income=max(taxable_rental_income, 0.0),
+                ordinary_deductions=max(-taxable_rental_income, 0.0),
             ),
-            2,
-        )
-        # guard against returning -0.0 when the loss was worth nothing
-        # -0.0 is falsy in python
-        return -tax_saved if tax_saved else 0.0
+        ).ordinary
 
     def annual_dividend_tax(
         self,
@@ -116,17 +261,11 @@ class TaxModule:
         right for a broad stock index fund and too generous for a REIT, a bond
         fund, or many foreign funds, whose distributions are largely ordinary.
         """
-        assert month >= 0
-        assert base_ordinary_income >= 0
-        assert dividends >= 0
-
-        return round(
-            self.market_config.get_tax(
-                month, base_ordinary_income, long_term_capital_gains=dividends
-            )
-            - self.market_config.get_tax(month, base_ordinary_income),
-            2,
-        )
+        return self.extra_tax_from(
+            month,
+            TaxableAmounts(ordinary_income=base_ordinary_income),
+            TaxableAmounts(long_term_capital_gains=dividends),
+        ).long_term_capital_gain
 
     def tax_saved_by_deduction(
         self,
@@ -145,16 +284,14 @@ class TaxModule:
         you earned saves only what the income was worth, and the remainder is not
         carried into another year.
         """
-        assert month >= 0
-        assert ordinary_income >= 0
-        assert deduction >= 0
-
-        return round(
-            self.market_config.get_income_tax_savings_from_deduction(
-                month, ordinary_income, deduction
-            ),
-            2,
-        )
+        cost = self.extra_tax_from(
+            month,
+            TaxableAmounts(ordinary_income=ordinary_income),
+            TaxableAmounts(ordinary_deductions=deduction),
+        ).ordinary
+        # a saving is the negative of a cost; guard against handing back -0.0,
+        # which is falsy in python, when the deduction was worth nothing
+        return -cost if cost else 0.0
 
     def tax_on_realized_gains(
         self,
@@ -219,47 +356,21 @@ class TaxModule:
         untaxed. Whether such a loss ought to produce a deduction is a separate
         question this tool does not yet answer.
         """
-        assert month >= 0
-        assert ordinary_income >= 0
-        assert depreciation_recapture_gain >= 0
-        assert long_term_capital_gain >= 0
-        assert ordinary_income_deduction >= 0
-
-        tax_saved_by_deduction = self.tax_saved_by_deduction(
-            month, ordinary_income, ordinary_income_deduction
-        )
-        # everything above stacks on what is left of the income
-        ordinary_income = max(ordinary_income - ordinary_income_deduction, 0)
-
-        # First layer above ordinary income: what the recapture would cost at
-        # ordinary rates, then capped. Note that depreciation recapture is taxed
-        # at ORDINARY not Long Term Cap Gains rate, capped at MAX_DEPRECIATION_RECAPTURE_RATE
-        recapture_tax_at_ordinary_rates = (
-            self.market_config.get_additional_tax_from_additional_income(
-                month, ordinary_income, depreciation_recapture_gain
-            )
-        )
-        depreciation_recapture_tax = round(
-            min(
-                MAX_DEPRECIATION_RECAPTURE_RATE * depreciation_recapture_gain,
-                recapture_tax_at_ordinary_rates,
-            ),
-            2,
-        )
-
-        # Second layer: capital gain starts where the recapture ended. Taking the
-        # difference of two calls isolates the capital gains tax, since the tax on
-        # the base is identical in both and cancels.
-        capital_gain_starts_at = ordinary_income + depreciation_recapture_gain
-        long_term_capital_gain_tax = round(
-            self.market_config.get_tax(
-                month,
-                capital_gain_starts_at,
+        cost = self.extra_tax_from(
+            month,
+            TaxableAmounts(ordinary_income=ordinary_income),
+            TaxableAmounts(
+                ordinary_deductions=ordinary_income_deduction,
+                depreciation_recapture=depreciation_recapture_gain,
                 long_term_capital_gains=long_term_capital_gain,
-            )
-            - self.market_config.get_tax(month, capital_gain_starts_at),
-            2,
+            ),
         )
+        depreciation_recapture_tax = cost.depreciation_recapture
+        long_term_capital_gain_tax = cost.long_term_capital_gain
+        # The deduction is the only ordinary-category amount here, so this
+        # category's cost IS what the deduction did -- reported as a positive
+        # saving, which is the opposite sign to the cost it came from.
+        tax_saved_by_deduction = -cost.ordinary if cost.ordinary else 0.0
 
         return RealizedGainsTax(
             depreciation_recapture_tax=depreciation_recapture_tax,
