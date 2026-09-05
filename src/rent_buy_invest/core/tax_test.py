@@ -1,7 +1,11 @@
 import pytest
 
 from rent_buy_invest.configs.market_config import MarketConfig
-from rent_buy_invest.core.tax import MAX_DEPRECIATION_RECAPTURE_RATE, TaxModule
+from rent_buy_invest.core.tax import (
+    MAX_DEPRECIATION_RECAPTURE_RATE,
+    TaxableAmounts,
+    TaxModule,
+)
 
 MARKET_CONFIG_PATH = "rent_buy_invest/core/test_resources/test-market-config.yaml"
 MONTH = 120
@@ -34,6 +38,79 @@ def _high_bracket_tax_module() -> TaxModule:
                 ],
             },
         )
+    )
+
+
+def test_extra_tax_from_parts_add_up_to_the_total() -> None:
+    """The categories are steps of one calculation, so they cannot fail to sum."""
+    tax_module = _high_bracket_tax_module()
+    salary = TaxableAmounts(ordinary_income=90_000.0)
+
+    for added in (
+        TaxableAmounts(),
+        TaxableAmounts(ordinary_income=20_000.0),
+        TaxableAmounts(ordinary_deductions=30_000.0),
+        TaxableAmounts(depreciation_recapture=40_000.0),
+        TaxableAmounts(long_term_capital_gains=60_000.0),
+        TaxableAmounts(
+            ordinary_income=15_000.0,
+            ordinary_deductions=50_000.0,
+            depreciation_recapture=40_000.0,
+            long_term_capital_gains=60_000.0,
+        ),
+    ):
+        cost = tax_module.extra_tax_from(MONTH, salary, added)
+        assert cost.total == pytest.approx(
+            cost.ordinary + cost.depreciation_recapture + cost.long_term_capital_gain,
+            abs=0.01,
+        )
+
+
+def test_extra_tax_from_charges_each_category_where_it_lands() -> None:
+    """A category is priced on top of the ones beneath it, not from the base.
+
+    The same capital gain costs more when there is ordinary income and recapture
+    underneath it, because it starts further up the schedule.
+    """
+    tax_module = _high_bracket_tax_module()
+    salary = TaxableAmounts(ordinary_income=20_000.0)
+    gain = TaxableAmounts(long_term_capital_gains=60_000.0)
+
+    alone = tax_module.extra_tax_from(MONTH, salary, gain)
+    with_more_underneath = tax_module.extra_tax_from(
+        MONTH,
+        salary,
+        gain + TaxableAmounts(ordinary_income=40_000.0),
+    )
+    assert with_more_underneath.long_term_capital_gain > alone.long_term_capital_gain
+
+    # and a deduction pushes it back down, for the same reason
+    with_a_deduction = tax_module.extra_tax_from(
+        MONTH, salary, gain + TaxableAmounts(ordinary_deductions=15_000.0)
+    )
+    assert with_a_deduction.long_term_capital_gain < alone.long_term_capital_gain
+
+
+def test_extra_tax_from_never_charges_the_base() -> None:
+    """``already`` says where things land; its own tax is not the caller's bill."""
+    tax_module = _high_bracket_tax_module()
+    nothing_added = tax_module.extra_tax_from(
+        MONTH, TaxableAmounts(ordinary_income=250_000.0), TaxableAmounts()
+    )
+    assert nothing_added.total == 0
+
+
+def test_extra_tax_from_caps_recapture_at_the_maximum_rate() -> None:
+    """Recapture is charged at ordinary rates, but never above the cap."""
+    tax_module = _high_bracket_tax_module()  # tops out at 37%, above the 25% cap
+    recapture = 100_000.0
+    cost = tax_module.extra_tax_from(
+        MONTH,
+        TaxableAmounts(ordinary_income=250_000.0),
+        TaxableAmounts(depreciation_recapture=recapture),
+    )
+    assert cost.depreciation_recapture == pytest.approx(
+        MAX_DEPRECIATION_RECAPTURE_RATE * recapture
     )
 
 
