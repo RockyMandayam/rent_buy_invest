@@ -13,16 +13,6 @@ from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.data_utils import to_df
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg, increment_month
 
-# For a given year, if the average mortgage balance is this amount or less, all mortgage interest is tax deducible
-# Otherwise, a "prorated" amount is deductible. E.g., if the average mortgage balance was 800,000,
-# and the max balance on which interest is deductible is 750,000, then
-# (750/800)*(mortgage interest paid that year) is deductible
-# The IRS lets you average just the first and last balance of the year; since we have every
-# monthly balance, we average all twelve instead, which tracks the real average balance more closely.
-# This is the cap for a single filer (married filing jointly is also 750,000; married filing
-# separately is half, 375,000). We assume a single filer throughout.
-MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE = 750000
-
 
 class Calculator:
     def __init__(
@@ -127,29 +117,16 @@ class Calculator:
                         month + 1 - MONTHS_PER_YEAR : month + 1
                     ]
                 )
-                # ordinary income tax savings due to mortgage interest deduction
-                # with this formula, if the average loan amount is <= MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, there is no change
-                # but if the average loan amount is larger than that, you only get a "prorated" deduction
-                deductible_fraction_of_interest = (
-                    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
-                    / max(
-                        MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
-                        avg_loan_amount,
-                    )
-                )
                 annual_income = sum(
                     ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
                 )
                 annual_rental_income = sum(
                     home_monthly_rental_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
                 )
-                # The cap limits how much interest may be DEDUCTED, so it has to
-                # shrink the deduction and let the brackets act on what is left.
-                # Shrinking the resulting saving instead would price the surviving
-                # dollars at the average rate of the whole deduction, and since a
-                # deduction comes off the top of income first, that understates the saving.
                 deductible_mortgage_interest = (
-                    deductible_fraction_of_interest * mortgage_interest_for_the_year
+                    self.tax_module.deductible_mortgage_interest(
+                        mortgage_interest_for_the_year, avg_loan_amount
+                    )
                 )
                 # The year has two ordinary-income adjustments, and they are not
                 # independent: rent RAISES taxable income and the deduction LOWERS

@@ -5,13 +5,14 @@ import pytest
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.configs.experiment_config_test import TestExperimentConfig
 from rent_buy_invest.configs.market_config import MarketConfig
-from rent_buy_invest.core.calculator import (
-    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
-    Calculator,
-)
+from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
-from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
+from rent_buy_invest.core.tax import (
+    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
+    TaxableAmounts,
+    TaxModule,
+)
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, avg
 
 EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH)

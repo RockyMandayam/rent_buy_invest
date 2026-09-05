@@ -3,6 +3,8 @@ import pytest
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.core.tax import (
     MAX_DEPRECIATION_RECAPTURE_RATE,
+    MAX_EXCLUDED_GAIN_ON_A_HOME_YOU_LIVED_IN,
+    MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
     TaxableAmounts,
     TaxModule,
 )
@@ -39,6 +41,57 @@ def _high_bracket_tax_module() -> TaxModule:
             },
         )
     )
+
+
+def test_deductible_mortgage_interest_is_all_of_it_under_the_cap() -> None:
+    tax_module = _tax_module()
+    interest = 30_000.0
+    under_the_cap = MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE - 1
+    assert tax_module.deductible_mortgage_interest(
+        interest, under_the_cap
+    ) == pytest.approx(interest)
+    assert tax_module.deductible_mortgage_interest(
+        interest, MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
+    ) == pytest.approx(interest)
+
+
+def test_deductible_mortgage_interest_is_prorated_above_the_cap() -> None:
+    """The cap limits the DEDUCTION, by the share of the loan it covers."""
+    tax_module = _tax_module()
+    interest = 60_000.0
+    balance = 2 * MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
+
+    assert tax_module.deductible_mortgage_interest(interest, balance) == pytest.approx(
+        interest / 2
+    )
+    # and it is an amount, not a tax -- nothing here touches the brackets
+    assert tax_module.deductible_mortgage_interest(0.0, balance) == 0
+
+
+def test_taxable_gain_on_a_home_sale_excludes_part_for_a_home_you_lived_in() -> None:
+    tax_module = _tax_module()
+    excluded = MAX_EXCLUDED_GAIN_ON_A_HOME_YOU_LIVED_IN
+
+    assert tax_module.taxable_gain_on_a_home_sale(
+        excluded + 90_000, is_a_home_you_lived_in=True
+    ) == pytest.approx(90_000)
+    # a gain smaller than the exclusion is wiped out, not made negative
+    assert (
+        tax_module.taxable_gain_on_a_home_sale(
+            excluded / 2, is_a_home_you_lived_in=True
+        )
+        == 0
+    )
+
+
+def test_taxable_gain_on_a_home_sale_excludes_nothing_for_a_rental() -> None:
+    """A rental is an investment; its gain is taxable in full."""
+    tax_module = _tax_module()
+    gain = MAX_EXCLUDED_GAIN_ON_A_HOME_YOU_LIVED_IN + 90_000
+
+    assert tax_module.taxable_gain_on_a_home_sale(
+        gain, is_a_home_you_lived_in=False
+    ) == pytest.approx(gain)
 
 
 def test_extra_tax_from_parts_add_up_to_the_total() -> None:
