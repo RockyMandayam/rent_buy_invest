@@ -192,7 +192,7 @@
       "type": "number"
     },
     "annual_maintenance_cost_fraction": {
-      "description": "ANNUAL maintenance cost as a fraction of the assessed home value (not sale price).",
+      "description": "The first year's maintenance spend, as a fraction of the PURCHASE PRICE. Not the assessed value, which is a separate number this tool tracks only for property tax and which an assessment cap can hold well below what the home is worth. The fraction sets the first year's amount; from there it grows with the home itself at 'annual_home_appreciation_rate', on the reasoning that a more valuable home costs more to keep up. Include what you would spend whether or not anyone rented it, plus any extra wear you expect a tenant to cause beyond that - 'management_fee_fraction_of_rent' covers only the manager's cut of the rent, not repairs.",
       "type": "number"
     },
     "annual_home_warranty": {
@@ -208,7 +208,7 @@
       "type": ["object", "null"],
       "properties": {
         "management_fee_fraction_of_rent": {
-          "description": "The property manager's cut of the rent, as a fraction of the rent actually COLLECTED each month - not a fraction of the home's value. 0.08 to 0.10 is the usual range for a single-family rental. Because it is charged on rent collected, it falls when the property sits empty and is zero before the property is first let; the occupancy rate is already applied to the rent this is taken from. Set it to 0 if you manage the property yourself. This covers the ongoing management cut only. It does NOT cover the leasing fee charged for signing a new tenant (often a large fraction of one month's rent), which is not modeled at all. It also does not cover the extra wear a tenant causes rather than a resident owner - put that in 'annual_maintenance_cost_fraction', which is a fraction of the home's value.",
+          "description": "The property manager's cut of the rent, as a fraction of the rent actually COLLECTED each month - not a fraction of the home's value. 0.08 to 0.10 is the usual range for a single-family rental. Because it is charged on rent collected, it falls when the property sits empty and is zero before the property is first let; the occupancy rate is already applied to the rent this is taken from. Set it to 0 if you manage the property yourself. This covers the ongoing management cut only. It does NOT cover the leasing fee charged for signing a new tenant (often a large fraction of one month's rent), which is not modeled at all. It also does not cover the extra wear a tenant causes rather than a resident owner - put that in 'annual_maintenance_cost_fraction', which is a fraction of the purchase price.",
           "type": "number"
         },
         "rental_income_waiting_period_months": {
