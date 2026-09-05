@@ -17,6 +17,7 @@ class TestMarketConfig(TestConfig):
     def test_inputs_with_invalid_schema(self) -> None:
         attributes = [
             "market_rate_of_return",
+            "market_dividend_yield",
             "tax_brackets_inflation",
             "annual_inflation_rate",
             "tax_brackets",
@@ -37,6 +38,13 @@ class TestMarketConfig(TestConfig):
             config_kwargs,
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
+        )
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["market_dividend_yield"],
+            allow_negative=False,
+            max_value=MarketConfig.MAX_MARKET_DIVIDEND_YIELD,
         )
         check_float_field(
             MarketConfig,
@@ -96,6 +104,62 @@ class TestMarketConfig(TestConfig):
             invalid_kwargs["validate_non_regressive_tax_brackets"] = True
             with pytest.raises(AssertionError):
                 MarketConfig(**invalid_kwargs)
+
+    def test_dividend_yield_may_not_exceed_the_total_return(self) -> None:
+        """The yield is a slice of the total return, not an addition to it.
+
+        Neither bound catches this on its own: a yield can sit under
+        MAX_MARKET_DIVIDEND_YIELD and still be more than the whole return.
+        """
+        config_kwargs = io_utils.read_yaml(TestMarketConfig.TEST_CONFIG_PATH)
+        total_return = config_kwargs["market_rate_of_return"]
+        assert total_return < MarketConfig.MAX_MARKET_DIVIDEND_YIELD
+
+        # the whole return paid out as dividends is allowed; more is not
+        at_the_limit = copy.deepcopy(config_kwargs)
+        at_the_limit["market_dividend_yield"] = total_return
+        MarketConfig(**at_the_limit)
+
+        over_the_limit = copy.deepcopy(config_kwargs)
+        over_the_limit["market_dividend_yield"] = total_return + 0.001
+        with pytest.raises(AssertionError):
+            MarketConfig(**over_the_limit)
+
+        # A negative total return has always been allowed and pays no dividend,
+        # so a yield of zero must not be read as exceeding it.
+        losing_market = copy.deepcopy(config_kwargs)
+        losing_market["market_rate_of_return"] = -0.02
+        losing_market["market_dividend_yield"] = 0.0
+        MarketConfig(**losing_market)
+
+        losing_market["market_dividend_yield"] = 0.01
+        with pytest.raises(AssertionError):
+            MarketConfig(**losing_market)
+
+    def test_get_dividends_from_growth(self) -> None:
+        """Dividends are the yield's share of the growth an account actually saw."""
+        config_kwargs = copy.deepcopy(
+            io_utils.read_yaml(TestMarketConfig.TEST_CONFIG_PATH)
+        )
+        config_kwargs["market_rate_of_return"] = 0.08
+        config_kwargs["market_dividend_yield"] = 0.02
+        market_config = MarketConfig(**config_kwargs)
+
+        # a quarter of the return is dividend, so a quarter of any growth is too
+        assert market_config.get_dividends_from_growth(1_000.0) == 250.0
+        assert market_config.get_dividends_from_growth(0.0) == 0.0
+        # a year the market lost money pays no dividend
+        assert market_config.get_dividends_from_growth(-5_000.0) == 0.0
+
+        # the whole return paid out means the whole of any growth is dividend
+        config_kwargs["market_dividend_yield"] = 0.08
+        assert MarketConfig(**config_kwargs).get_dividends_from_growth(1_000.0) == (
+            1_000.0
+        )
+
+        # and no yield means none of it is
+        config_kwargs["market_dividend_yield"] = 0.0
+        assert MarketConfig(**config_kwargs).get_dividends_from_growth(1_000.0) == 0.0
 
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):

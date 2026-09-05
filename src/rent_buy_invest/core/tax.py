@@ -91,6 +91,43 @@ class TaxModule:
         # -0.0 is falsy in python
         return -tax_saved if tax_saved else 0.0
 
+    def annual_dividend_tax(
+        self,
+        month: int,
+        base_ordinary_income: float,
+        dividends: float,
+    ) -> float:
+        """Tax on a year of dividends from a taxable brokerage account.
+
+        Returns a positive number: the tax owed, in dollars, for that year alone.
+        It is the EXTRA tax the dividends cause, stacked on top of whatever else
+        was earned, for the same reason every other figure in this class is a
+        difference -- the tax on the rest of your income is identical in both
+        worlds and cancels.
+
+        ``base_ordinary_income`` is what the year's earlier layers left, not your
+        salary. A rental running a loss drags taxable income down before the
+        dividends land on it, so passing salary here would tax them in a bracket
+        they never reach. The caller is responsible for that ordering today;
+        ``annual_rental_activity_tax`` is the layer that comes before this one.
+
+        Dividends are assumed to be entirely QUALIFIED, so they are taxed at the
+        long-term capital gains brackets rather than as ordinary income. That is
+        right for a broad stock index fund and too generous for a REIT, a bond
+        fund, or many foreign funds, whose distributions are largely ordinary.
+        """
+        assert month >= 0
+        assert base_ordinary_income >= 0
+        assert dividends >= 0
+
+        return round(
+            self.market_config.get_tax(
+                month, base_ordinary_income, long_term_capital_gains=dividends
+            )
+            - self.market_config.get_tax(month, base_ordinary_income),
+            2,
+        )
+
     def tax_saved_by_deduction(
         self,
         month: int,
