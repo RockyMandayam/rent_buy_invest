@@ -5,6 +5,7 @@ import pytest
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.config_test import TestConfig
 from rent_buy_invest.configs.utils_for_testing import check_float_field
+from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
 from rent_buy_invest.io import io_utils
 from rent_buy_invest.utils.math_utils import (
     MONTHS_PER_YEAR,
@@ -551,26 +552,94 @@ class TestBuyConfig(TestConfig):
             )
         )
 
-    def test_get_not_part_of_basis_upfront_one_time_cost(self) -> None:
+    def test_get_upfront_mortgage_insurance_cost_is_zero_with_enough_down(
+        self,
+    ) -> None:
+        """No insurance required, so no premium -- whatever the fraction says."""
+        buy_config = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config.is_fha_loan = False
+        buy_config.upfront_mortgage_insurance_fraction = 0.0175
+        buy_config.down_payment_fraction = 1 - PMI_LTV_THRESHOLD
+
+        assert buy_config.initial_loan_fraction == pytest.approx(PMI_LTV_THRESHOLD)
+        assert buy_config.get_upfront_mortgage_insurance_cost() == 0
+
+    def test_get_upfront_mortgage_insurance_cost_applies_below_the_threshold(
+        self,
+    ) -> None:
+        """A conventional loan above the threshold pays it, as a share of the loan."""
+        buy_config = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config.is_fha_loan = False
+        buy_config.upfront_mortgage_insurance_fraction = 0.0175
+        buy_config.down_payment_fraction = 0.05
+
+        assert buy_config.initial_loan_fraction > PMI_LTV_THRESHOLD
+        assert buy_config.get_upfront_mortgage_insurance_cost() == pytest.approx(
+            0.0175 * buy_config.initial_loan_amount
+        )
+
+    def test_get_upfront_mortgage_insurance_cost_applies_to_every_fha_loan(
+        self,
+    ) -> None:
+        """FHA charges it whatever the down payment, unlike conventional PMI."""
+        buy_config = deepcopy(TestBuyConfig.BUY_CONFIG)
+        buy_config.rental_income_config = None  # an FHA loan cannot be a rental
+        buy_config.is_fha_loan = True
+        buy_config.upfront_mortgage_insurance_fraction = 0.0175
+        buy_config.down_payment_fraction = 0.5
+
+        assert buy_config.initial_loan_fraction < PMI_LTV_THRESHOLD
+        assert buy_config.get_upfront_mortgage_insurance_cost() == pytest.approx(
+            0.0175 * buy_config.initial_loan_amount
+        )
+
+    def test_get_upfront_mortgage_insurance_cost_reaches_the_upfront_total(
+        self,
+    ) -> None:
+        """It has to actually be charged, not just computed.
+
+        The field was parsed and validated for a long time without any calculation
+        reading it, so this pins that it reaches what buying costs on day one --
+        and that it stays out of the cost basis, being a loan cost rather than
+        part of what was paid for the property.
+        """
+        without = deepcopy(TestBuyConfig.BUY_CONFIG)
+        without.is_fha_loan = False
+        without.upfront_mortgage_insurance_fraction = 0.0
+        without.down_payment_fraction = 0.05
+
+        with_premium = deepcopy(without)
+        with_premium.upfront_mortgage_insurance_fraction = 0.0175
+        premium = with_premium.get_upfront_mortgage_insurance_cost()
+        assert premium > 0
+
+        assert with_premium.get_upfront_one_time_cost() == pytest.approx(
+            without.get_upfront_one_time_cost() + premium
+        )
         assert (
-            TestBuyConfig.BUY_CONFIG.get_not_part_of_basis_upfront_one_time_cost()
-            == pytest.approx(
-                0.015 * 400000
-                + 300
-                + 500
-                + 0.005 * 400000
-                + 500
-                + 50
-                + 20
-                + 0.025 * 500000
-                + 0 * 300
-                + 500
-                + 500
-                + 1 * 500
-                + 0.02 * 400000
-                + 150
-                + 35
-            )
+            with_premium.get_part_of_basis_upfront_one_time_cost()
+            == without.get_part_of_basis_upfront_one_time_cost()
+        )
+
+    def test_get_not_part_of_basis_upfront_one_time_cost(self) -> None:
+        assert TestBuyConfig.BUY_CONFIG.get_not_part_of_basis_upfront_one_time_cost() == pytest.approx(
+            0.015 * 400000
+            + 300
+            + 500
+            # upfront mortgage insurance: none required at 20% down
+            + 0.0 * 400000
+            + 0.005 * 400000
+            + 500
+            + 50
+            + 20
+            + 0.025 * 500000
+            + 0 * 300
+            + 500
+            + 500
+            + 1 * 500
+            + 0.02 * 400000
+            + 150
+            + 35
         )
 
     def test_get_upfront_one_time_cost(self) -> None:

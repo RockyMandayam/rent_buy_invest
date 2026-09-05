@@ -2,6 +2,7 @@ import math
 from typing import Any
 
 from rent_buy_invest.configs.config import Config
+from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR, project_growth
 
 
@@ -572,6 +573,29 @@ class BuyConfig(Config):
             + self.notary_fee
         )
 
+    def get_upfront_mortgage_insurance_cost(self) -> float:
+        """The one-time mortgage insurance premium paid at closing, in dollars.
+
+        Zero unless insurance is required in the first place. An FHA loan always
+        carries an upfront premium, whatever the down payment. A conventional loan
+        carries one only when the down payment leaves the loan above
+        ``PMI_LTV_THRESHOLD`` of the price -- so putting 20% down costs nothing
+        here, the same condition that decides whether monthly PMI is owed.
+
+        **Assumed paid in cash at closing.** FHA borrowers usually finance it into
+        the loan instead, which would raise the balance, the monthly payment and
+        the interest paid over the term. Financing it is not modelled: the loan
+        amount here is always the price less the down payment.
+
+        Not deductible, matching the monthly premium.
+        """
+        insurance_is_required = (
+            self.is_fha_loan or self.initial_loan_fraction > PMI_LTV_THRESHOLD
+        )
+        if not insurance_is_required:
+            return 0.0
+        return self.upfront_mortgage_insurance_fraction * self.initial_loan_amount
+
     def get_not_part_of_basis_upfront_one_time_cost(self) -> float:
         return (
             # fmt: off
@@ -580,6 +604,8 @@ class BuyConfig(Config):
             # fmt: on
             + self.mortgage_processing_fee
             + self.mortgage_underwriting_fee
+            # a loan cost like the fees around it, so it never reaches the basis
+            + self.get_upfront_mortgage_insurance_cost()
             # fmt: off
             + self.mortgage_discount_points_fee_fraction
                 * self.initial_loan_amount
