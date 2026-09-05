@@ -9,6 +9,21 @@ from rent_buy_invest.configs.market_config import MarketConfig
 MAX_DEPRECIATION_RECAPTURE_RATE = 0.25
 
 
+# Interest is deductible only on this much of the loan. Above it you get a
+# prorated deduction: on an average balance of 800,000, (750/800) of the year's
+# interest is deductible. The IRS lets you average just the first and last balance
+# of the year; every monthly balance is available here, so all twelve are averaged
+# instead, which tracks the real average more closely. This is the cap for a single
+# filer (married filing jointly is also 750,000; married filing separately is half,
+# 375,000). We assume a single filer throughout.
+MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE = 750000
+
+# Gain on a home you lived in is excluded up to this much when you sell. A rental
+# gets none of it. This is the figure for a single filer; married filing jointly
+# is double. We assume a single filer throughout.
+MAX_EXCLUDED_GAIN_ON_A_HOME_YOU_LIVED_IN = 250000
+
+
 @dataclass(frozen=True)
 class TaxableAmounts:
     """What happened in one tax year, sorted into the categories taxed differently.
@@ -93,6 +108,61 @@ class TaxModule:
 
     def __init__(self, market_config: MarketConfig) -> None:
         self.market_config: MarketConfig = market_config
+
+    def deductible_mortgage_interest(
+        self, interest_paid: float, average_loan_balance: float
+    ) -> float:
+        """How much of a year's mortgage interest may actually be deducted.
+
+        All of it, until the loan is bigger than
+        ``MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE``; above that the
+        cap limits the DEDUCTION to the share of the loan it covers, and the rest
+        of the interest is simply not deductible.
+
+        The result is an amount, not a tax: hand it to ``extra_tax_from`` as an
+        ordinary deduction and let the brackets act on what is left. Shrinking the
+        resulting tax saving instead would price the surviving dollars at the
+        average rate of the whole deduction, including brackets the real, smaller
+        deduction never reaches -- and since a deduction comes off the top of
+        income first, that can only understate it.
+
+        Args:
+            interest_paid: the year's mortgage interest, in dollars.
+            average_loan_balance: the average balance over that year, in dollars.
+        """
+        assert interest_paid >= 0
+        assert average_loan_balance >= 0
+
+        deductible_fraction = (
+            MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
+            / max(
+                MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
+                average_loan_balance,
+            )
+        )
+        return deductible_fraction * interest_paid
+
+    def taxable_gain_on_a_home_sale(
+        self, gain: float, is_a_home_you_lived_in: bool
+    ) -> float:
+        """How much of the gain on selling a home is actually taxed.
+
+        A home you lived in excludes the first
+        ``MAX_EXCLUDED_GAIN_ON_A_HOME_YOU_LIVED_IN`` of gain. A rental excludes
+        nothing -- it is an investment, and its gain is taxable in full (with the
+        part that came from depreciation charged separately as recapture).
+
+        The result is an amount, not a tax: hand it to ``extra_tax_from`` as a
+        long-term capital gain.
+
+        The ownership and use tests -- broadly, lived in it two of the last five
+        years -- are not modelled. The caller says which case it is.
+        """
+        assert gain >= 0
+
+        if not is_a_home_you_lived_in:
+            return gain
+        return max(gain - MAX_EXCLUDED_GAIN_ON_A_HOME_YOU_LIVED_IN, 0.0)
 
     def _tax_owed(self, month: int, amounts: TaxableAmounts) -> float:
         """The whole tax bill for a year described by ``amounts``, in dollars.

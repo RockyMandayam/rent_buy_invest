@@ -13,8 +13,6 @@ from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.io.experiment_writer import ExperimentWriter
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
-PRIMARY_HOME_CAP_GAINS_EXEMPTION = 250000
-
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -75,6 +73,7 @@ def _run_rent_vs_buy(
     rent_config = experiment_config.rent_config
     buy_config = experiment_config.buy_config
     start_date = experiment_config.start_date
+    tax_module = TaxModule(market_config)
 
     # calculate initial state
     initial_state = InitialState.from_configs(
@@ -139,17 +138,17 @@ def _run_rent_vs_buy(
         (final_home_price - deductible_selling_costs) - home_cost_basis,
         0,
     )
-    # calculate deduction here because it is separate for home vs investments
-    if not buy_config.rental_income_config:
-        home_cap_gains_exemption = min(
-            PRIMARY_HOME_CAP_GAINS_EXEMPTION, cap_gains_from_selling_home
-        )
-        cap_gains_from_selling_home -= home_cap_gains_exemption
+    # A home lived in excludes part of its gain; one rented out excludes none.
+    # Applied to the home's gain alone, before it joins the investment gains,
+    # because the exclusion is a property rule and does not touch them.
+    cap_gains_from_selling_home = tax_module.taxable_gain_on_a_home_sale(
+        cap_gains_from_selling_home,
+        is_a_home_you_lived_in=not buy_config.rental_income_config,
+    )
     total_cap_gains_if_buying = (
         cap_gains_from_selling_investments_if_buying + cap_gains_from_selling_home
     )
     num_months = num_years * MONTHS_PER_YEAR
-    tax_module = TaxModule(market_config)
     cap_gains_tax_if_buying = tax_module.extra_tax_from(
         num_months + 1,
         TaxableAmounts(ordinary_income=annual_income),
