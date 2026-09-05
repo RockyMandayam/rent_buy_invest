@@ -403,6 +403,51 @@ def test_the_unamortized_points_reduce_the_sale_year_tax() -> None:
     assert experiment.final_state.tax_if_buying < gains_tax
 
 
+def test_pretax_wealth_is_the_pile_the_tax_is_charged_on() -> None:
+    """The reported pre-tax total must reconcile with both its parts and the answer.
+
+    It is derived, not stored, so the only way it can be wrong is if the equations
+    it sits between stop holding.
+    """
+    experiment = _experiment()
+    final_state = experiment.final_state
+
+    assert final_state.pretax_wealth_if_buying == pytest.approx(
+        final_state.market_balance_if_buying + final_state.sale_proceeds, abs=0.01
+    )
+    assert final_state.pretax_wealth_if_investing == pytest.approx(
+        final_state.market_balance_if_investing, abs=0.01
+    )
+    assert final_state.wealth_if_buying == pytest.approx(
+        final_state.pretax_wealth_if_buying - final_state.tax_if_buying, abs=0.01
+    )
+    assert final_state.wealth_if_investing == pytest.approx(
+        final_state.pretax_wealth_if_investing - final_state.tax_if_investing, abs=0.01
+    )
+    # tax is really being charged, so pre-tax is strictly the larger pile
+    assert final_state.tax_if_buying > 0
+    assert final_state.tax_if_investing > 0
+    assert final_state.pretax_wealth_if_buying > final_state.wealth_if_buying
+    assert final_state.pretax_wealth_if_investing > final_state.wealth_if_investing
+
+
+def test_final_state_rows_read_pretax_then_tax_then_post_tax() -> None:
+    """The table shows what you hold, what it costs, and what is left, in order."""
+    df = _experiment().final_state.get_df()
+    assert list(df.index) == [
+        "Market Account (Pre-Tax)",
+        "Property Sale Proceeds",
+        "Total (Pre-Tax)",
+        "Tax",
+        "Wealth (Post-Tax)",
+    ]
+    for column in df.columns:
+        market, proceeds, pretax, tax, post_tax = df[column]
+        assert pretax == pytest.approx(market + proceeds, abs=0.01)
+        # tax is shown as the negative it is, so it adds
+        assert post_tax == pytest.approx(pretax + tax, abs=0.01)
+
+
 def test_selling_underwater_reduces_wealth_rather_than_being_ignored() -> None:
     """Owing more than the sale brings in is money you bring to closing."""
     experiment = _experiment(_underwater_buy_config(), num_years=1)

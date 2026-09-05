@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Any
+
+import pandas as pd
 
 from rent_buy_invest.utils.data_utils import to_df
 
@@ -9,7 +10,7 @@ class FinalState:
     wealth_if_renting: float
     wealth_if_buying: float
 
-    def get_df(self) -> list[list[Any | None]]:
+    def get_df(self) -> pd.DataFrame:
         rows = ["Wealth"]
         cols = {
             "Rent": [self.wealth_if_renting],
@@ -27,8 +28,15 @@ class RentalVsInvestFinalState:
     building block** -- the arithmetic that got there, kept so the answer can be
     checked rather than taken on faith.
 
-        wealth_if_buying    = market_balance_if_buying + sale_proceeds - tax_if_buying
-        wealth_if_investing = market_balance_if_investing - tax_if_investing
+        pretax_wealth_if_buying    = market_balance_if_buying + sale_proceeds
+        wealth_if_buying           = pretax_wealth_if_buying - tax_if_buying
+
+        pretax_wealth_if_investing = market_balance_if_investing
+        wealth_if_investing        = pretax_wealth_if_investing - tax_if_investing
+
+    The two pre-tax figures are derived rather than stored, so they cannot drift
+    from the parts they are made of. They exist because the tax is easier to judge
+    against the pile it is charged on than against the pile that is left.
 
     Two ways of having spent the same money: one bought a property to rent out,
     the other put that money in the market. Both are cashed out here so the
@@ -69,23 +77,44 @@ class RentalVsInvestFinalState:
     # the answer, for the investing world
     wealth_if_investing: float
 
-    def get_df(self) -> list[list[Any | None]]:
+    @property
+    def pretax_wealth_if_buying(self) -> float:
+        """Everything this world holds at the horizon, before the sale year's tax.
+
+        Both of its assets, cashed out: the market account plus what the property
+        nets after selling costs and repaying the loan.
+        """
+        return round(self.market_balance_if_buying + self.sale_proceeds, 2)
+
+    @property
+    def pretax_wealth_if_investing(self) -> float:
+        """Everything this world holds at the horizon, before tax.
+
+        It owns one asset, so this is just the market account -- named to sit
+        alongside ``pretax_wealth_if_buying`` rather than to add anything.
+        """
+        return self.market_balance_if_investing
+
+    def get_df(self) -> pd.DataFrame:
         rows = [
             "Market Account (Pre-Tax)",
             "Property Sale Proceeds",
+            "Total (Pre-Tax)",
             "Tax",
-            "Wealth",
+            "Wealth (Post-Tax)",
         ]
         cols = {
             "Buy Rental": [
                 self.market_balance_if_buying,
                 self.sale_proceeds,
+                self.pretax_wealth_if_buying,
                 -self.tax_if_buying,
                 self.wealth_if_buying,
             ],
             "Invest": [
                 self.market_balance_if_investing,
                 0,
+                self.pretax_wealth_if_investing,
                 -self.tax_if_investing,
                 self.wealth_if_investing,
             ],
