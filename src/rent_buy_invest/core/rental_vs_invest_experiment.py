@@ -112,6 +112,8 @@ class RentalVsInvestExperiment:
         property_values = self.buy_config.get_monthly_home_values(num_months)
 
         annual_taxes: list[float] = []
+        dividend_taxes_if_buying: list[float] = []
+        dividend_taxes_if_investing: list[float] = []
         buy_surpluses: list[float] = []
         after_tax_cash_flows: list[float] = []
         equities: list[float] = []
@@ -123,23 +125,80 @@ class RentalVsInvestExperiment:
         # the two cannot fall out of step.
         basis_if_buying = [0.0]
         basis_if_investing = [self.upfront_cost_of_buying]
+        # What each account earned since the last year boundary. Dividends are a
+        # share of this, so it has to be accumulated as the year runs rather than
+        # inferred from the balances, which also move on deposits.
+        growth_if_buying_this_year = 0.0
+        growth_if_investing_this_year = 0.0
 
         for month in range(num_months + 1):
+            # Both accounts grow for the month. This runs before tax because the
+            # year's dividends are a share of this growth, and the tax on them
+            # stacks on top of the rental's income for the same year.
+            grown_if_buying = self.market_config.get_pretax_monthly_wealth(
+                invested_if_buying[-1], 1
+            )[1]
+            grown_if_investing = self.market_config.get_pretax_monthly_wealth(
+                invested_if_investing[-1], 1
+            )[1]
+            growth_if_buying_this_year += grown_if_buying - invested_if_buying[-1]
+            growth_if_investing_this_year += (
+                grown_if_investing - invested_if_investing[-1]
+            )
+
             # Tax is settled annually, so it lands entirely in the last month of
             # each year and is zero in every other month.
-            if month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1):
-                annual_tax = self.tax_module.annual_rental_activity_tax(
-                    month,
-                    sum(ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]),
-                    sum(
-                        rental_property.monthly_taxable_income[
-                            month + 1 - MONTHS_PER_YEAR : month + 1
-                        ]
-                    ),
+            is_year_boundary = month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1)
+            if is_year_boundary:
+                income_for_the_year = sum(
+                    ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
                 )
+                taxable_rental_income_for_the_year = sum(
+                    rental_property.monthly_taxable_income[
+                        month + 1 - MONTHS_PER_YEAR : month + 1
+                    ]
+                )
+                # Dividends are already sitting in each balance -- an account
+                # compounds at the total return, dividends included -- so this
+                # only says how much of that growth is taxable now rather than
+                # deferred to the sale.
+                get_dividends = self.market_config.get_dividends_from_growth
+                dividends_if_buying = get_dividends(growth_if_buying_this_year)
+                dividends_if_investing = get_dividends(growth_if_investing_this_year)
+
+                # One call per world, so a world's layers are charged in order
+                # instead of each being worked out from salary in isolation. The
+                # investing world owns no property, so it has no rental layer.
+                annual_tax = self.tax_module.annual_rental_activity_tax(
+                    month, income_for_the_year, taxable_rental_income_for_the_year
+                )
+                # Dividends are charged on top of what the rental left, not on
+                # salary: a rental loss drags taxable income down first, and a
+                # loss bigger than the income leaves nothing to stack on. The
+                # investing world owns no property, so its base is just salary.
+                dividend_tax_if_buying = self.tax_module.annual_dividend_tax(
+                    month,
+                    max(income_for_the_year + taxable_rental_income_for_the_year, 0.0),
+                    dividends_if_buying,
+                )
+                dividend_tax_if_investing = self.tax_module.annual_dividend_tax(
+                    month, income_for_the_year, dividends_if_investing
+                )
+                reinvested_if_buying = round(
+                    dividends_if_buying - dividend_tax_if_buying, 2
+                )
+                reinvested_if_investing = round(
+                    dividends_if_investing - dividend_tax_if_investing, 2
+                )
+                growth_if_buying_this_year = 0.0
+                growth_if_investing_this_year = 0.0
             else:
                 annual_tax = 0
+                dividend_tax_if_buying = dividend_tax_if_investing = 0.0
+                reinvested_if_buying = reinvested_if_investing = 0.0
             annual_taxes.append(annual_tax)
+            dividend_taxes_if_buying.append(dividend_tax_if_buying)
+            dividend_taxes_if_investing.append(dividend_tax_if_investing)
 
             # Positive tax is money owed, so it comes off what the property left
             # you with; negative tax is money back, so it adds.
@@ -161,26 +220,37 @@ class RentalVsInvestExperiment:
                 )
             )
 
-            # Both accounts grow for the month; the surplus goes to whichever
-            # world actually had it.
-            grown_if_buying = self.market_config.get_pretax_monthly_wealth(
-                invested_if_buying[-1], 1
-            )[1]
-            grown_if_investing = self.market_config.get_pretax_monthly_wealth(
-                invested_if_investing[-1], 1
-            )[1]
-            if buy_surplus >= 0:
-                invested_if_buying.append(round(grown_if_buying + buy_surplus, 2))
-                invested_if_investing.append(grown_if_investing)
-                basis_if_buying.append(round(basis_if_buying[-1] + buy_surplus, 2))
-                basis_if_investing.append(basis_if_investing[-1])
-            else:
-                invested_if_buying.append(grown_if_buying)
-                invested_if_investing.append(round(grown_if_investing - buy_surplus, 2))
-                basis_if_buying.append(basis_if_buying[-1])
-                basis_if_investing.append(
-                    round(basis_if_investing[-1] - buy_surplus, 2)
+            # Only the cheaper world has money spare to put in, so exactly one of
+            # these is non-zero.
+            deposit_if_buying = buy_surplus if buy_surplus >= 0 else 0.0
+            deposit_if_investing = -buy_surplus if buy_surplus < 0 else 0.0
+
+            # The dividend tax is paid out of the account, so it lowers the
+            # balance and nothing else. The dividend left after that tax stays
+            # invested and has already been taxed, so it is basis, not gain, when
+            # the account is finally sold.
+            invested_if_buying.append(
+                round(grown_if_buying + deposit_if_buying - dividend_tax_if_buying, 2)
+            )
+            basis_if_buying.append(
+                round(basis_if_buying[-1] + deposit_if_buying + reinvested_if_buying, 2)
+            )
+            invested_if_investing.append(
+                round(
+                    grown_if_investing
+                    + deposit_if_investing
+                    - dividend_tax_if_investing,
+                    2,
                 )
+            )
+            basis_if_investing.append(
+                round(
+                    basis_if_investing[-1]
+                    + deposit_if_investing
+                    + reinvested_if_investing,
+                    2,
+                )
+            )
 
         # Only the balances are trimmed. A balance is state at a point in time, so
         # each was seeded with its month-0 value and every pass appended the NEXT
@@ -205,6 +275,8 @@ class RentalVsInvestExperiment:
         self.property_values: list[float] = property_values
         self.equities: list[float] = equities
         self.annual_taxes: list[float] = annual_taxes
+        self.dividend_taxes_if_buying: list[float] = dividend_taxes_if_buying
+        self.dividend_taxes_if_investing: list[float] = dividend_taxes_if_investing
         self.after_tax_cash_flows: list[float] = after_tax_cash_flows
         self.buy_surpluses: list[float] = buy_surpluses
 
@@ -219,6 +291,15 @@ class RentalVsInvestExperiment:
         rather than separately. Brackets are progressive, so two gains taxed apart
         cost less than the same total taxed as one, and this world realises both in
         the same year. ``main.py`` stacks them for the same reason.
+
+        The sale is treated as happening in the tax year AFTER the projection ends,
+        which is why the gains stack on the last projected year's salary alone and
+        not on that year's rental income or dividends -- those were settled in
+        their own year, at the year boundary, and are done with. It also means the
+        rental earns no income in the year it is sold. A real sale lands mid-year,
+        alongside part of a year of rent and a part-year of depreciation; that is
+        not modelled, and the horizon is best read as "the end of the last full
+        year of renting, sold the following January".
         """
         rental_property = self.rental_property
         sale = rental_property.sale(self.property_values[-1], self.num_months)
@@ -293,8 +374,10 @@ class RentalVsInvestExperiment:
             "Buy Rental: Taxable Income": rental_property.monthly_taxable_income,
             "Buy Rental: Tax": self.annual_taxes,
             "Buy Rental: Cash Flow (After Tax)": self.after_tax_cash_flows,
+            "Buy Rental: Dividend Tax": self.dividend_taxes_if_buying,
             "Buy Rental: Surplus": self.buy_surpluses,
             "Invest: Invested (Pre-Tax)": self.invested_if_investing,
+            "Invest: Dividend Tax": self.dividend_taxes_if_investing,
         }
         rows = []
         date = self.start_date

@@ -230,8 +230,15 @@ class MarketConfig(Config):
         ), f"Please set 'market_dividend_yield' to something reasonable (at most {MarketConfig.MAX_MARKET_DIVIDEND_YIELD})"
         # The yield is a slice of the total return, not something on top of it, so a
         # yield above the total return would mean the price falls every year. That is
-        # a real thing in the world but almost never what someone meant to type.
-        assert self.market_dividend_yield <= self.market_rate_of_return, (
+        # a real thing in the world but almost never what someone meant to type, and
+        # this tool cannot represent it: dividends are taken as a share of the growth
+        # an account actually saw, and a share above 1 would pay out more than was
+        # earned. Only checked when a yield is actually set, so that a negative
+        # market_rate_of_return -- which has always been allowed, and pays no
+        # dividend -- is not rejected by a yield of zero.
+        assert self.market_dividend_yield == 0 or (
+            self.market_dividend_yield <= self.market_rate_of_return
+        ), (
             "market_dividend_yield must not exceed market_rate_of_return; it is the "
             "part of that return paid out as dividends, not an addition to it."
         )
@@ -326,6 +333,29 @@ class MarketConfig(Config):
         original_income_tax = self.get_tax(month, income)
         modified_income_tax = self.get_tax(month, income, deduction)
         return original_income_tax - modified_income_tax
+
+    def get_dividends_from_growth(self, growth: float) -> float:
+        """How many of those dollars of growth arrived as taxable dividends.
+
+        Dividends and price appreciation together make up
+        ``market_rate_of_return``, so a ``market_dividend_yield / market_rate_of_return``
+        share of whatever an account earned is the part taxable in that year;
+        the rest is unrealized and waits until the account is sold.
+
+        Splitting growth that already happened, rather than applying the yield to
+        a balance, is what keeps dividends and appreciation adding up to exactly
+        the growth the account saw -- however the balance moved during the period,
+        including deposits.
+
+        A period the market lost money pays no dividend, and a market that earns
+        nothing pays none either; the config already forbids a yield above the
+        total return, so a zero return implies a zero yield.
+        """
+        if growth <= 0 or not self.market_rate_of_return:
+            return 0.0
+        return round(
+            (self.market_dividend_yield / self.market_rate_of_return) * growth, 2
+        )
 
     def get_pretax_monthly_wealth(self, principal: float, num_months: int) -> float:
         """Return the pretax wealth in the market at the BEGINNING of each month

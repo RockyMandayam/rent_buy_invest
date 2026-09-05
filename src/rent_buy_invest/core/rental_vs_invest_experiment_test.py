@@ -43,6 +43,130 @@ def _profitable_buy_config() -> BuyConfig:
     return BuyConfig(**kwargs)
 
 
+def _experiment_with_dividends(
+    dividend_yield: float, num_years: int = NUM_YEARS
+) -> RentalVsInvestExperiment:
+    """The shared fixture with part of the market return paid out as dividends."""
+    experiment_config = ExperimentConfig.parse(EXPERIMENT_CONFIG_PATH)
+    market_kwargs = deepcopy(
+        io_utils.read_yaml(
+            "rent_buy_invest/core/test_resources/test-market-config.yaml"
+        )
+    )
+    market_kwargs["market_dividend_yield"] = dividend_yield
+    return RentalVsInvestExperiment(
+        experiment_config.buy_config,
+        MarketConfig(**market_kwargs),
+        experiment_config.personal_config,
+        num_years,
+        experiment_config.start_date,
+    )
+
+
+def test_a_zero_dividend_yield_costs_nothing() -> None:
+    """The whole return is price appreciation, deferred until the account is sold."""
+    experiment = _experiment_with_dividends(0.0)
+    assert all(tax == 0 for tax in experiment.dividend_taxes_if_buying)
+    assert all(tax == 0 for tax in experiment.dividend_taxes_if_investing)
+
+
+def test_dividend_tax_is_settled_once_a_year() -> None:
+    """Like every other tax here, it lands in the last month of each year."""
+    experiment = _experiment_with_dividends(0.02)
+    taxes = experiment.dividend_taxes_if_investing
+    assert any(tax > 0 for tax in taxes)
+    for month, tax in enumerate(taxes):
+        if month % MONTHS_PER_YEAR != MONTHS_PER_YEAR - 1:
+            assert tax == 0, f"month {month} settled dividend tax mid-year"
+
+
+def test_dividends_taxed_yearly_are_not_taxed_again_at_the_end() -> None:
+    """The whole point of growing the basis by the dividend net of its tax.
+
+    Pay out the ENTIRE return as dividends and every dollar the account earns is
+    taxed in the year it arrives, so by the horizon there is no unrealized gain
+    left to tax. Basis rising by exactly what stayed invested is what produces
+    that; taxing the dividend and leaving the basis alone would tax the same
+    dollars twice, and adding the gross dividend would invent a loss.
+    """
+    experiment_config = ExperimentConfig.parse(EXPERIMENT_CONFIG_PATH)
+    total_return = experiment_config.market_config.market_rate_of_return
+    assert total_return > 0
+
+    experiment = _experiment_with_dividends(total_return)
+    assert sum(experiment.dividend_taxes_if_investing) > 0
+    # the investing world holds nothing but the market account, so any tax at
+    # liquidation could only be tax on a gain that should not exist
+    assert experiment.final_state.tax_if_investing == 0
+    assert experiment.invested_if_investing[-1] == pytest.approx(
+        experiment.basis_if_investing[-1], abs=0.01
+    )
+
+
+def test_the_buying_worlds_dividends_stack_on_its_rental_income() -> None:
+    """Dividends are charged on what the rental left, not on salary.
+
+    The rental runs a loss most years, which drags taxable income down before the
+    dividends land on it. Charging them against salary instead would tax them in
+    a bracket they never reach -- silently, and only in the years the loss moves
+    a bracket boundary.
+    """
+    experiment = _experiment_with_dividends(0.02)
+    market_config = experiment.market_config
+    tax_module = experiment.tax_module
+    rental_property = experiment.rental_property
+    incomes = experiment.ordinary_incomes
+
+    # rebuild each year's dividends the way the projection does, from the growth
+    # the buying account earned
+    growth = 0.0
+    years_where_the_base_matters = 0
+    for month in range(experiment.num_months + 1):
+        balance = experiment.invested_if_buying[month]
+        growth += market_config.get_pretax_monthly_wealth(balance, 1)[1] - balance
+        if month % MONTHS_PER_YEAR != MONTHS_PER_YEAR - 1:
+            continue
+        first_month_of_year = month + 1 - MONTHS_PER_YEAR
+        salary = sum(incomes[first_month_of_year : month + 1])
+        rental_net = sum(
+            rental_property.monthly_taxable_income[first_month_of_year : month + 1]
+        )
+        dividends = market_config.get_dividends_from_growth(growth)
+        growth = 0.0
+
+        stacked_on_the_rental = tax_module.annual_dividend_tax(
+            month, max(salary + rental_net, 0.0), dividends
+        )
+        stacked_on_salary_alone = tax_module.annual_dividend_tax(
+            month, salary, dividends
+        )
+        assert experiment.dividend_taxes_if_buying[month] == pytest.approx(
+            stacked_on_the_rental, abs=0.01
+        )
+        if stacked_on_the_rental != pytest.approx(stacked_on_salary_alone, abs=0.01):
+            years_where_the_base_matters += 1
+
+    # without a year where the two bases disagree, the assertion above would hold
+    # for either of them and this test would prove nothing
+    assert years_where_the_base_matters > 0
+
+
+def test_a_dividend_yield_leaves_both_worlds_poorer() -> None:
+    """Moving return from untaxed growth into taxed income costs money."""
+    without = _experiment_with_dividends(0.0)
+    with_dividends = _experiment_with_dividends(0.02)
+
+    assert sum(with_dividends.dividend_taxes_if_investing) > 0
+    assert (
+        with_dividends.final_state.wealth_if_investing
+        < without.final_state.wealth_if_investing
+    )
+    assert (
+        with_dividends.final_state.wealth_if_buying
+        < without.final_state.wealth_if_buying
+    )
+
+
 def test_rejects_a_zero_length_projection() -> None:
     experiment_config = ExperimentConfig.parse(EXPERIMENT_CONFIG_PATH)
     with pytest.raises(AssertionError):

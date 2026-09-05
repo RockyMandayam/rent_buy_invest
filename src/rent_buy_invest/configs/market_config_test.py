@@ -125,6 +125,42 @@ class TestMarketConfig(TestConfig):
         with pytest.raises(AssertionError):
             MarketConfig(**over_the_limit)
 
+        # A negative total return has always been allowed and pays no dividend,
+        # so a yield of zero must not be read as exceeding it.
+        losing_market = copy.deepcopy(config_kwargs)
+        losing_market["market_rate_of_return"] = -0.02
+        losing_market["market_dividend_yield"] = 0.0
+        MarketConfig(**losing_market)
+
+        losing_market["market_dividend_yield"] = 0.01
+        with pytest.raises(AssertionError):
+            MarketConfig(**losing_market)
+
+    def test_get_dividends_from_growth(self) -> None:
+        """Dividends are the yield's share of the growth an account actually saw."""
+        config_kwargs = copy.deepcopy(
+            io_utils.read_yaml(TestMarketConfig.TEST_CONFIG_PATH)
+        )
+        config_kwargs["market_rate_of_return"] = 0.08
+        config_kwargs["market_dividend_yield"] = 0.02
+        market_config = MarketConfig(**config_kwargs)
+
+        # a quarter of the return is dividend, so a quarter of any growth is too
+        assert market_config.get_dividends_from_growth(1_000.0) == 250.0
+        assert market_config.get_dividends_from_growth(0.0) == 0.0
+        # a year the market lost money pays no dividend
+        assert market_config.get_dividends_from_growth(-5_000.0) == 0.0
+
+        # the whole return paid out means the whole of any growth is dividend
+        config_kwargs["market_dividend_yield"] = 0.08
+        assert MarketConfig(**config_kwargs).get_dividends_from_growth(1_000.0) == (
+            1_000.0
+        )
+
+        # and no yield means none of it is
+        config_kwargs["market_dividend_yield"] = 0.0
+        assert MarketConfig(**config_kwargs).get_dividends_from_growth(1_000.0) == 0.0
+
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):
             TestMarketConfig.MARKET_CONFIG.get_tax(0, -1)
