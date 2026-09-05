@@ -5,6 +5,7 @@ from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
+from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.data_utils import to_df
 
 
@@ -32,9 +33,13 @@ class InitialState:
             * buy_config.initial_loan_amount
         )
         discount_points_deduction_savings = (
-            market_config.get_income_tax_savings_from_deduction(
-                0, personal_config.ordinary_income, discount_points_fee
+            -TaxModule(market_config)
+            .extra_tax_from(
+                0,
+                TaxableAmounts(ordinary_income=personal_config.ordinary_income),
+                TaxableAmounts(ordinary_deductions=discount_points_fee),
             )
+            .ordinary
         )
         buy_upfront_one_time_cost -= discount_points_deduction_savings
 

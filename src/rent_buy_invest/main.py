@@ -9,6 +9,7 @@ from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.rental_vs_invest_experiment import (
     RentalVsInvestExperiment,
 )
+from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.io.experiment_writer import ExperimentWriter
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
@@ -147,19 +148,13 @@ def _run_rent_vs_buy(
     total_cap_gains_if_buying = (
         cap_gains_from_selling_investments_if_buying + cap_gains_from_selling_home
     )
-    # TODO create classes/methods for this
     num_months = num_years * MONTHS_PER_YEAR
-    income_and_cap_gains_tax_if_buying = market_config.get_tax(
+    tax_module = TaxModule(market_config)
+    cap_gains_tax_if_buying = tax_module.extra_tax_from(
         num_months + 1,
-        ordinary_income=annual_income,
-        long_term_capital_gains=total_cap_gains_if_buying,
-    )
-    only_income_tax_if_buying = market_config.get_tax(
-        num_months + 1, ordinary_income=annual_income
-    )
-    cap_gains_tax_if_buying = (
-        income_and_cap_gains_tax_if_buying - only_income_tax_if_buying
-    )
+        TaxableAmounts(ordinary_income=annual_income),
+        TaxableAmounts(long_term_capital_gains=total_cap_gains_if_buying),
+    ).long_term_capital_gain
     wealth_if_buying = (
         -loan_amount
         + final_investments_if_buying
@@ -173,17 +168,11 @@ def _run_rent_vs_buy(
         projection, "Rent"
     )
     total_cap_gains_if_renting = cap_gains_from_selling_investments_if_renting
-    income_and_cap_gains_tax_if_renting = market_config.get_tax(
+    cap_gains_tax_if_renting = tax_module.extra_tax_from(
         num_months + 1,
-        ordinary_income=annual_income,
-        long_term_capital_gains=total_cap_gains_if_renting,
-    )
-    only_income_tax_if_renting = market_config.get_tax(
-        num_months + 1, ordinary_income=annual_income
-    )
-    cap_gains_tax_if_renting = (
-        income_and_cap_gains_tax_if_renting - only_income_tax_if_renting
-    )
+        TaxableAmounts(ordinary_income=annual_income),
+        TaxableAmounts(long_term_capital_gains=total_cap_gains_if_renting),
+    ).long_term_capital_gain
     wealth_if_renting = final_investments_if_renting - cap_gains_tax_if_renting
     final_state = FinalState(
         wealth_if_renting=wealth_if_renting, wealth_if_buying=wealth_if_buying

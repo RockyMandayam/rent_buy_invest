@@ -316,24 +316,6 @@ class MarketConfig(Config):
         # TODO just noticed here that values are not rounded...
         return tax_with_additional_income - base_tax
 
-    def get_income_tax_savings_from_deduction(
-        self, month: int, income: float, deduction: float
-    ) -> float:
-        """Calculates income tax savings due to deduction at the given original income.
-
-        Args:
-            income: non-negative income
-
-        Returns:
-            tax: non-negative tax owed
-        """
-        assert month >= 0, "Month must be non-negative"
-        assert income >= 0, "Income must be non-negative"
-        assert deduction >= 0, "Deduction must be non-negative"
-        original_income_tax = self.get_tax(month, income)
-        modified_income_tax = self.get_tax(month, income, deduction)
-        return original_income_tax - modified_income_tax
-
     def get_dividends_from_growth(self, growth: float) -> float:
         """How many of those dollars of growth arrived as taxable dividends.
 

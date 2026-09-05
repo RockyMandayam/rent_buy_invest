@@ -7,6 +7,7 @@ from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.core.rental_vs_invest_experiment import RentalVsInvestExperiment
+from rent_buy_invest.core.tax import TaxableAmounts
 from rent_buy_invest.io import io_utils
 from rent_buy_invest.utils.math_utils import MONTHS_PER_YEAR
 
@@ -134,12 +135,15 @@ def test_the_buying_worlds_dividends_stack_on_its_rental_income() -> None:
         dividends = market_config.get_dividends_from_growth(growth)
         growth = 0.0
 
-        stacked_on_the_rental = tax_module.annual_dividend_tax(
-            month, max(salary + rental_net, 0.0), dividends
-        )
-        stacked_on_salary_alone = tax_module.annual_dividend_tax(
-            month, salary, dividends
-        )
+        dividend_layer = TaxableAmounts(long_term_capital_gains=dividends)
+        stacked_on_the_rental = tax_module.extra_tax_from(
+            month,
+            TaxableAmounts(ordinary_income=max(salary + rental_net, 0.0)),
+            dividend_layer,
+        ).long_term_capital_gain
+        stacked_on_salary_alone = tax_module.extra_tax_from(
+            month, TaxableAmounts(ordinary_income=salary), dividend_layer
+        ).long_term_capital_gain
         assert experiment.dividend_taxes_if_buying[month] == pytest.approx(
             stacked_on_the_rental, abs=0.01
         )
@@ -336,21 +340,30 @@ def test_the_buying_worlds_gains_are_taxed_together_not_separately() -> None:
         experiment.final_state.market_balance_if_buying - experiment.basis_if_buying[-1]
     )
 
-    together = experiment.tax_module.tax_on_realized_gains(
+    together = experiment.tax_module.extra_tax_from(
         month,
-        income,
-        sale.depreciation_recapture_gain,
-        sale.long_term_capital_gain + investment_gain,
+        TaxableAmounts(ordinary_income=income),
+        TaxableAmounts(
+            depreciation_recapture=sale.depreciation_recapture_gain,
+            long_term_capital_gains=sale.long_term_capital_gain + investment_gain,
+        ),
     ).total
     apart = (
-        experiment.tax_module.tax_on_realized_gains(
+        experiment.tax_module.extra_tax_from(
             month,
-            income,
-            sale.depreciation_recapture_gain,
-            sale.long_term_capital_gain,
+            TaxableAmounts(ordinary_income=income),
+            TaxableAmounts(
+                depreciation_recapture=sale.depreciation_recapture_gain,
+                long_term_capital_gains=sale.long_term_capital_gain,
+            ),
         ).total
-        + experiment.tax_module.tax_on_realized_gains(
-            month, income, 0, investment_gain
+        + experiment.tax_module.extra_tax_from(
+            month,
+            TaxableAmounts(ordinary_income=income),
+            TaxableAmounts(
+                depreciation_recapture=0,
+                long_term_capital_gains=investment_gain,
+            ),
         ).total
     )
 
@@ -369,18 +382,22 @@ def test_the_unamortized_points_reduce_the_sale_year_tax() -> None:
 
     # a 30-year loan sold after 10 years still has most of its points undeducted
     assert sale.unamortized_discount_points > 0
-    gains_tax = experiment.tax_module.tax_on_realized_gains(
+    gains_tax = experiment.tax_module.extra_tax_from(
         experiment.num_months + 1,
-        sum(
-            experiment.ordinary_incomes[
-                experiment.num_months - MONTHS_PER_YEAR : experiment.num_months
-            ]
+        TaxableAmounts(
+            ordinary_income=sum(
+                experiment.ordinary_incomes[
+                    experiment.num_months - MONTHS_PER_YEAR : experiment.num_months
+                ]
+            )
         ),
-        sale.depreciation_recapture_gain,
-        sale.long_term_capital_gain
-        + (
-            experiment.final_state.market_balance_if_buying
-            - experiment.basis_if_buying[-1]
+        TaxableAmounts(
+            depreciation_recapture=sale.depreciation_recapture_gain,
+            long_term_capital_gains=sale.long_term_capital_gain
+            + (
+                experiment.final_state.market_balance_if_buying
+                - experiment.basis_if_buying[-1]
+            ),
         ),
     ).total
     assert experiment.final_state.tax_if_buying < gains_tax
@@ -455,8 +472,10 @@ def test_a_world_taxed_on_its_deposits_would_owe_far_more() -> None:
     )
 
     correct = final_state.tax_if_investing
-    if_basis_ignored = experiment.tax_module.tax_on_realized_gains(
-        month, income, 0, final_state.market_balance_if_investing
+    if_basis_ignored = experiment.tax_module.extra_tax_from(
+        month,
+        TaxableAmounts(ordinary_income=income),
+        TaxableAmounts(long_term_capital_gains=final_state.market_balance_if_investing),
     ).total
 
     assert if_basis_ignored > correct
@@ -499,25 +518,22 @@ def test_the_points_deduction_comes_off_before_the_gains_stack() -> None:
     assert sale.unamortized_discount_points > 0
 
     # what the gains would cost with the deduction ignored entirely
-    stacked_on_full_income = experiment.tax_module.tax_on_realized_gains(
-        tax_month,
-        income,
-        sale.depreciation_recapture_gain,
-        sale.long_term_capital_gain + gain,
+    gains = TaxableAmounts(
+        depreciation_recapture=sale.depreciation_recapture_gain,
+        long_term_capital_gains=sale.long_term_capital_gain + gain,
+    )
+    stacked_on_full_income = experiment.tax_module.extra_tax_from(
+        tax_month, TaxableAmounts(ordinary_income=income), gains
     ).total
     # and with it applied, which is what the experiment asks for
-    sequenced = experiment.tax_module.tax_on_realized_gains(
+    sequenced = experiment.tax_module.extra_tax_from(
         tax_month,
-        income,
-        sale.depreciation_recapture_gain,
-        sale.long_term_capital_gain + gain,
-        ordinary_income_deduction=sale.unamortized_discount_points,
+        TaxableAmounts(ordinary_income=income),
+        gains + TaxableAmounts(ordinary_deductions=sale.unamortized_discount_points),
     )
 
     # the deduction is worth more than its own tax saving, because it also drops
     # the gains into a lower band
-    assert sequenced.tax_saved_by_deduction > 0
-    assert (
-        stacked_on_full_income - sequenced.total
-    ) > sequenced.tax_saved_by_deduction + 1_000
+    assert -sequenced.ordinary > 0
+    assert (stacked_on_full_income - sequenced.total) > -sequenced.ordinary + 1_000
     assert experiment.final_state.tax_if_buying == pytest.approx(sequenced.total)
