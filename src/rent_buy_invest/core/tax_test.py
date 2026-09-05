@@ -20,6 +20,7 @@ def _high_bracket_tax_module() -> TaxModule:
     return TaxModule(
         MarketConfig(
             market_rate_of_return=0.07,
+            market_dividend_yield=0.0,
             tax_brackets_inflation=0.0,
             annual_inflation_rate=0.0,
             tax_brackets={

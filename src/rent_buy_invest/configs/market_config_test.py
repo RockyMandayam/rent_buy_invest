@@ -17,6 +17,7 @@ class TestMarketConfig(TestConfig):
     def test_inputs_with_invalid_schema(self) -> None:
         attributes = [
             "market_rate_of_return",
+            "market_dividend_yield",
             "tax_brackets_inflation",
             "annual_inflation_rate",
             "tax_brackets",
@@ -37,6 +38,13 @@ class TestMarketConfig(TestConfig):
             config_kwargs,
             ["market_rate_of_return"],
             max_value=MarketConfig.MAX_MARKET_RATE_OF_RETURN,
+        )
+        check_float_field(
+            MarketConfig,
+            config_kwargs,
+            ["market_dividend_yield"],
+            allow_negative=False,
+            max_value=MarketConfig.MAX_MARKET_DIVIDEND_YIELD,
         )
         check_float_field(
             MarketConfig,
@@ -96,6 +104,26 @@ class TestMarketConfig(TestConfig):
             invalid_kwargs["validate_non_regressive_tax_brackets"] = True
             with pytest.raises(AssertionError):
                 MarketConfig(**invalid_kwargs)
+
+    def test_dividend_yield_may_not_exceed_the_total_return(self) -> None:
+        """The yield is a slice of the total return, not an addition to it.
+
+        Neither bound catches this on its own: a yield can sit under
+        MAX_MARKET_DIVIDEND_YIELD and still be more than the whole return.
+        """
+        config_kwargs = io_utils.read_yaml(TestMarketConfig.TEST_CONFIG_PATH)
+        total_return = config_kwargs["market_rate_of_return"]
+        assert total_return < MarketConfig.MAX_MARKET_DIVIDEND_YIELD
+
+        # the whole return paid out as dividends is allowed; more is not
+        at_the_limit = copy.deepcopy(config_kwargs)
+        at_the_limit["market_dividend_yield"] = total_return
+        MarketConfig(**at_the_limit)
+
+        over_the_limit = copy.deepcopy(config_kwargs)
+        over_the_limit["market_dividend_yield"] = total_return + 0.001
+        with pytest.raises(AssertionError):
+            MarketConfig(**over_the_limit)
 
     def test_get_tax(self) -> None:
         with pytest.raises(AssertionError):

@@ -14,6 +14,7 @@ class MarketConfig(Config):
 
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the market, as a decimal
+        self.market_dividend_yield: The portion of that return arriving as taxable dividends
         self.tax_brackets_inflation: Rate at which the tax bracket limits inflate (by government policy)
         self.annual_inflation_rate: General ANNUAL rate of price inflation in the economy, as a fraction
         # TODO more tax stuff (e.g., standard exemption, net investment income tax, payroll tax, etc.)
@@ -23,6 +24,7 @@ class MarketConfig(Config):
     """
 
     MAX_MARKET_RATE_OF_RETURN = 0.5
+    MAX_MARKET_DIVIDEND_YIELD = 0.1
     MAX_ANNUAL_INFLATION_RATE = 0.5
 
     @classmethod
@@ -161,6 +163,7 @@ class MarketConfig(Config):
     def __init__(
         self,
         market_rate_of_return: float,
+        market_dividend_yield: float,
         tax_brackets_inflation: float,
         annual_inflation_rate: float,
         tax_brackets: dict[str, dict],
@@ -172,6 +175,7 @@ class MarketConfig(Config):
         in Config.
         """
         self.market_rate_of_return: float = market_rate_of_return
+        self.market_dividend_yield: float = market_dividend_yield
         self.tax_brackets_inflation: float = tax_brackets_inflation
         self.annual_inflation_rate: float = annual_inflation_rate
         self.ordinary_income_tax_brackets: MarketConfig.TaxBrackets = (
@@ -215,6 +219,22 @@ class MarketConfig(Config):
         assert (
             self.market_rate_of_return <= MarketConfig.MAX_MARKET_RATE_OF_RETURN
         ), "Please set a reasonable market rate of return (at most 0.5)"
+        assert math.isfinite(
+            self.market_dividend_yield
+        ), "market_dividend_yield must not be NaN, infinity, or negative infinity"
+        assert (
+            self.market_dividend_yield >= 0
+        ), "market_dividend_yield must be non-negative."
+        assert (
+            self.market_dividend_yield <= MarketConfig.MAX_MARKET_DIVIDEND_YIELD
+        ), f"Please set 'market_dividend_yield' to something reasonable (at most {MarketConfig.MAX_MARKET_DIVIDEND_YIELD})"
+        # The yield is a slice of the total return, not something on top of it, so a
+        # yield above the total return would mean the price falls every year. That is
+        # a real thing in the world but almost never what someone meant to type.
+        assert self.market_dividend_yield <= self.market_rate_of_return, (
+            "market_dividend_yield must not exceed market_rate_of_return; it is the "
+            "part of that return paid out as dividends, not an addition to it."
+        )
         assert (
             self.ordinary_income_tax_brackets is not None
         ), "Ordinary income tax brackets must not be null or empty."

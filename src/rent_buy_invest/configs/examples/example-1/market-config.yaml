@@ -1,5 +1,8 @@
 market_rate_of_return: !!float 0.07
 
+# 0.0 treats the whole return above as price appreciation, taxed only at sale
+market_dividend_yield: !!float 0.0
+
 tax_brackets_inflation: !!float 0.02
 
 # mirrors this scenario's annual_rent_inflation_rate so results are unchanged;
