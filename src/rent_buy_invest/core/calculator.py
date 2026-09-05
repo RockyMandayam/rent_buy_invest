@@ -111,8 +111,9 @@ class Calculator:
         for month in range(num_months + 1):
             loan_amount = mortgage_amortization_schedule.starting_balances[month]
             mortgage_interest = mortgage_amortization_schedule.interest_payments[month]
-            # mortgage interest tax deduction savings
-            # only do it at the year boundary
+            # The year's ordinary-income tax adjustments -- rent received and the
+            # mortgage interest deduction -- are settled together at the year
+            # boundary, because they stack on each other.
             if month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1):
                 mortgage_interest_for_the_year = sum(
                     mortgage_amortization_schedule.interest_payments[
@@ -137,6 +138,9 @@ class Calculator:
                 annual_income = sum(
                     ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
                 )
+                annual_rental_income = sum(
+                    home_monthly_rental_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
+                )
                 # The cap limits how much interest may be DEDUCTED, so it has to
                 # shrink the deduction and let the brackets act on what is left.
                 # Shrinking the resulting saving instead would price the surviving
@@ -145,40 +149,39 @@ class Calculator:
                 deductible_mortgage_interest = (
                     deductible_fraction_of_interest * mortgage_interest_for_the_year
                 )
+                # The year has two ordinary-income adjustments, and they are not
+                # independent: rent RAISES taxable income and the deduction LOWERS
+                # it, so whichever is charged second lands in the bracket the first
+                # one moved you to. Working each out from salary alone -- which is
+                # what this did until now -- charges the rent and credits the
+                # deduction as if the other had not happened, and prices some of
+                # each in a bracket the year never reaches.
+                #
+                # The convention here is the one a tax return follows: all income
+                # first, then deductions come off the top of it.
+                rental_income_tax = (
+                    self.market_config.get_additional_tax_from_additional_income(
+                        month, annual_income, annual_rental_income
+                    )
+                )
                 mortgage_interest_deduction_saving = (
                     self.market_config.get_income_tax_savings_from_deduction(
                         month,
-                        annual_income,
+                        annual_income + annual_rental_income,
                         deductible_mortgage_interest,
                     )
                 )
             else:
+                rental_income_tax = 0
                 mortgage_interest_deduction_saving = 0
             mortgage_interest_deduction_savings.append(
                 mortgage_interest_deduction_saving
             )
+            rental_income_taxes.append(rental_income_tax)
 
             # mortgage equity payment and equity value
             toward_equity = mortgage_amortization_schedule.principal_payments[month]
             equities.append(round(home_values[month] - loan_amount, 2))
-
-            # taxes on rental income
-            # only do it at the year boundary
-            if month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1):
-                annual_ordinary_income = sum(
-                    ordinary_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
-                )
-                annual_rental_income = sum(
-                    home_monthly_rental_incomes[month + 1 - MONTHS_PER_YEAR : month + 1]
-                )
-                rental_income_tax = (
-                    self.market_config.get_additional_tax_from_additional_income(
-                        month, annual_ordinary_income, annual_rental_income
-                    )
-                )
-            else:
-                rental_income_tax = 0
-            rental_income_taxes.append(rental_income_tax)
 
             # monthly surplus from one option vs the other
             # investment_values_if_renting and investment_values_if_buying have their

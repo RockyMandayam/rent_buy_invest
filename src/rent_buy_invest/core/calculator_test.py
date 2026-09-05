@@ -4,6 +4,7 @@ import pytest
 
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.configs.experiment_config_test import TestExperimentConfig
+from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.core.calculator import (
     MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE,
     Calculator,
@@ -16,6 +17,21 @@ EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH
 PRIMARY_RESIDENCE_EXPERIMENT_CONFIG = ExperimentConfig.parse(
     "rent_buy_invest/core/test_resources/test-primary-residence-experiment-config.yaml"
 )
+
+
+def _deductible_mortgage_interest_for_the_year(projection, month: int) -> float:
+    """The interest deductible in the tax year ending at ``month``, in dollars."""
+    first_month_of_year = month + 1 - MONTHS_PER_YEAR
+    interest_for_the_year = projection["Buy"]["Mortgage Interest Payment"][
+        first_month_of_year : month + 1
+    ].sum()
+    avg_loan_amount = avg(
+        list(projection["Buy"]["Loan Amount"][first_month_of_year : month + 1])
+    )
+    deductible_fraction = MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE / max(
+        MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE, avg_loan_amount
+    )
+    return deductible_fraction * interest_for_the_year
 
 
 class TestCalculator:
@@ -235,6 +251,90 @@ class TestCalculator:
 
         # without this the assertions above would hold for either formula
         assert years_where_the_two_formulas_disagree > 0
+
+    def test_calculate_stacks_the_years_two_ordinary_income_adjustments(
+        self,
+    ) -> None:
+        """Rent received and the mortgage interest deduction land on each other.
+
+        Rent raises taxable income and the deduction lowers it, so whichever is
+        charged second lands in the bracket the first one moved you to. Working
+        each out from salary alone -- which this did until now -- prices some of
+        each in a bracket the year never reaches. Only their combined effect is a
+        fact; the split between the two reported columns is a convention (all
+        income first, then deductions off the top), so this checks the total.
+        """
+        # The shared config's brackets are flat across the whole range this
+        # scenario touches, so stacking could never change a number in it. These
+        # put a boundary right where the year's salary sits, which is what a real
+        # federal schedule does.
+        experiment_config = deepcopy(EXPERIMENT_CONFIG)
+        assert experiment_config.buy_config.rental_income_config is not None
+        experiment_config.market_config = MarketConfig(
+            market_rate_of_return=experiment_config.market_config.market_rate_of_return,
+            market_dividend_yield=0.0,
+            tax_brackets_inflation=0.0,
+            annual_inflation_rate=experiment_config.market_config.annual_inflation_rate,
+            tax_brackets={
+                "ordinary_income_tax_brackets": [
+                    {"upper_limit": 105_000.0, "tax_rate": 0.10},
+                    {"upper_limit": float("inf"), "tax_rate": 0.37},
+                ],
+                "long_term_capital_gains_tax_brackets": [
+                    {"upper_limit": 105_000.0, "tax_rate": 0.0},
+                    {"upper_limit": float("inf"), "tax_rate": 0.20},
+                ],
+            },
+        )
+        calculator = Calculator(
+            experiment_config.buy_config,
+            experiment_config.rent_config,
+            experiment_config.market_config,
+            experiment_config.personal_config,
+            experiment_config.num_years,
+            experiment_config.start_date,
+            InitialState.from_configs(
+                experiment_config.buy_config,
+                experiment_config.rent_config,
+                experiment_config.market_config,
+                experiment_config.personal_config,
+            ),
+        )
+        projection = calculator.calculate()
+
+        market_config = experiment_config.market_config
+        num_months = experiment_config.num_years * MONTHS_PER_YEAR
+        ordinary_incomes = experiment_config.personal_config.get_ordinary_incomes(
+            num_months
+        )
+        years_where_stacking_matters = 0
+
+        for month in range(MONTHS_PER_YEAR - 1, num_months + 1, MONTHS_PER_YEAR):
+            first_month_of_year = month + 1 - MONTHS_PER_YEAR
+            salary = sum(ordinary_incomes[first_month_of_year : month + 1])
+            rent = projection["Buy"]["Rental Income (Pre-Tax)"][
+                first_month_of_year : month + 1
+            ].sum()
+            deduction = _deductible_mortgage_interest_for_the_year(projection, month)
+
+            reported = (
+                projection["Buy"]["Tax on Rental Income"].iloc[month]
+                - projection["Buy"]["Mortgage Interest Deduction Savings"].iloc[month]
+            )
+            stacked = market_config.get_tax(
+                month, salary + rent, ordinary_income_deduction=deduction
+            ) - market_config.get_tax(month, salary)
+            parallel = market_config.get_additional_tax_from_additional_income(
+                month, salary, rent
+            ) - market_config.get_income_tax_savings_from_deduction(
+                month, salary, deduction
+            )
+            assert reported == pytest.approx(stacked, abs=0.02)
+            if stacked != pytest.approx(parallel, abs=0.02):
+                years_where_stacking_matters += 1
+
+        # a config whose brackets never bind would pass either way
+        assert years_where_stacking_matters > 0
 
     def test_calculate_for_primary_residence(self) -> None:
         """A home lived in rather than rented out projects over the full horizon.
