@@ -13,6 +13,7 @@ jobs:
           python-version: 3.12
       - name: Run isort
         run: |
+          pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
           isort --version-number
           isort --check-only .
