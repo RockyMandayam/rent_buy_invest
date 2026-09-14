@@ -217,6 +217,16 @@ class Calculator:
                 investment_values_if_buying.append(
                     round(gain_in_investment_if_buying + surplus, 2)
                 )
+            else:
+                # if the two worlds cost exactly the same this month, neither has
+                # anything to invest, and both accounts just grow. This branch has to
+                # exist even though a tie to the cent is rare: without it nothing is
+                # appended this month, every list after it falls a row short, and
+                # building the projection table fails.
+                rent_monthly_surpluses.append(0)
+                investment_values_if_renting.append(gain_in_investment_if_renting)
+                housing_monthly_surpluses.append(0)
+                investment_values_if_buying.append(gain_in_investment_if_buying)
 
             assert loan_amount >= 0, "Loan amount cannot be negative."
         # Pop last element from lists which have an extra item (starting value)

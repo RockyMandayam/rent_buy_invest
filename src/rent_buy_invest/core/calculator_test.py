@@ -173,6 +173,72 @@ class TestCalculator:
                 buy_net_monthly_cost - rent_net_monthly_cost, abs=0.01
             )
 
+    def test_calculate_handles_a_month_where_both_worlds_cost_the_same(self) -> None:
+        """A month with no surplus on either side still produces a row.
+
+        The loop used to handle only a positive or a negative surplus. A tie to the
+        cent appended nothing, so every column after it came up one row short and
+        building the projection raised. Here one month's rent is set to exactly
+        what buying costs that month, which forces the tie.
+        """
+        month = 5
+        baseline = Calculator(
+            EXPERIMENT_CONFIG.buy_config,
+            EXPERIMENT_CONFIG.rent_config,
+            EXPERIMENT_CONFIG.market_config,
+            EXPERIMENT_CONFIG.personal_config,
+            EXPERIMENT_CONFIG.num_years,
+            EXPERIMENT_CONFIG.start_date,
+            InitialState.from_configs(
+                EXPERIMENT_CONFIG.buy_config,
+                EXPERIMENT_CONFIG.rent_config,
+                EXPERIMENT_CONFIG.market_config,
+                EXPERIMENT_CONFIG.personal_config,
+            ),
+        ).calculate()
+        # the rent that makes this month's two net costs equal: the gap between
+        # them is exactly the pair of surpluses
+        rent_costs = list(baseline["Rent"]["Costs Tied to Inflation"])
+        rent_costs[month] = round(
+            rent_costs[month]
+            + baseline["Rent"]["Surplus"].iloc[month]
+            - baseline["Buy"]["Surplus"].iloc[month],
+            2,
+        )
+        rent_config = deepcopy(EXPERIMENT_CONFIG.rent_config)
+        rent_config.get_monthly_costs_of_renting = lambda num_months: rent_costs
+
+        projection = Calculator(
+            EXPERIMENT_CONFIG.buy_config,
+            rent_config,
+            EXPERIMENT_CONFIG.market_config,
+            EXPERIMENT_CONFIG.personal_config,
+            EXPERIMENT_CONFIG.num_years,
+            EXPERIMENT_CONFIG.start_date,
+            InitialState.from_configs(
+                EXPERIMENT_CONFIG.buy_config,
+                rent_config,
+                EXPERIMENT_CONFIG.market_config,
+                EXPERIMENT_CONFIG.personal_config,
+            ),
+        ).calculate()
+
+        assert projection.shape[0] == EXPERIMENT_CONFIG.num_years * MONTHS_PER_YEAR + 1
+        assert projection["Rent"]["Surplus"].iloc[month] == 0
+        assert projection["Buy"]["Surplus"].iloc[month] == 0
+        # up to and including the tie nothing else changed, so the accounts match
+        # the baseline; the month after, each has only grown, with no deposit
+        for world in ["Rent", "Buy"]:
+            invested = projection[world]["Invested (Pre-Tax)"]
+            assert invested.iloc[: month + 1].equals(
+                baseline[world]["Invested (Pre-Tax)"].iloc[: month + 1]
+            )
+            assert invested.iloc[month + 1] == (
+                EXPERIMENT_CONFIG.market_config.get_pretax_monthly_wealth(
+                    invested.iloc[month], 1
+                )[1]
+            )
+
     def test_calculate_prorates_the_deduction_not_the_saving_on_a_jumbo_loan(
         self,
     ) -> None:
