@@ -31,7 +31,7 @@ def _get_args() -> argparse.Namespace:
         help="Name of the experiment. Output folder will be 'out/<experiment_name>/<timestamp>'; defaults to 'experiment'",
     )
     args = parser.parse_args()
-    assert args.experiment_config.endswith(".yaml") or args.experiment.config_endswith(
+    assert args.experiment_config.endswith(".yaml") or args.experiment_config.endswith(
         ".yml"
     ), "Experiment config file must end in '.yaml' or '.yml'"
     if not args.experiment_name:

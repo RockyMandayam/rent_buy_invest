@@ -1,6 +1,8 @@
+import sys
+
 import pytest
 
-from rent_buy_invest.main import _cap_gains_from_selling_investments
+from rent_buy_invest.main import _cap_gains_from_selling_investments, _get_args
 from rent_buy_invest.utils.data_utils import to_df
 
 
@@ -62,3 +64,27 @@ def test_deposits_alone_are_never_taxed() -> None:
     projection = _projection([0, 100, 200, 300], [100, 100, 100, 0])
 
     assert _cap_gains_from_selling_investments(projection, "Rent") == 0
+
+
+@pytest.mark.parametrize("extension", [".yaml", ".yml"])
+def test_get_args_accepts_both_yaml_extensions(monkeypatch, extension: str) -> None:
+    """Both spellings are accepted.
+
+    The ``.yml`` check once read ``args.experiment.config_endswith`` -- an attribute
+    that does not exist -- so every ``.yml`` config crashed with an
+    ``AttributeError``. The examples all end in ``.yaml``, which is checked first,
+    so nothing exercised the broken half.
+    """
+    path = f"rent_buy_invest/configs/experiment-config{extension}"
+    monkeypatch.setattr(sys, "argv", ["rent_buy_invest", path])
+
+    assert _get_args().experiment_config == path
+
+
+def test_get_args_rejects_other_extensions(monkeypatch) -> None:
+    monkeypatch.setattr(
+        sys, "argv", ["rent_buy_invest", "rent_buy_invest/configs/config.json"]
+    )
+
+    with pytest.raises(AssertionError):
+        _get_args()
