@@ -125,16 +125,13 @@ def _run_rent_vs_buy(
     loan_amount = projection[("Buy", "Loan Amount")].iloc[-1]
     final_home_price = projection[("Buy", "Home Value")].iloc[-1]
     initial_home_price = projection[("Buy", "Home Value")].iloc[0]
-    # some selling costs are immediately deductible from capital gains
-    deductible_selling_costs = buy_config.get_deductible_selling_costs(final_home_price)
-    nondeductible_selling_costs = buy_config.get_nondeductible_selling_costs(
-        final_home_price
-    )
+    # every cost of selling comes off the gain, not just off the cash
+    selling_costs = buy_config.get_selling_costs(final_home_price)
     home_cost_basis = (
         initial_home_price + buy_config.get_part_of_basis_upfront_one_time_cost()
     )
     cap_gains_from_selling_home = max(
-        (final_home_price - deductible_selling_costs) - home_cost_basis,
+        (final_home_price - selling_costs) - home_cost_basis,
         0,
     )
     # A home lived in excludes part of its gain; one rented out excludes none.
@@ -156,7 +153,7 @@ def _run_rent_vs_buy(
     wealth_if_buying = (
         -loan_amount
         + final_investments_if_buying
-        + (final_home_price - deductible_selling_costs - nondeductible_selling_costs)
+        + (final_home_price - selling_costs)
         - cap_gains_tax_if_buying
     )
 

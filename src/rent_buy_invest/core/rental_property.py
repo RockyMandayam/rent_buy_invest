@@ -15,8 +15,8 @@ class RentalSaleResult:
 
     Two separate stories, the same split that runs through the monthly figures.
 
-    The cash story is simple: you receive ``final_sale_price``, hand back both
-    kinds of selling cost, and pay off whatever is left of the loan. What remains
+    The cash story is simple: you receive ``final_sale_price``, pay
+    ``selling_costs``, and pay off whatever is left of the loan. What remains
     is ``pretax_cash_proceeds`` -- "pretax" because the tax owed on the sale is
     computed elsewhere, from the gain figures below, and subtracted by the caller.
 
@@ -58,8 +58,7 @@ class RentalSaleResult:
     """
 
     final_sale_price: float
-    deductible_selling_costs: float
-    nondeductible_selling_costs: float
+    selling_costs: float
     loan_payoff: float
     pretax_cash_proceeds: float
 
@@ -312,15 +311,10 @@ class RentalProperty:
         accumulated_depreciation = self.accumulated_depreciation(month)
         adjusted_basis = round(original_basis - accumulated_depreciation, 2)
 
-        # Only the deductible costs come off the amount realized; the rest are
-        # money out of your pocket that the gain calculation simply ignores.
-        deductible_selling_costs = round(
-            self.buy_config.get_deductible_selling_costs(final_sale_price), 2
-        )
-        nondeductible_selling_costs = round(
-            self.buy_config.get_nondeductible_selling_costs(final_sale_price), 2
-        )
-        amount_realized = round(final_sale_price - deductible_selling_costs, 2)
+        # Every cost of selling comes off the amount realized, so the same figure
+        # reduces both the gain here and the cash below.
+        selling_costs = round(self.buy_config.get_selling_costs(final_sale_price), 2)
+        amount_realized = round(final_sale_price - selling_costs, 2)
 
         # Reported raw: negative when the property sold for less than the part of
         # its cost you had not yet deducted.
@@ -342,17 +336,13 @@ class RentalProperty:
 
         loan_payoff = self._amortization_schedule.starting_balances[month]
         pretax_cash_proceeds = round(
-            final_sale_price
-            - deductible_selling_costs
-            - nondeductible_selling_costs
-            - loan_payoff,
+            final_sale_price - selling_costs - loan_payoff,
             2,
         )
 
         return RentalSaleResult(
             final_sale_price=final_sale_price,
-            deductible_selling_costs=deductible_selling_costs,
-            nondeductible_selling_costs=nondeductible_selling_costs,
+            selling_costs=selling_costs,
             loan_payoff=loan_payoff,
             pretax_cash_proceeds=pretax_cash_proceeds,
             unamortized_discount_points=unamortized_discount_points,

@@ -769,25 +769,39 @@ class BuyConfig(Config):
             # monthly projection, which covers month 0 through num_months inclusive
             return [0 for _ in range(num_months + 1)]
 
-    def get_deductible_selling_costs(self, final_sale_price: float) -> float:
+    def get_selling_costs(self, final_sale_price: float) -> float:
+        """Everything the seller pays to sell the home, in dollars.
+
+        Every one of these reduces the taxable gain as well as the cash the sale
+        nets. The IRS measures gain from the "amount realized" -- the sale price
+        less the costs of selling -- so a cost paid only because you sold comes off
+        the gain, whether or not it could ever be deducted from income.
+
+        None of these costs is deductible from income; all of them reduce the gain.
+
+        Args:
+            final_sale_price: what the home sells for at the END of the
+                projection, in dollars -- not ``purchase_price``.
+        """
         return (
-            # seems that transfer tax is not tax deductible, but the buyer portion can be added to buyer's cost basis
             self.seller_realtor_commission_fraction * final_sale_price
-            # seems that hoa fee is not tax deductible
+            # the buyer's share of the transfer tax is part of their cost basis instead
+            + self.seller_burden_of_transfer_tax_fraction
+            * self.transfer_tax_fraction
+            * final_sale_price
+            + self.seller_burden_of_hoa_transfer_fee * self.hoa_transfer_fee
+            + self.seller_natural_hazard_report_fee
             + self.seller_burden_of_escrow_fixed_fee * self.escrow_fixed_fee
             + self.seller_burden_of_title_search_fee * self.title_search_fee
             + self.seller_burden_of_title_search_abstract_fee
             * self.title_search_abstract_fee
             + self.seller_attorney_fee
             + self.seller_deed_prep_fee
-        )
-
-    def get_nondeductible_selling_costs(self, final_sale_price: float) -> float:
-        return (
-            self.seller_burden_of_transfer_tax_fraction
-            * self.transfer_tax_fraction
-            * final_sale_price
-            + self.seller_burden_of_hoa_transfer_fee * self.hoa_transfer_fee
+            # UNCERTAIN. A warranty bought for the buyer is treated as reducing the
+            # gain, as a concession that effectively lowers the sale price. The IRS
+            # does not list home warranties as a selling expense, and some tax
+            # guidance says one cannot reduce the gain on a home you lived in; no
+            # IRS source settles it either way. The amount is small, so the choice
+            # barely moves the result.
             + self.seller_one_time_home_warranty
-            + self.seller_natural_hazard_report_fee
         )

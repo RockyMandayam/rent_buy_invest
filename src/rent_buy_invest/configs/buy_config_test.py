@@ -923,16 +923,23 @@ class TestBuyConfig(TestConfig):
             assert len(actual) == num_months + 1
             assert all(income == 0 for income in actual)
 
-    def test_get_deductible_selling_costs(self) -> None:
+    def test_get_selling_costs(self) -> None:
         final_sale_price = 600000  # arbitrary
-        actual = TestBuyConfig.BUY_CONFIG.get_deductible_selling_costs(final_sale_price)
-        expected = 0.025 * final_sale_price + 0 * 500 + 1 * 100 + 0 * 300 + 800 + 50
-        assert actual == pytest.approx(expected)
-
-    def test_get_nondeductible_selling_costs(self) -> None:
-        final_sale_price = 800000  # arbitrary
-        actual = TestBuyConfig.BUY_CONFIG.get_nondeductible_selling_costs(
-            final_sale_price
+        actual = TestBuyConfig.BUY_CONFIG.get_selling_costs(final_sale_price)
+        expected = (
+            0.025 * final_sale_price
+            # seller's share of the transfer tax
+            + 0.9 * 0.0011 * final_sale_price
+            # seller's share of the HOA transfer fee
+            + 1 * 300
+            # natural hazard report
+            + 100
+            + 0 * 500
+            + 1 * 100
+            + 0 * 300
+            + 800
+            + 50
+            # home warranty bought for the buyer
+            + 600
         )
-        expected = 0.9 * 0.0011 * final_sale_price + 1 * 300 + 600 + 100
         assert actual == pytest.approx(expected)
