@@ -107,7 +107,18 @@ def _run_rent_vs_buy(
     # but here we assume all at once...
     # TODO maybe I should do it separately. After all, there may be a HUGE cap gains in one year, so doing it all at once may make it seem like buying is worse than it really is
     assert len(projection) % MONTHS_PER_YEAR == 1
-    # get last year's annual income
+    # The sale is treated as happening in the tax year AFTER the projection ends:
+    # sold the following January, the same convention as
+    # RentalVsInvestExperiment._liquidate. That is why the sale's gains are taxed
+    # at month num_months + 1 and stack on salary alone. The last projected
+    # year's rental income, mortgage interest deduction and dividends were
+    # already taxed at that year's boundary in Calculator, so adding them here
+    # would tax them twice. And in a January sale year they would be zero
+    # anyway: the home is sold so there is no rent, the loan is paid off so no
+    # interest accrues, and the account is sold so no dividends arrive.
+    #
+    # The one approximation is the salary itself: that next year's is taken to
+    # be the same as the last projected year's.
     annual_income = sum(
         personal_config.get_ordinary_incomes(num_years * MONTHS_PER_YEAR)[
             -1 - MONTHS_PER_YEAR : -1
