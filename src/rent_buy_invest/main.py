@@ -5,6 +5,7 @@ import pandas as pd
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.final_state import FinalState
+from rent_buy_invest.core.home_sale import compute_home_sale
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.rental_vs_invest_experiment import (
     RentalVsInvestExperiment,
@@ -125,20 +126,20 @@ def _run_rent_vs_buy(
     loan_amount = projection[("Buy", "Loan Amount")].iloc[-1]
     final_home_price = projection[("Buy", "Home Value")].iloc[-1]
     initial_home_price = projection[("Buy", "Home Value")].iloc[0]
-    # every cost of selling comes off the gain, not just off the cash
-    selling_costs = buy_config.get_selling_costs(final_home_price)
-    home_cost_basis = (
-        initial_home_price + buy_config.get_part_of_basis_upfront_one_time_cost()
-    )
-    cap_gains_from_selling_home = max(
-        (final_home_price - selling_costs) - home_cost_basis,
-        0,
+    home_sale = compute_home_sale(
+        final_sale_price=final_home_price,
+        purchase_price=initial_home_price,
+        selling_costs=buy_config.get_selling_costs(final_home_price),
+        part_of_basis_upfront_one_time_cost=(
+            buy_config.get_part_of_basis_upfront_one_time_cost()
+        ),
     )
     # A home lived in excludes part of its gain; one rented out excludes none.
     # Applied to the home's gain alone, before it joins the investment gains,
     # because the exclusion is a property rule and does not touch them.
     cap_gains_from_selling_home = tax_module.taxable_gain_on_a_home_sale(
-        cap_gains_from_selling_home,
+        # losses are not modelled: a sale at a loss is taxed as no gain
+        max(home_sale.gain, 0),
         is_a_home_you_lived_in=not buy_config.rental_income_config,
     )
     total_cap_gains_if_buying = (
@@ -153,7 +154,7 @@ def _run_rent_vs_buy(
     wealth_if_buying = (
         -loan_amount
         + final_investments_if_buying
-        + (final_home_price - selling_costs)
+        + home_sale.amount_realized
         - cap_gains_tax_if_buying
     )
 
