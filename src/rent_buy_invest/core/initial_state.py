@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Any
+
+import pandas as pd
 
 from rent_buy_invest.configs.buy_config import BuyConfig
 from rent_buy_invest.configs.market_config import MarketConfig
@@ -64,7 +65,7 @@ class InitialState:
             home_equity_if_buying,
         )
 
-    def get_df(self) -> list[list[Any | None]]:
+    def get_df(self) -> pd.DataFrame:
         rows = ["Upfront one-time costs", "Home equity", "Invested (Pre-Tax)"]
         cols = {
             "Rent": [self.rent_upfront_one_time_cost, 0, self.invested_if_renting],
@@ -92,7 +93,7 @@ class RentalVsInvestInitialState:
     property_equity_if_buying: float
     market_balance_if_investing: float
 
-    def get_df(self) -> list[list[Any | None]]:
+    def get_df(self) -> pd.DataFrame:
         rows = ["Upfront one-time costs", "Property equity", "Invested (Pre-Tax)"]
         cols = {
             "Buy Rental": [
