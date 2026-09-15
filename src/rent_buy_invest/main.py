@@ -41,22 +41,20 @@ def _get_args() -> argparse.Namespace:
 
 
 def _cap_gains_from_selling_investments(projection: pd.DataFrame, world: str) -> float:
-    """Gain on a world's market account: its balance less everything paid in.
+    """Gain on a world's market account: its final balance less its cost basis.
 
-    Cost basis is the opening balance **plus every deposit**, not just the
-    opening balance. Each world pays its monthly surplus into the market for the
-    whole projection, and that is money you put in, not money you made. Ignoring
-    it taxes you on your own deposits.
+    The basis is tracked month by month in ``Calculator`` rather than inferred
+    here. It is the opening balance, **plus every deposit**, plus every dividend
+    that was already taxed in its own year and stayed invested. None of that is
+    money you made at the sale: the deposits are your own money, and the
+    dividends have been taxed once already. Leaving either out taxes you twice.
 
-    The final month's surplus is excluded because it never lands: ``Calculator``
-    appends one extra balance and pops it, so the last row's cash flow never moves
-    an account.
+    Losses are floored at zero: the tax layer has no way to use them yet.
     """
     # NOTE you cannot deduct losses for a primary residence property...
     final = projection[(world, "Invested (Pre-Tax)")].iloc[-1]
-    opening = projection[(world, "Invested (Pre-Tax)")].iloc[0]
-    deposits = projection[(world, "Surplus")].iloc[:-1].sum()
-    return max(final - opening - deposits, 0)
+    basis = projection[(world, "Invested Cost Basis")].iloc[-1]
+    return max(final - basis, 0)
 
 
 def _run_rent_vs_buy(
