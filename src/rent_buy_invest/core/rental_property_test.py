@@ -282,7 +282,7 @@ def test_sale_splits_the_gain_into_recapture_then_capital_gain() -> None:
 
     assert result.total_gain > 0
     assert result.amount_realized == pytest.approx(
-        result.final_sale_price - result.deductible_selling_costs
+        result.final_sale_price - result.selling_costs
     )
     assert result.total_gain == pytest.approx(
         result.amount_realized - result.adjusted_basis
@@ -346,15 +346,11 @@ def test_sale_cash_proceeds_ignore_the_gain_calculation() -> None:
     assert result.loan_payoff == pytest.approx(
         rental_property._amortization_schedule.starting_balances[month]
     )
-    # both kinds of selling cost are money out, even though only one of them
-    # reduces the gain
+    # selling costs are money out as well as coming off the gain
     assert result.pretax_cash_proceeds == pytest.approx(
-        result.final_sale_price
-        - result.deductible_selling_costs
-        - result.nondeductible_selling_costs
-        - result.loan_payoff
+        result.final_sale_price - result.selling_costs - result.loan_payoff
     )
-    assert result.nondeductible_selling_costs > 0
+    assert result.selling_costs > 0
     assert result.pretax_cash_proceeds != pytest.approx(result.total_gain)
 
 
