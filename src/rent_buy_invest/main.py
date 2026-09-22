@@ -99,7 +99,7 @@ def _run_rent_vs_buy(
     assert num_years > 1
     # at the end, compare only post-tax values
     # buy side: need to sell house, and investments
-    # the sale itself includes some deductible and non-deductible expenses, so we'll calculate that too
+    # the sale itself has selling costs, all of which reduce the gain as well as the cash, so we'll calculate those too
     # rent side: need to sell investments
     # First do buy case
     # Realistically you wouldn't sell all your investments at once...
