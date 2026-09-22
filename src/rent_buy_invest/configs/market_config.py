@@ -14,7 +14,11 @@ class MarketConfig(Config):
 
     Instance Attributes:
         self.market_rate_of_return: ANNUAL rate of return in the market, as a decimal
-        self.market_dividend_yield: The portion of that return arriving as taxable dividends
+        self.market_dividend_yield: ANNUAL dividends as a fraction of the account
+            balance, in the same units as market_rate_of_return (0.013 is close to
+            the S&P 500's recent yield). It is part of that return, not an addition
+            to it: 0.03 against a 0.07 return means 3% arrives as dividends and 4% as
+            price appreciation -- NOT 3% of the 7%.
         self.tax_brackets_inflation: Rate at which the tax bracket limits inflate (by government policy)
         self.annual_inflation_rate: General ANNUAL rate of price inflation in the economy, as a fraction
         # TODO more tax stuff (e.g., standard exemption, net investment income tax, payroll tax, etc.)

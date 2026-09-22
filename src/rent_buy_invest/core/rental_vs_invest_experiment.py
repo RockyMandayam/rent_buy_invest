@@ -7,6 +7,7 @@ from rent_buy_invest.configs.market_config import MarketConfig
 from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.core.final_state import RentalVsInvestFinalState
 from rent_buy_invest.core.initial_state import RentalVsInvestInitialState
+from rent_buy_invest.core.market_account import compute_market_account_schedule
 from rent_buy_invest.core.rental_property import RentalProperty
 from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.data_utils import to_df
@@ -112,40 +113,18 @@ class RentalVsInvestExperiment:
         property_values = self.buy_config.get_monthly_home_values(num_months)
 
         annual_taxes: list[float] = []
-        dividend_taxes_if_buying: list[float] = []
-        dividend_taxes_if_investing: list[float] = []
         buy_surpluses: list[float] = []
         after_tax_cash_flows: list[float] = []
         equities: list[float] = []
-        # NOTE: first value filled in; the value at the start of each month
-        invested_if_buying = [0.0]
-        invested_if_investing = [self.upfront_cost_of_buying]
-        # Cost basis: every dollar deposited, which is not gain when the account is
-        # cashed out. Tracked alongside the balances, and popped the same way, so
-        # the two cannot fall out of step.
-        basis_if_buying = [0.0]
-        basis_if_investing = [self.upfront_cost_of_buying]
-        # What each account earned since the last year boundary. Dividends are a
-        # share of this, so it has to be accumulated as the year runs rather than
-        # inferred from the balances, which also move on deposits.
-        growth_if_buying_this_year = 0.0
-        growth_if_investing_this_year = 0.0
+        # What each world pays into its market account each month.
+        deposits_if_buying: list[float] = []
+        deposits_if_investing: list[float] = []
+        # For each tax year, the rest of each world's taxable income, which its
+        # dividends are taxed on top of.
+        dividend_tax_bases_if_buying: list[TaxableAmounts] = []
+        dividend_tax_bases_if_investing: list[TaxableAmounts] = []
 
         for month in range(num_months + 1):
-            # Both accounts grow for the month. This runs before tax because the
-            # year's dividends are a share of this growth, and the tax on them
-            # stacks on top of the rental's income for the same year.
-            grown_if_buying = self.market_config.get_pretax_monthly_wealth(
-                invested_if_buying[-1], 1
-            )[1]
-            grown_if_investing = self.market_config.get_pretax_monthly_wealth(
-                invested_if_investing[-1], 1
-            )[1]
-            growth_if_buying_this_year += grown_if_buying - invested_if_buying[-1]
-            growth_if_investing_this_year += (
-                grown_if_investing - invested_if_investing[-1]
-            )
-
             # Tax is settled annually, so it lands entirely in the last month of
             # each year and is zero in every other month.
             is_year_boundary = month % MONTHS_PER_YEAR == (MONTHS_PER_YEAR - 1)
@@ -158,55 +137,24 @@ class RentalVsInvestExperiment:
                         month + 1 - MONTHS_PER_YEAR : month + 1
                     ]
                 )
-                # Dividends are already sitting in each balance -- an account
-                # compounds at the total return, dividends included -- so this
-                # only says how much of that growth is taxable now rather than
-                # deferred to the sale.
-                get_dividends = self.market_config.get_dividends_from_growth
-                dividends_if_buying = get_dividends(growth_if_buying_this_year)
-                dividends_if_investing = get_dividends(growth_if_investing_this_year)
-
-                # One call per world, and the layering happens inside it: the
-                # rental's net income moves taxable income up or down, and the
-                # dividends are then charged wherever that left it. Handing over
-                # the whole year at once is what makes that ordering impossible
-                # to get wrong here.
                 salary = TaxableAmounts(ordinary_income=income_for_the_year)
-                tax_if_buying = self.tax_module.extra_tax_from(
-                    month,
-                    salary,
-                    TaxableAmounts(
-                        ordinary_income=max(taxable_rental_income_for_the_year, 0.0),
-                        ordinary_deductions=max(
-                            -taxable_rental_income_for_the_year, 0.0
-                        ),
-                        long_term_capital_gains=dividends_if_buying,
-                    ),
+                # The rental's net income moves the year's taxable income up or
+                # down: a profit is income, a loss is a deduction against salary.
+                rental_income = TaxableAmounts(
+                    ordinary_income=max(taxable_rental_income_for_the_year, 0.0),
+                    ordinary_deductions=max(-taxable_rental_income_for_the_year, 0.0),
                 )
-                # The investing world owns no property, so it has no rental layer.
-                tax_if_investing = self.tax_module.extra_tax_from(
-                    month,
-                    salary,
-                    TaxableAmounts(long_term_capital_gains=dividends_if_investing),
-                )
-                annual_tax = tax_if_buying.ordinary
-                dividend_tax_if_buying = tax_if_buying.long_term_capital_gain
-                dividend_tax_if_investing = tax_if_investing.long_term_capital_gain
-                reinvested_if_buying = round(
-                    dividends_if_buying - dividend_tax_if_buying, 2
-                )
-                reinvested_if_investing = round(
-                    dividends_if_investing - dividend_tax_if_investing, 2
-                )
-                growth_if_buying_this_year = 0.0
-                growth_if_investing_this_year = 0.0
+                annual_tax = self.tax_module.extra_tax_from(
+                    month, salary, rental_income
+                ).ordinary
+                # Dividends are taxed on top of everything else in the year: in
+                # the buying world that is salary plus the rental's net income; the
+                # investing world owns no property, so it is salary alone.
+                dividend_tax_bases_if_buying.append(salary + rental_income)
+                dividend_tax_bases_if_investing.append(salary)
             else:
                 annual_tax = 0
-                dividend_tax_if_buying = dividend_tax_if_investing = 0.0
-                reinvested_if_buying = reinvested_if_investing = 0.0
             annual_taxes.append(annual_tax)
-            dividend_taxes_if_buying.append(dividend_tax_if_buying)
-            dividend_taxes_if_investing.append(dividend_tax_if_investing)
 
             # Positive tax is money owed, so it comes off what the property left
             # you with; negative tax is money back, so it adds.
@@ -230,61 +178,49 @@ class RentalVsInvestExperiment:
 
             # Only the cheaper world has money spare to put in, so exactly one of
             # these is non-zero.
-            deposit_if_buying = buy_surplus if buy_surplus >= 0 else 0.0
-            deposit_if_investing = -buy_surplus if buy_surplus < 0 else 0.0
+            deposits_if_buying.append(buy_surplus if buy_surplus >= 0 else 0.0)
+            deposits_if_investing.append(-buy_surplus if buy_surplus < 0 else 0.0)
 
-            # The dividend tax is paid out of the account, so it lowers the
-            # balance and nothing else. The dividend left after that tax stays
-            # invested and has already been taxed, so it is basis, not gain, when
-            # the account is finally sold.
-            invested_if_buying.append(
-                round(grown_if_buying + deposit_if_buying - dividend_tax_if_buying, 2)
-            )
-            basis_if_buying.append(
-                round(basis_if_buying[-1] + deposit_if_buying + reinvested_if_buying, 2)
-            )
-            invested_if_investing.append(
-                round(
-                    grown_if_investing
-                    + deposit_if_investing
-                    - dividend_tax_if_investing,
-                    2,
-                )
-            )
-            basis_if_investing.append(
-                round(
-                    basis_if_investing[-1]
-                    + deposit_if_investing
-                    + reinvested_if_investing,
-                    2,
-                )
-            )
-
-        # Only the balances are trimmed. A balance is state at a point in time, so
-        # each was seeded with its month-0 value and every pass appended the NEXT
-        # month's -- leaving one entry too many, the balance at the start of the
-        # month after the horizon, which the projection does not cover. The other
-        # lists hold flows, what happened DURING a month, so a pass appends its own
-        # month and they come out the right length already.
+        # The market accounts are worked out after the loop because nothing above
+        # depends on them: the dividend tax is paid out of each account, never out
+        # of the cash flow that decides the deposits.
         #
-        # A consequence worth knowing: the final month's surplus is computed but
-        # lands in the entry that gets discarded here, so it never moves a balance.
-        # Reported month m is therefore the state entering month m, which is what
-        # the sale at the horizon is priced against.
-        invested_if_buying.pop()
-        invested_if_investing.pop()
-        basis_if_buying.pop()
-        basis_if_investing.pop()
+        # A consequence worth knowing: the final month's deposit never moves a
+        # balance, because there is no month after it to show it in. Reported
+        # month m is the state entering month m, which is what the sale at the
+        # horizon is priced against.
+        market_account_if_buying = compute_market_account_schedule(
+            opening_balance=0.0,
+            opening_cost_basis=0.0,
+            monthly_deposits=deposits_if_buying,
+            taxable_income_before_dividends_by_year=dividend_tax_bases_if_buying,
+            market_config=self.market_config,
+            tax_module=self.tax_module,
+        )
+        # The investing world opens with everything buying would have cost, all
+        # of it basis: it is money paid in, not gain.
+        market_account_if_investing = compute_market_account_schedule(
+            opening_balance=self.upfront_cost_of_buying,
+            opening_cost_basis=self.upfront_cost_of_buying,
+            monthly_deposits=deposits_if_investing,
+            taxable_income_before_dividends_by_year=dividend_tax_bases_if_investing,
+            market_config=self.market_config,
+            tax_module=self.tax_module,
+        )
 
-        self.invested_if_buying: list[float] = invested_if_buying
-        self.invested_if_investing: list[float] = invested_if_investing
-        self.basis_if_buying: list[float] = basis_if_buying
-        self.basis_if_investing: list[float] = basis_if_investing
+        self.invested_if_buying: list[float] = market_account_if_buying.balances
+        self.invested_if_investing: list[float] = market_account_if_investing.balances
+        self.basis_if_buying: list[float] = market_account_if_buying.cost_bases
+        self.basis_if_investing: list[float] = market_account_if_investing.cost_bases
         self.property_values: list[float] = property_values
         self.equities: list[float] = equities
         self.annual_taxes: list[float] = annual_taxes
-        self.dividend_taxes_if_buying: list[float] = dividend_taxes_if_buying
-        self.dividend_taxes_if_investing: list[float] = dividend_taxes_if_investing
+        self.dividend_taxes_if_buying: list[
+            float
+        ] = market_account_if_buying.dividend_taxes
+        self.dividend_taxes_if_investing: list[
+            float
+        ] = market_account_if_investing.dividend_taxes
         self.after_tax_cash_flows: list[float] = after_tax_cash_flows
         self.buy_surpluses: list[float] = buy_surpluses
 
