@@ -5,6 +5,7 @@ import pytest
 from rent_buy_invest.configs.experiment_config import ExperimentConfig
 from rent_buy_invest.configs.experiment_config_test import TestExperimentConfig
 from rent_buy_invest.configs.market_config import MarketConfig
+from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.calculator import Calculator
 from rent_buy_invest.core.initial_state import InitialState
 from rent_buy_invest.core.mortgage_insurance import PMI_LTV_THRESHOLD
@@ -20,6 +21,30 @@ EXPERIMENT_CONFIG = ExperimentConfig.parse(TestExperimentConfig.TEST_CONFIG_PATH
 PRIMARY_RESIDENCE_EXPERIMENT_CONFIG = ExperimentConfig.parse(
     "rent_buy_invest/core/test_resources/test-primary-residence-experiment-config.yaml"
 )
+
+
+def _calculator(
+    experiment_config: ExperimentConfig = EXPERIMENT_CONFIG,
+    rent_config: RentConfig | None = None,
+    market_config: MarketConfig | None = None,
+) -> Calculator:
+    """A Calculator for ``experiment_config``, optionally with a config swapped out.
+
+    The initial state is built from the same configs as the projection, so a
+    swapped config reaches both and the two cannot disagree.
+    """
+    configs = (
+        experiment_config.buy_config,
+        rent_config if rent_config is not None else experiment_config.rent_config,
+        market_config if market_config is not None else experiment_config.market_config,
+        experiment_config.personal_config,
+    )
+    return Calculator(
+        *configs,
+        experiment_config.num_years,
+        experiment_config.start_date,
+        InitialState.from_configs(*configs),
+    )
 
 
 def _deductible_mortgage_interest_for_the_year(projection, month: int) -> float:
@@ -39,20 +64,7 @@ def _deductible_mortgage_interest_for_the_year(projection, month: int) -> float:
 
 class TestCalculator:
     def test_calculate(self) -> None:
-        calculator = Calculator(
-            EXPERIMENT_CONFIG.buy_config,
-            EXPERIMENT_CONFIG.rent_config,
-            EXPERIMENT_CONFIG.market_config,
-            EXPERIMENT_CONFIG.personal_config,
-            EXPERIMENT_CONFIG.num_years,
-            EXPERIMENT_CONFIG.start_date,
-            InitialState.from_configs(
-                EXPERIMENT_CONFIG.buy_config,
-                EXPERIMENT_CONFIG.rent_config,
-                EXPERIMENT_CONFIG.market_config,
-                EXPERIMENT_CONFIG.personal_config,
-            ),
-        )
+        calculator = _calculator()
 
         # initial state tested separately
         projection = calculator.calculate()
@@ -135,20 +147,7 @@ class TestCalculator:
         is: exactly one of the two surpluses is non-zero each month, and the pair
         is the gap between the two costs.
         """
-        calculator = Calculator(
-            EXPERIMENT_CONFIG.buy_config,
-            EXPERIMENT_CONFIG.rent_config,
-            EXPERIMENT_CONFIG.market_config,
-            EXPERIMENT_CONFIG.personal_config,
-            EXPERIMENT_CONFIG.num_years,
-            EXPERIMENT_CONFIG.start_date,
-            InitialState.from_configs(
-                EXPERIMENT_CONFIG.buy_config,
-                EXPERIMENT_CONFIG.rent_config,
-                EXPERIMENT_CONFIG.market_config,
-                EXPERIMENT_CONFIG.personal_config,
-            ),
-        )
+        calculator = _calculator()
         projection = calculator.calculate()
 
         deduction_savings = projection["Buy"]["Mortgage Interest Deduction Savings"]
@@ -183,20 +182,7 @@ class TestCalculator:
         what buying costs that month, which forces the tie.
         """
         month = 5
-        baseline = Calculator(
-            EXPERIMENT_CONFIG.buy_config,
-            EXPERIMENT_CONFIG.rent_config,
-            EXPERIMENT_CONFIG.market_config,
-            EXPERIMENT_CONFIG.personal_config,
-            EXPERIMENT_CONFIG.num_years,
-            EXPERIMENT_CONFIG.start_date,
-            InitialState.from_configs(
-                EXPERIMENT_CONFIG.buy_config,
-                EXPERIMENT_CONFIG.rent_config,
-                EXPERIMENT_CONFIG.market_config,
-                EXPERIMENT_CONFIG.personal_config,
-            ),
-        ).calculate()
+        baseline = _calculator().calculate()
         # the rent that makes this month's two net costs equal: the gap between
         # them is exactly the pair of surpluses
         rent_costs = list(baseline["Rent"]["Costs Tied to Inflation"])
@@ -209,20 +195,7 @@ class TestCalculator:
         rent_config = deepcopy(EXPERIMENT_CONFIG.rent_config)
         rent_config.get_monthly_costs_of_renting = lambda num_months: rent_costs
 
-        projection = Calculator(
-            EXPERIMENT_CONFIG.buy_config,
-            rent_config,
-            EXPERIMENT_CONFIG.market_config,
-            EXPERIMENT_CONFIG.personal_config,
-            EXPERIMENT_CONFIG.num_years,
-            EXPERIMENT_CONFIG.start_date,
-            InitialState.from_configs(
-                EXPERIMENT_CONFIG.buy_config,
-                rent_config,
-                EXPERIMENT_CONFIG.market_config,
-                EXPERIMENT_CONFIG.personal_config,
-            ),
-        ).calculate()
+        projection = _calculator(rent_config=rent_config).calculate()
 
         assert projection.shape[0] == EXPERIMENT_CONFIG.num_years * MONTHS_PER_YEAR + 1
         assert projection["Rent"]["Surplus"].iloc[month] == 0
@@ -259,20 +232,7 @@ class TestCalculator:
             > MAX_MORTGAGE_BALANCE_ON_WHICH_INTEREST_IS_DEDUCTIBLE
         )
 
-        calculator = Calculator(
-            experiment_config.buy_config,
-            experiment_config.rent_config,
-            experiment_config.market_config,
-            experiment_config.personal_config,
-            experiment_config.num_years,
-            experiment_config.start_date,
-            InitialState.from_configs(
-                experiment_config.buy_config,
-                experiment_config.rent_config,
-                experiment_config.market_config,
-                experiment_config.personal_config,
-            ),
-        )
+        calculator = _calculator(experiment_config)
         projection = calculator.calculate()
 
         num_months = experiment_config.num_years * MONTHS_PER_YEAR
@@ -363,20 +323,7 @@ class TestCalculator:
                 ],
             },
         )
-        calculator = Calculator(
-            experiment_config.buy_config,
-            experiment_config.rent_config,
-            experiment_config.market_config,
-            experiment_config.personal_config,
-            experiment_config.num_years,
-            experiment_config.start_date,
-            InitialState.from_configs(
-                experiment_config.buy_config,
-                experiment_config.rent_config,
-                experiment_config.market_config,
-                experiment_config.personal_config,
-            ),
-        )
+        calculator = _calculator(experiment_config)
         projection = calculator.calculate()
 
         market_config = experiment_config.market_config
@@ -429,20 +376,7 @@ class TestCalculator:
         experiment_config = PRIMARY_RESIDENCE_EXPERIMENT_CONFIG
         assert experiment_config.buy_config.rental_income_config is None
 
-        calculator = Calculator(
-            experiment_config.buy_config,
-            experiment_config.rent_config,
-            experiment_config.market_config,
-            experiment_config.personal_config,
-            experiment_config.num_years,
-            experiment_config.start_date,
-            InitialState.from_configs(
-                experiment_config.buy_config,
-                experiment_config.rent_config,
-                experiment_config.market_config,
-                experiment_config.personal_config,
-            ),
-        )
+        calculator = _calculator(experiment_config)
         projection = calculator.calculate()
 
         assert projection.shape[0] == experiment_config.num_years * MONTHS_PER_YEAR + 1
@@ -488,20 +422,7 @@ def _calculator_with_dividends(
             "long_term_capital_gains_tax_brackets"
         ] = long_term_capital_gains_brackets
     market_config = MarketConfig(**market_kwargs)
-    return Calculator(
-        EXPERIMENT_CONFIG.buy_config,
-        EXPERIMENT_CONFIG.rent_config,
-        market_config,
-        EXPERIMENT_CONFIG.personal_config,
-        EXPERIMENT_CONFIG.num_years,
-        EXPERIMENT_CONFIG.start_date,
-        InitialState.from_configs(
-            EXPERIMENT_CONFIG.buy_config,
-            EXPERIMENT_CONFIG.rent_config,
-            market_config,
-            EXPERIMENT_CONFIG.personal_config,
-        ),
-    )
+    return _calculator(market_config=market_config)
 
 
 class TestCalculatorDividends:
