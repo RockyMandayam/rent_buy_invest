@@ -7,8 +7,20 @@ from rent_buy_invest.utils.data_utils import to_df
 
 @dataclass(frozen=True)
 class FinalState:
+    """What each world is worth after selling up at the horizon, in dollars.
+
+    ``wealth_if_renting`` and ``wealth_if_buying`` are the answer: each world's
+    wealth once everything it holds is sold and the tax on doing so is paid.
+
+    ``tax_if_renting`` and ``tax_if_buying`` are that tax -- the extra tax the
+    sale causes in the year it happens, not a whole year's tax bill. They are
+    already subtracted from the wealth beside them.
+    """
+
     wealth_if_renting: float
     wealth_if_buying: float
+    tax_if_renting: float
+    tax_if_buying: float
 
     def get_df(self) -> pd.DataFrame:
         rows = ["Wealth"]
