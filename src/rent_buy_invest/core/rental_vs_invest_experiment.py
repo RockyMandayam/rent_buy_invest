@@ -121,8 +121,8 @@ class RentalVsInvestExperiment:
         deposits_if_investing: list[float] = []
         # For each tax year, the rest of each world's taxable income, which its
         # dividends are taxed on top of.
-        dividend_tax_bases_if_buying: list[TaxableAmounts] = []
-        dividend_tax_bases_if_investing: list[TaxableAmounts] = []
+        taxable_income_before_dividends_by_year_if_buying: list[TaxableAmounts] = []
+        taxable_income_before_dividends_by_year_if_investing: list[TaxableAmounts] = []
 
         for month in range(num_months + 1):
             # Tax is settled annually, so it lands entirely in the last month of
@@ -150,8 +150,10 @@ class RentalVsInvestExperiment:
                 # Dividends are taxed on top of everything else in the year: in
                 # the buying world that is salary plus the rental's net income; the
                 # investing world owns no property, so it is salary alone.
-                dividend_tax_bases_if_buying.append(salary + rental_income)
-                dividend_tax_bases_if_investing.append(salary)
+                taxable_income_before_dividends_by_year_if_buying.append(
+                    salary + rental_income
+                )
+                taxable_income_before_dividends_by_year_if_investing.append(salary)
             else:
                 annual_tax = 0
             annual_taxes.append(annual_tax)
@@ -193,7 +195,7 @@ class RentalVsInvestExperiment:
             opening_balance=0.0,
             opening_cost_basis=0.0,
             monthly_deposits=deposits_if_buying,
-            taxable_income_before_dividends_by_year=dividend_tax_bases_if_buying,
+            taxable_income_before_dividends_by_year=taxable_income_before_dividends_by_year_if_buying,
             market_config=self.market_config,
             tax_module=self.tax_module,
         )
@@ -203,7 +205,7 @@ class RentalVsInvestExperiment:
             opening_balance=self.upfront_cost_of_buying,
             opening_cost_basis=self.upfront_cost_of_buying,
             monthly_deposits=deposits_if_investing,
-            taxable_income_before_dividends_by_year=dividend_tax_bases_if_investing,
+            taxable_income_before_dividends_by_year=taxable_income_before_dividends_by_year_if_investing,
             market_config=self.market_config,
             tax_module=self.tax_module,
         )

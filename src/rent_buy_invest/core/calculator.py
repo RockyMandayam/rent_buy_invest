@@ -8,6 +8,7 @@ from rent_buy_invest.configs.personal_config import PersonalConfig
 from rent_buy_invest.configs.rent_config import RentConfig
 from rent_buy_invest.core.amortization import compute_loan_amortization_schedule
 from rent_buy_invest.core.initial_state import InitialState
+from rent_buy_invest.core.market_account import compute_market_account_schedule
 from rent_buy_invest.core.mortgage_insurance import compute_mortgage_insurance_schedule
 from rent_buy_invest.core.tax import TaxableAmounts, TaxModule
 from rent_buy_invest.utils.data_utils import to_df
@@ -76,23 +77,10 @@ class Calculator:
         rental_income_taxes = []
         housing_monthly_surpluses = []
         rent_monthly_surpluses = []
-        investment_values_if_renting = [
-            self.initial_state.invested_if_renting
-        ]  # NOTE: first value filled in
-        investment_values_if_buying = [0]  # NOTE: first value filed in
-        # Cost basis: every dollar paid into the account, plus dividends that were
-        # already taxed and stayed invested -- none of which is gain when the
-        # account is cashed out. Seeded and popped the same way as the balances, so
-        # the two cannot fall out of step.
-        invested_cost_bases_if_renting = [self.initial_state.invested_if_renting]
-        invested_cost_bases_if_buying = [0]
-        dividend_taxes_if_renting = []
-        dividend_taxes_if_buying = []
-        # What each account earned since the last year boundary. Dividends are a
-        # share of this, so it has to be accumulated as the year runs rather than
-        # inferred from the balances, which also move on deposits.
-        growth_if_renting_this_year = 0.0
-        growth_if_buying_this_year = 0.0
+        # For each tax year, the rest of each world's taxable income, which its
+        # dividends are taxed on top of.
+        taxable_income_before_dividends_if_renting = []
+        taxable_income_before_dividends_if_buying = []
 
         monthly_mortgage_payment = self.buy_config.get_monthly_mortgage_payment()
         mortgage_amortization_schedule = compute_loan_amortization_schedule(
@@ -114,21 +102,6 @@ class Calculator:
         buy_one_off_costs = mortgage_insurance_schedule.appraisal_costs
 
         for month in range(num_months + 1):
-            # Both accounts grow for the month. This runs before tax because the
-            # year's dividends are a share of this growth.
-            grown_if_renting = self.market_config.get_pretax_monthly_wealth(
-                investment_values_if_renting[-1], 1
-            )[1]
-            grown_if_buying = self.market_config.get_pretax_monthly_wealth(
-                investment_values_if_buying[-1], 1
-            )[1]
-            growth_if_renting_this_year += (
-                grown_if_renting - investment_values_if_renting[-1]
-            )
-            growth_if_buying_this_year += (
-                grown_if_buying - investment_values_if_buying[-1]
-            )
-
             loan_amount = mortgage_amortization_schedule.starting_balances[month]
             mortgage_interest = mortgage_amortization_schedule.interest_payments[month]
             # The year's ordinary-income tax adjustments -- rent received and the
@@ -185,49 +158,18 @@ class Calculator:
                 ).ordinary
                 position = position + mortgage_interest_deduction
 
-                # How much of this year's growth was paid out as dividends. Nothing
-                # is added to the balance here: it already grew at the full market
-                # return, dividends included. What changes is when those dollars
-                # are taxed: now, instead of at the sale.
-                #
-                # Qualified dividends are taxed at the long-term capital gains
-                # rates, and which of those rates applies depends on the rest of
-                # the year's taxable income, which fills the lower brackets first.
-                # For the renter that is salary. For the buyer it is salary, plus
-                # any rental income, less the mortgage interest deduction -- which
-                # is why `position` was advanced past all three above.
-                #
-                # The tax comes out of the balance below. What is left of the
-                # dividends stays invested like any other money, and counts toward
-                # the basis so it is not taxed a second time at the sale.
-                get_dividends = self.market_config.get_dividends_from_growth
-                dividends_if_renting = get_dividends(growth_if_renting_this_year)
-                dividends_if_buying = get_dividends(growth_if_buying_this_year)
-                dividend_tax_if_renting = self.tax_module.extra_tax_from(
-                    month,
-                    TaxableAmounts(ordinary_income=annual_income),
-                    TaxableAmounts(long_term_capital_gains=dividends_if_renting),
-                ).long_term_capital_gain
-                dividend_tax_if_buying = self.tax_module.extra_tax_from(
-                    month,
-                    position,
-                    TaxableAmounts(long_term_capital_gains=dividends_if_buying),
-                ).long_term_capital_gain
-                reinvested_if_renting = round(
-                    dividends_if_renting - dividend_tax_if_renting, 2
+                # Dividends are taxed on top of the rest of the year's taxable
+                # income, which fills the lower brackets first. For the renter that
+                # is salary. For the buyer it is salary, plus any rental income,
+                # less the mortgage interest deduction -- which is why `position`
+                # was advanced past all three above.
+                taxable_income_before_dividends_if_renting.append(
+                    TaxableAmounts(ordinary_income=annual_income)
                 )
-                reinvested_if_buying = round(
-                    dividends_if_buying - dividend_tax_if_buying, 2
-                )
-                growth_if_renting_this_year = 0.0
-                growth_if_buying_this_year = 0.0
+                taxable_income_before_dividends_if_buying.append(position)
             else:
                 rental_income_tax = 0
                 mortgage_interest_deduction_saving = 0
-                dividend_tax_if_renting = dividend_tax_if_buying = 0.0
-                reinvested_if_renting = reinvested_if_buying = 0.0
-            dividend_taxes_if_renting.append(dividend_tax_if_renting)
-            dividend_taxes_if_buying.append(dividend_tax_if_buying)
             mortgage_interest_deduction_savings.append(
                 mortgage_interest_deduction_saving
             )
@@ -238,9 +180,6 @@ class Calculator:
             equities.append(round(home_values[month] - loan_amount, 2))
 
             # monthly surplus from one option vs the other
-            # investment_values_if_renting and investment_values_if_buying have their
-            # start-of-the-month value already filled in, so this calculates the value
-            # at the end of the month.
             # The deduction saving is money the buyer does not send the IRS, so it
             # lands here as a negative cost, in the same year-boundary month the
             # rental income tax beside it lands in. It is zero in every other month.
@@ -270,51 +209,42 @@ class Calculator:
             rent_monthly_surpluses.append(deposit_if_renting)
             housing_monthly_surpluses.append(deposit_if_buying)
 
-            # The dividend tax is paid out of the account, so it lowers the balance
-            # and nothing else. The dividend left after that tax stays invested and
-            # has already been taxed, so it is basis, not gain, when the account is
-            # finally sold.
-            investment_values_if_renting.append(
-                round(
-                    grown_if_renting + deposit_if_renting - dividend_tax_if_renting,
-                    2,
-                )
-            )
-            invested_cost_bases_if_renting.append(
-                round(
-                    invested_cost_bases_if_renting[-1]
-                    + deposit_if_renting
-                    + reinvested_if_renting,
-                    2,
-                )
-            )
-            investment_values_if_buying.append(
-                round(
-                    grown_if_buying + deposit_if_buying - dividend_tax_if_buying,
-                    2,
-                )
-            )
-            invested_cost_bases_if_buying.append(
-                round(
-                    invested_cost_bases_if_buying[-1]
-                    + deposit_if_buying
-                    + reinvested_if_buying,
-                    2,
-                )
-            )
-
             assert loan_amount >= 0, "Loan amount cannot be negative."
-        # Pop last element from lists which have an extra item (starting value)
-        investment_values_if_renting.pop()
-        investment_values_if_buying.pop()
-        invested_cost_bases_if_renting.pop()
-        invested_cost_bases_if_buying.pop()
+
+        # The market accounts are worked out after the loop because nothing above
+        # depends on them: the dividend tax is paid out of each account, never out
+        # of the housing costs that decide the surplus. Each month's surplus is the
+        # cheaper world's deposit, and the dearer world deposits nothing.
+        #
+        # The renting world opens with everything buying would have cost up front,
+        # all of it basis: it is money paid in, not gain. The buying world opens
+        # empty, its money having gone into the home.
+        market_account_if_renting = compute_market_account_schedule(
+            opening_balance=self.initial_state.invested_if_renting,
+            opening_cost_basis=self.initial_state.invested_if_renting,
+            monthly_deposits=rent_monthly_surpluses,
+            taxable_income_before_dividends_by_year=(
+                taxable_income_before_dividends_if_renting
+            ),
+            market_config=self.market_config,
+            tax_module=self.tax_module,
+        )
+        market_account_if_buying = compute_market_account_schedule(
+            opening_balance=0.0,
+            opening_cost_basis=0.0,
+            monthly_deposits=housing_monthly_surpluses,
+            taxable_income_before_dividends_by_year=(
+                taxable_income_before_dividends_if_buying
+            ),
+            market_config=self.market_config,
+            tax_module=self.tax_module,
+        )
 
         # RELIES on the fact that python dictionaries are now ordered
         cols = {
             # Buy: state
-            "Buy: Invested (Pre-Tax)": investment_values_if_buying,
-            "Buy: Invested Cost Basis": invested_cost_bases_if_buying,
+            "Buy: Invested (Pre-Tax)": market_account_if_buying.balances,
+            "Buy: Invested Cost Basis": market_account_if_buying.cost_bases,
             "Buy: Home Equity": equities,
             "Buy: Home Value": home_values,
             "Buy: Loan Amount": mortgage_amortization_schedule.starting_balances,
@@ -334,15 +264,15 @@ class Calculator:
             # TODO rental income's effect on your taxable income and therefore brackets and deductions savings
             "Buy: Rental Income (Pre-Tax)": home_monthly_rental_incomes,
             "Buy: Tax on Rental Income": rental_income_taxes,
-            "Buy: Dividend Tax": dividend_taxes_if_buying,
+            "Buy: Dividend Tax": market_account_if_buying.dividend_taxes,
             # Buy: relative surplus
             "Buy: Surplus": housing_monthly_surpluses,
             # Rent: state
-            "Rent: Invested (Pre-Tax)": investment_values_if_renting,
-            "Rent: Invested Cost Basis": invested_cost_bases_if_renting,
+            "Rent: Invested (Pre-Tax)": market_account_if_renting.balances,
+            "Rent: Invested Cost Basis": market_account_if_renting.cost_bases,
             # Rent: costs
             "Rent: Costs Tied to Inflation": rent_monthly_costs,
-            "Rent: Dividend Tax": dividend_taxes_if_renting,
+            "Rent: Dividend Tax": market_account_if_renting.dividend_taxes,
             # Rent: relative surplus
             "Rent: Surplus": rent_monthly_surpluses,
         }
