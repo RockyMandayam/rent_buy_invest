@@ -568,7 +568,8 @@ class BuyConfig(Config):
             + self.title_courier_fee
             # fmt: on
             + self.buyer_attorney_fee
-            + self.owners_title_insurance_fraction * self.initial_loan_amount
+            # priced on the price, not the loan: it insures the whole property
+            + self.owners_title_insurance_fraction * self.purchase_price
             + self.survey_fee
             + self.notary_fee
         )

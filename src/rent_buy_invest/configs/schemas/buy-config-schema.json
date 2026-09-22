@@ -152,7 +152,7 @@
       "type": "number"
     },
     "owners_title_insurance_fraction": {
-      "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.",
+      "description": "Owner's title insurance (which protects the owner (you!)) as a fraction of the purchase price (NOT the loan amount). It insures your ownership of the whole property, so it is priced on what you paid for it -- unlike lender's title insurance, which only protects the lender's loan and so is priced on the loan amount. Apparently there is a wide range of typical values here. This counts toward the cost basis.",
       "type": "number"
     },
     "endorsement_fees": {

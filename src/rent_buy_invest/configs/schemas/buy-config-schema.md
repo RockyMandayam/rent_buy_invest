@@ -41,7 +41,7 @@
 - **`buyer_attorney_fee`** *(number, required)*: Buyer's attorney fee.
 - **`seller_attorney_fee`** *(number, required)*: Seller's attorney fee.
 - **`lenders_title_insurance_fraction`** *(number, required)*: Lender's title insurance (which protects the lender) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
-- **`owners_title_insurance_fraction`** *(number, required)*: Owner's title insurance (which protects the owner (you!)) as a fraction of the loan amount. Apparently there is a wide range of typical values here.
+- **`owners_title_insurance_fraction`** *(number, required)*: Owner's title insurance (which protects the owner (you!)) as a fraction of the purchase price (NOT the loan amount). It insures your ownership of the whole property, so it is priced on what you paid for it -- unlike lender's title insurance, which only protects the lender's loan and so is priced on the loan amount. Apparently there is a wide range of typical values here. This counts toward the cost basis.
 - **`endorsement_fees`** *(number, required)*: Endorsement fees are for add-ons ('endorsements') that are not included in a standard title insurance (e.g., Easements And Encroachments, Zoning). A typical price per-endorsement is about $75. Enter the total amount you expect for all endorsements.
 - **`closing_protection_letter_fee`** *(number, required)*: The closing protection letter (CPL) fee.
 - **`survey_fee`** *(number, required)*: Survey fee, which surveys the boundaries of the property. This is often loosely considered part of 'settlement fees'.
