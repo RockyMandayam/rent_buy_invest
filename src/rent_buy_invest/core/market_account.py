@@ -60,11 +60,11 @@ def compute_market_account_schedule(
             deposit made in month ``m`` is first seen in ``balances[m + 1]``, so
             the last month's deposit never appears in the result: there is no
             month after it to show it in.
-        dividend_tax_bases: for each tax year in order, the rest of that year's
-            taxable income, which the dividends are taxed on top of. Which
-            long-term capital gains rate applies depends on it, because the rest
-            of the year's income fills the lower brackets first. One per year
-            that ends inside the projection.
+        taxable_income_before_dividends_by_year: for each tax year in order, the
+            rest of that year's taxable income, which the dividends are taxed on
+            top of. Which long-term capital gains rate applies depends on it,
+            because the rest of the year's income fills the lower brackets first.
+            One per year that ends inside the projection.
         market_config: the market's return, and how much of it is dividends.
         tax_module: prices the dividend tax.
     """
